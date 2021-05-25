@@ -893,4 +893,11 @@ config  TOUCHSCREEN_COASIA
        tristate  "COASIA touchscreen driver"
        help
           COASIA touchscreen driver
+
+config  TOUCHSCREEN_GSLX680
+       tristate  "gslX680 touchscreen driver"      
+       depends on INPUT && I2C
+       default m
+       help
+         gsl1680,gsl2680,gsl3680 touchscreen driver
 endif
