@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_SECURITY_H_
 #define __RTW_SECURITY_H_
 
@@ -61,7 +77,7 @@ union pn48	{
 
 	u64	val;
 
-#ifdef __LITTLE_ENDIAN
+#ifdef CONFIG_LITTLE_ENDIAN
 
 struct {
 	u8 TSC0;
@@ -74,7 +90,7 @@ struct {
 	u8 TSC7;
 } _byte_;
 
-#else
+#elif defined(CONFIG_BIG_ENDIAN)
 
 struct {
 	u8 TSC7;
@@ -159,7 +175,7 @@ struct security_priv {
 	u8	binstallBIPkey;
 #endif /* CONFIG_IEEE80211W */
 	u8	busetkipkey;
-	/* struct timer_list tkip_timer; */
+	/* _timer tkip_timer; */
 	u8	bcheck_grpkey;
 	u8	bgrpkey_handshake;
 
@@ -168,7 +184,7 @@ struct security_priv {
 	s32	sw_encrypt;/* from registry_priv */
 	s32	sw_decrypt;/* from registry_priv */
 
-	s32 	hw_decrypted;/* if the rx packets is hw_decrypted==false, it means the hw has not been ready. */
+	s32 	hw_decrypted;/* if the rx packets is hw_decrypted==_FALSE, it means the hw has not been ready. */
 
 
 	/* keeps the auth_type & enc_status from upper layer ioctl(wpa_supplicant or wzc) */
@@ -176,6 +192,9 @@ struct security_priv {
 	u32 ndisencryptstatus;	/* NDIS_802_11_ENCRYPTION_STATUS */
 
 	NDIS_802_11_WEP ndiswep;
+#ifdef PLATFORM_WINDOWS
+	u8 KeyMaterial[16];/* variable length depending on above field. */
+#endif
 
 	u8 assoc_info[600];
 	u8 szofcapability[256]; /* for wpa2 usage */
@@ -227,7 +246,7 @@ struct security_priv {
 #endif /* DBG_SW_SEC_CNT */
 };
 
-struct sha256_state_rtk {
+struct sha256_state {
 	u64 length;
 	u32 state[8], curlen;
 	u8 buf[64];
@@ -453,7 +472,7 @@ void rtw_wep_decrypt(_adapter *padapter, u8  *precvframe);
 u32	rtw_BIP_verify(_adapter *padapter, u8 *precvframe);
 #endif /* CONFIG_IEEE80211W */
 #ifdef CONFIG_TDLS
-void wpa_tdls_generate_tpk(_adapter *padapter, void * sta);
+void wpa_tdls_generate_tpk(_adapter *padapter, PVOID sta);
 int wpa_tdls_ftie_mic(u8 *kck, u8 trans_seq,
 			u8 *lnkid, u8 *rsnie, u8 *timeoutie, u8 *ftie,
 			u8 *mic);

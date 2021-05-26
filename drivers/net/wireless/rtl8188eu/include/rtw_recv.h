@@ -1,22 +1,59 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2012 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef _RTW_RECV_H_
 #define _RTW_RECV_H_
 
-#ifdef CONFIG_SINGLE_RECV_BUF
-	#define NR_RECVBUFF (1)
-#else
-		#define NR_RECVBUFF (8)
-#endif /* CONFIG_SINGLE_RECV_BUF */
-#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
-	#define NR_PREALLOC_RECV_SKB (rtw_rtkm_get_nr_recv_skb()>>1)
-#else /*!CONFIG_PREALLOC_RX_SKB_BUFFER */
-	#define NR_PREALLOC_RECV_SKB 8
-#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
+#ifdef PLATFORM_OS_XP
+	#ifdef CONFIG_SDIO_HCI
+		#define NR_RECVBUFF 1024/* 512 */ /* 128 */
+	#else
+		#define NR_RECVBUFF (16)
+	#endif
+#elif defined(PLATFORM_OS_CE)
+	#ifdef CONFIG_SDIO_HCI
+		#define NR_RECVBUFF (128)
+	#else
+		#define NR_RECVBUFF (4)
+	#endif
+#else /* PLATFORM_LINUX /PLATFORM_BSD */
 
-#ifdef CONFIG_RTW_NAPI
-	#define RTL_NAPI_WEIGHT (32)
+	#ifdef CONFIG_SINGLE_RECV_BUF
+		#define NR_RECVBUFF (1)
+	#else
+		#if defined(CONFIG_GSPI_HCI)
+			#define NR_RECVBUFF (32)
+		#elif defined(CONFIG_SDIO_HCI)
+			#define NR_RECVBUFF (8)
+		#else
+			#define NR_RECVBUFF (8)
+		#endif
+	#endif /* CONFIG_SINGLE_RECV_BUF */
+	#ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
+		#define NR_PREALLOC_RECV_SKB (rtw_rtkm_get_nr_recv_skb()>>1)
+	#else /*!CONFIG_PREALLOC_RX_SKB_BUFFER */
+		#define NR_PREALLOC_RECV_SKB 8
+	#endif /* CONFIG_PREALLOC_RX_SKB_BUFFER */
+
+	#ifdef CONFIG_RTW_NAPI
+		#define RTL_NAPI_WEIGHT (32)
+	#endif
 #endif
 
 #define NR_RECVFRAME 256
@@ -65,14 +102,33 @@ struct recv_reorder_ctrl {
 	u8 wsize_b;
 	u8 ampdu_size;
 	_queue pending_recvframe_queue;
-	struct timer_list reordering_ctrl_timer;
+	_timer reordering_ctrl_timer;
 	u8 bReorderWaiting;
 };
 
 struct	stainfo_rxcache	{
 	u16	tid_rxseq[16];
 	u8 iv[16][8];
+#if 0
+	unsigned short	tid0_rxseq;
+	unsigned short	tid1_rxseq;
+	unsigned short	tid2_rxseq;
+	unsigned short	tid3_rxseq;
+	unsigned short	tid4_rxseq;
+	unsigned short	tid5_rxseq;
+	unsigned short	tid6_rxseq;
+	unsigned short	tid7_rxseq;
+	unsigned short	tid8_rxseq;
+	unsigned short	tid9_rxseq;
+	unsigned short	tid10_rxseq;
+	unsigned short	tid11_rxseq;
+	unsigned short	tid12_rxseq;
+	unsigned short	tid13_rxseq;
+	unsigned short	tid14_rxseq;
+	unsigned short	tid15_rxseq;
+#endif
 };
+
 
 struct smooth_rssi_data {
 	u32	elements[100];	/* array to store values */
@@ -87,6 +143,40 @@ struct signal_stat {
 	u32	total_num;		/* num of valid elements */
 	u32	total_val;		/* sum of valid elements	 */
 };
+#if 0
+typedef struct _ODM_Phy_Status_Info_ {
+	/* */
+	/*  Be care, if you want to add any element please insert between */
+	/*  RxPWDBAll & SignalStrength. */
+	/* */
+#if (DM_ODM_SUPPORT_TYPE &  (ODM_WIN))
+	u4Byte		RxPWDBAll;
+#else
+	u1Byte		RxPWDBAll;
+#endif
+
+	u1Byte		SignalQuality;	 		/*  in 0-100 index. */
+	s1Byte		RxMIMOSignalQuality[4];	/* per-path's EVM */
+	u1Byte		RxMIMOEVMdbm[4]; 		/* per-path's EVM dbm */
+
+	u1Byte		RxMIMOSignalStrength[4];/*  in 0~100 index */
+
+	u2Byte		Cfo_short[4]; 			/*  per-path's Cfo_short */
+	u2Byte		Cfo_tail[4];			/*  per-path's Cfo_tail */
+
+#if (DM_ODM_SUPPORT_TYPE &  (ODM_WIN|ODM_CE))
+	s1Byte		RxPower;				/*  in dBm Translate from PWdB */
+	s1Byte		RecvSignalPower;		/*  Real power in dBm for this packet, no beautification and aggregation. Keep this raw info to be used for the other procedures. */
+	u1Byte		BTRxRSSIPercentage;
+	u1Byte		SignalStrength; 		/*  in 0-100 index. */
+
+	u1Byte		RxPwr[4];				/* per-path's pwdb */
+#endif
+	u1Byte		RxSNR[4];				/* per-path's SNR	 */
+	u1Byte		BandWidth;
+	u1Byte		btCoexPwrAdjust;
+} ODM_PHY_INFO_T, *PODM_PHY_INFO_T;
+#endif
 
 struct phy_info {
 	u8			RxPWDBAll;
@@ -102,8 +192,19 @@ struct phy_info {
 	u8			SignalStrength;				/* in 0-100 index. */
 	s8			RxPwr[4];					/* per-path's pwdb */
 	s8			RxSNR[4];
+#if ((RTL8822B_SUPPORT == 1) || (RTL8723D_SUPPORT == 1) || (RTL8821C_SUPPORT == 1))
+	u8			RxCount:2;
+	u8			BandWidth:2;
+	u8			rxsc:4;
+#else
 	u8			BandWidth;
+#endif
 	u8			btCoexPwrAdjust;
+#if ((RTL8822B_SUPPORT == 1) || (RTL8723D_SUPPORT == 1) || (RTL8821C_SUPPORT == 1))
+	u8			channel;						/* channel number---*/
+	BOOLEAN		bMuPacket;					/* is MU packet or not---*/
+	BOOLEAN		bBeamformed;
+#endif
 };
 
 struct rx_raw_rssi {
@@ -118,8 +219,9 @@ struct rx_raw_rssi {
 	u8 ofdm_snr[4];
 };
 
+
 struct rx_pkt_attrib	{
-	__le16	pkt_len;
+	u16	pkt_len;
 	u8	physt;
 	u8	drvinfo_sz;
 	u8	shift_sz;
@@ -130,7 +232,7 @@ struct rx_pkt_attrib	{
 	u8	priority;
 	u8	pw_save;
 	u8	mdata;
-	__le16	seq_num;
+	u16	seq_num;
 	u8	frag_num;
 	u8	mfrag;
 	u8	order;
@@ -142,7 +244,7 @@ struct rx_pkt_attrib	{
 	u8	crc_err;
 	u8	icv_err;
 
-	__le16	eth_type;
+	u16	eth_type;
 
 	u8	dst[ETH_ALEN];
 	u8	src[ETH_ALEN];
@@ -166,9 +268,16 @@ struct rx_pkt_attrib	{
 	u8	ldpc;
 	u8	sgi;
 	u8	pkt_rpt_type;
-	__le32 tsfl;
-	__le32	MacIDValidEntry[2];	/* 64 bits present 64 entry. */
+	u32 tsfl;
+	u32	MacIDValidEntry[2];	/* 64 bits present 64 entry. */
 
+#if 0
+	u8	signal_qual;
+	s8	rx_mimo_signal_qual[2];
+	u8	signal_strength;
+	u32	RxPWDBAll;
+	s32	RecvSignalPower;
+#endif
 	struct phy_info phy_info;
 };
 
@@ -184,6 +293,8 @@ struct rx_pkt_attrib	{
 
 #ifdef CONFIG_TRX_BD_ARCH
 	#define RX_WIFI_INFO_SIZE	24
+#elif (defined(CONFIG_RTL8192E) || defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B)) && defined(CONFIG_PCI_HCI)
+	#define RXBD_SIZE	sizeof(struct recv_stat)
 #endif
 
 #define RXDESC_SIZE	24
@@ -204,21 +315,52 @@ struct recv_stat {
 };
 #else
 struct recv_stat {
-	__le32 rxdw0;
-	__le32 rxdw1;
-	__le32 rxdw2;
-	__le32 rxdw3;
+	unsigned int rxdw0;
+
+	unsigned int rxdw1;
+
+#if !((defined(CONFIG_RTL8192E) || defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)) && defined(CONFIG_PCI_HCI))  /* exclude 8192ee, 8814ae, 8822be, 8821ce */
+	unsigned int rxdw2;
+
+	unsigned int rxdw3;
+#endif
 
 #ifndef BUF_DESC_ARCH
-	__le32 rxdw4;
+	unsigned int rxdw4;
 
-	__le32 rxdw5;
+	unsigned int rxdw5;
 
+#ifdef CONFIG_PCI_HCI
+	unsigned int rxdw6;
+
+	unsigned int rxdw7;
+#endif
 #endif /* if BUF_DESC_ARCH is defined, rx_buf_desc occupy 4 double words */
 };
 #endif
 
 #define EOR BIT(30)
+
+#ifdef CONFIG_PCI_HCI
+#define PCI_MAX_RX_QUEUE		1/* MSDU packet queue, Rx Command Queue */
+#define PCI_MAX_RX_COUNT		128
+#ifdef CONFIG_TRX_BD_ARCH
+#define RX_BD_NUM				PCI_MAX_RX_COUNT	/* alias */
+#endif
+
+struct rtw_rx_ring {
+#ifdef CONFIG_TRX_BD_ARCH
+	struct rx_buf_desc	*buf_desc;
+#else
+	struct recv_stat	*desc;
+#endif
+	dma_addr_t		dma;
+	unsigned int		idx;
+	struct sk_buff	*rx_buf[PCI_MAX_RX_COUNT];
+};
+#endif
+
+
 
 /*
 accesser of recv_priv: rtw_recv_entry(dispatch / passive level); recv_thread(passive) ; returnpkt(dispatch)
@@ -247,6 +389,18 @@ struct recv_priv {
 
 	_adapter	*adapter;
 
+#ifdef PLATFORM_WINDOWS
+	_nic_hdl  RxPktPoolHdl;
+	_nic_hdl  RxBufPoolHdl;
+
+#ifdef PLATFORM_OS_XP
+	PMDL	pbytecnt_mdl;
+#endif
+	uint	counter; /* record the number that up-layer will return to drv; only when counter==0 can we  release recv_priv */
+	NDIS_EVENT	recv_resource_evt ;
+#endif
+
+
 	u32 is_any_non_be_pkts;
 
 	u64	rx_bytes;
@@ -258,19 +412,29 @@ struct recv_priv {
 	uint  rx_smallpacket_crcerr;
 	uint  rx_middlepacket_crcerr;
 
+#ifdef CONFIG_USB_HCI
 	/* u8 *pallocated_urb_buf; */
 	_sema allrxreturnevt;
 	uint	ff_hwaddr;
 	ATOMIC_T	rx_pending_cnt;
 
 #ifdef CONFIG_USB_INTERRUPT_IN_PIPE
+#ifdef PLATFORM_LINUX
 	PURB	int_in_urb;
+#endif
 
 	u8	*int_in_buf;
 #endif /* CONFIG_USB_INTERRUPT_IN_PIPE */
 
+#endif
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD)
+#ifdef PLATFORM_FREEBSD
+	struct task irq_prepare_beacon_tasklet;
+	struct task recv_tasklet;
+#else /* PLATFORM_FREEBSD */
 	struct tasklet_struct irq_prepare_beacon_tasklet;
 	struct tasklet_struct recv_tasklet;
+#endif /* PLATFORM_FREEBSD */
 	struct sk_buff_head free_recv_skb_queue;
 	struct sk_buff_head rx_skb_queue;
 #ifdef CONFIG_RTW_NAPI
@@ -281,12 +445,23 @@ struct recv_priv {
 	struct ifqueue rx_indicate_queue;
 #endif /* CONFIG_RX_INDICATE_QUEUE */
 
+#endif /* defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD) */
+
 	u8 *pallocated_recv_buf;
 	u8 *precv_buf;    /* 4 alignment */
 	_queue	free_recv_buf_queue;
 	u32	free_recv_buf_queue_cnt;
 
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI) || defined(CONFIG_USB_HCI)
 	_queue	recv_buf_pending_queue;
+#endif
+
+#ifdef CONFIG_PCI_HCI
+	/* Rx */
+	struct rtw_rx_ring	rx_ring[PCI_MAX_RX_QUEUE];
+	int rxringcount;	/* size should be PCI_MAX_RX_QUEUE */
+	u16	rxbuffersize;
+#endif
 
 	/* For display the phy informatiom */
 	u8 is_signal_dbg;	/* for debug */
@@ -304,7 +479,7 @@ struct recv_priv {
 
 
 #ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
-	struct timer_list signal_stat_timer;
+	_timer signal_stat_timer;
 	u32 signal_stat_sampling_interval;
 	/* u32 signal_stat_converging_constant; */
 	struct signal_stat signal_qual_data;
@@ -315,7 +490,7 @@ struct recv_priv {
 #endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 	u16 sink_udpport, pre_rtp_rxseq, cur_rtp_rxseq;
 
-	bool store_law_data_flag;
+	BOOLEAN store_law_data_flag;
 };
 
 #ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
@@ -357,14 +532,33 @@ struct recv_buf {
 	u8	*ptail;
 	u8	*pend;
 
+#ifdef CONFIG_USB_HCI
+
+#if defined(PLATFORM_OS_XP) || defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD)
 	PURB	purb;
 	dma_addr_t dma_transfer_addr;	/* (in) dma addr for transfer_buffer */
 	u32 alloc_sz;
+#endif
+
+#ifdef PLATFORM_OS_XP
+	PIRP		pirp;
+#endif
+
+#ifdef PLATFORM_OS_CE
+	USB_TRANSFER	usb_transfer_read_port;
+#endif
 
 	u8  irp_pending;
 	int  transfer_len;
 
+#endif
+
+#ifdef PLATFORM_LINUX
 	_pkt	*pskb;
+#endif
+#ifdef PLATFORM_FREEBSD /* skb solution */
+	struct sk_buff *pskb;
+#endif /* PLATFORM_FREEBSD */ /* skb solution */
 };
 
 
@@ -553,14 +747,17 @@ __inline static u8 *recvframe_pull(union recv_frame *precvframe, sint sz)
 
 }
 
-__inline static u8 *recvframe_put(union recv_frame *precvframe, __le16 le_sz)
+__inline static u8 *recvframe_put(union recv_frame *precvframe, sint sz)
 {
-	s16 sz = le16_to_cpu(le_sz);
+	/* rx_tai += sz; move rx_tail sz bytes  hereafter */
+
 	/* used for append sz bytes from ptr to rx_tail, update rx_tail and return the updated rx_tail to the caller */
 	/* after putting, rx_tail must be still larger than rx_end. */
 	unsigned char *prev_rx_tail;
 
-	if (!precvframe)
+	/* RTW_INFO("recvframe_put: len=%d\n", sz); */
+
+	if (precvframe == NULL)
 		return NULL;
 
 	prev_rx_tail = precvframe->u.hdr.rx_tail;
@@ -575,6 +772,7 @@ __inline static u8 *recvframe_put(union recv_frame *precvframe, __le16 le_sz)
 	precvframe->u.hdr.len += sz;
 
 	return precvframe->u.hdr.rx_tail;
+
 }
 
 
@@ -610,6 +808,9 @@ __inline static _buffer *get_rxbuf_desc(union recv_frame *precvframe)
 
 	if (precvframe == NULL)
 		return NULL;
+#ifdef PLATFORM_WINDOWS
+	NdisQueryPacket(precvframe->u.hdr.pkt, NULL, NULL, &buf_desc, NULL);
+#endif
 
 	return buf_desc;
 }
@@ -630,6 +831,13 @@ __inline static union recv_frame *pkt_to_recvframe(_pkt *pkt)
 
 	u8 *buf_star;
 	union recv_frame *precv_frame;
+#ifdef PLATFORM_WINDOWS
+	_buffer *buf_desc;
+	uint len;
+
+	NdisQueryPacket(pkt, NULL, NULL, &buf_desc, &len);
+	NdisQueryBufferSafe(buf_desc, &buf_star, &len, HighPagePriority);
+#endif
 	precv_frame = rxmem_to_recvframe((unsigned char *)buf_star);
 
 	return precv_frame;

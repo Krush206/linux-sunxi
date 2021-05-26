@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_BEAMFORMING_H_
 #define __RTW_BEAMFORMING_H_
 
@@ -77,7 +93,7 @@ enum _SOUNDING_STATE {
 };
 
 struct beamformee_entry {
-	u8 used;	/* true/false */
+	u8 used;	/* _TRUE/_FALSE */
 	u8 txbf;
 	u8 sounding;
 	/* Used to construct AID field of NDPA packet */
@@ -127,7 +143,7 @@ struct beamformee_entry {
 	u8 user_position[16];
 
 	/* For 8822B C-cut workaround */
-	/* If the flag set to true, do not sound this STA */
+	/* If the flag set to _TRUE, do not sound this STA */
 	u8 bSuspendSUCap;
 };
 
@@ -200,9 +216,9 @@ struct beamforming_info {
 
 	struct sounding_info sounding_info;
 	/* schedule regular timer for sounding */
-	struct timer_list sounding_timer;
+	_timer sounding_timer;
 	/* moniter if soudning too long */
-	struct timer_list sounding_timeout_timer;
+	_timer sounding_timeout_timer;
 
 	/* For HW configuration */
 	u8 SetHalBFEnterOnDemandCnt;
@@ -294,8 +310,8 @@ typedef enum _SOUNDING_MODE {
 } SOUNDING_MODE, *PSOUNDING_MODE;
 
 struct beamforming_entry {
-	bool	bUsed;
-	bool	bSound;
+	BOOLEAN	bUsed;
+	BOOLEAN	bSound;
 	u16	aid;			/* Used to construct AID field of NDPA packet. */
 	u16	mac_id;		/* Used to Set Reg42C in IBSS mode. */
 	u16	p_aid;		/* Used to fill Reg42C & Reg714 to compare with P_AID of Tx DESC. */
@@ -314,7 +330,7 @@ struct beamforming_entry {
 	u8	LogStatusFailCnt;
 	u8	PreCsiReport[327];
 	u8	DefaultCsiCnt;
-	bool	bDefaultCSI;
+	BOOLEAN	bDefaultCSI;
 };
 
 struct sounding_info {
@@ -340,14 +356,14 @@ struct rtw_ndpa_sta_info {
 	u16	nc_index:3;
 };
 
-BEAMFORMING_CAP beamforming_get_entry_beam_cap_by_mac_id(void * pmlmepriv , u8 mac_id);
+BEAMFORMING_CAP beamforming_get_entry_beam_cap_by_mac_id(PVOID pmlmepriv , u8 mac_id);
 void	beamforming_notify(PADAPTER adapter);
 BEAMFORMING_CAP beamforming_get_beamform_cap(struct beamforming_info	*pBeamInfo);
 
-bool	beamforming_send_ht_ndpa_packet(PADAPTER Adapter, u8 *ra, CHANNEL_WIDTH bw, u8 qidx);
-bool	beamforming_send_vht_ndpa_packet(PADAPTER Adapter, u8 *ra, u16 aid, CHANNEL_WIDTH bw, u8 qidx);
+BOOLEAN	beamforming_send_ht_ndpa_packet(PADAPTER Adapter, u8 *ra, CHANNEL_WIDTH bw, u8 qidx);
+BOOLEAN	beamforming_send_vht_ndpa_packet(PADAPTER Adapter, u8 *ra, u16 aid, CHANNEL_WIDTH bw, u8 qidx);
 
-void	beamforming_check_sounding_success(PADAPTER Adapter, bool status);
+void	beamforming_check_sounding_success(PADAPTER Adapter, BOOLEAN status);
 
 void	beamforming_watchdog(PADAPTER Adapter);
 #endif /*#if (BEAMFORMING_SUPPORT ==0)- for diver defined beamforming*/

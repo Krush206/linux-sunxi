@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef __RTW_BT_MP_H
 #define __RTW_BT_MP_H
@@ -26,16 +42,16 @@ typedef enum _MP_BT_MODE {
 
 /* definition for BT_UP_OP_BT_SET_TX_RX_PARAMETER */
 typedef struct _BT_TXRX_PARAMETERS {
-	u8		txrxChannel;
-	u32		txrxTxPktCnt;
-	u8		txrxTxPktInterval;
-	u8		txrxPayloadType;
-	u8		txrxPktType;
-	u16		txrxPayloadLen;
-	u32		txrxPktHeader;
-	u8		txrxWhitenCoeff;
-	u8		txrxBdaddr[6];
-	u8		txrxTxGainIndex;
+	u1Byte		txrxChannel;
+	u4Byte		txrxTxPktCnt;
+	u1Byte		txrxTxPktInterval;
+	u1Byte		txrxPayloadType;
+	u1Byte		txrxPktType;
+	u2Byte		txrxPayloadLen;
+	u4Byte		txrxPktHeader;
+	u1Byte		txrxWhitenCoeff;
+	u1Byte		txrxBdaddr[6];
+	u1Byte		txrxTxGainIndex;
 } BT_TXRX_PARAMETERS, *PBT_TXRX_PARAMETERS;
 
 /* txrxPktType */
@@ -149,71 +165,71 @@ typedef enum _BT_REPORT_TYPE {
 	BT_REPORT_MAX
 } BT_REPORT_TYPE, *PBT_REPORT_TYPE;
 
-void
+VOID
 MPTBT_Test(
 	IN	PADAPTER	Adapter,
-	IN	u8		opCode,
-	IN	u8		byte1,
-	IN	u8		byte2,
-	IN	u8		byte3
+	IN	u1Byte		opCode,
+	IN	u1Byte		byte1,
+	IN	u1Byte		byte2,
+	IN	u1Byte		byte3
 );
 
 NDIS_STATUS
 MPTBT_SendOidBT(
 	IN	PADAPTER		pAdapter,
-	IN	void *			InformationBuffer,
-	IN	u32			InformationBufferLength,
-	OUT	u32 *			BytesRead,
-	OUT	u32 *			BytesNeeded
+	IN	PVOID			InformationBuffer,
+	IN	ULONG			InformationBufferLength,
+	OUT	PULONG			BytesRead,
+	OUT	PULONG			BytesNeeded
 );
 
-void
+VOID
 MPTBT_FwC2hBtMpCtrl(
 	PADAPTER	Adapter,
-	u8 *	tmpBuf,
-	u8		length
+	pu1Byte	tmpBuf,
+	u1Byte		length
 );
 
 void MPh2c_timeout_handle(void *FunctionContext);
 
-void mptbt_BtControlProcess(
+VOID mptbt_BtControlProcess(
 	PADAPTER	Adapter,
-	void *		pInBuf
+	PVOID		pInBuf
 );
 
 #define	BT_H2C_MAX_RETRY								1
 #define	BT_MAX_C2H_LEN								20
 
 typedef struct _BT_REQ_CMD {
-	u8       opCodeVer;
-	u8       OpCode;
-	u16      paraLength;
-	u8       pParamStart[100];
+	UCHAR       opCodeVer;
+	UCHAR       OpCode;
+	USHORT      paraLength;
+	UCHAR       pParamStart[100];
 } BT_REQ_CMD, *PBT_REQ_CMD;
 
 typedef struct _BT_RSP_CMD {
-	u16      status;
-	u16      paraLength;
-	u8       pParamStart[100];
+	USHORT      status;
+	USHORT      paraLength;
+	UCHAR       pParamStart[100];
 } BT_RSP_CMD, *PBT_RSP_CMD;
 
 
 typedef struct _BT_H2C {
-	u8	opCodeVer:4;
-	u8	reqNum:4;
-	u8	opCode;
-	u8	buf[100];
+	u1Byte	opCodeVer:4;
+	u1Byte	reqNum:4;
+	u1Byte	opCode;
+	u1Byte	buf[100];
 } BT_H2C, *PBT_H2C;
 
 
 
 typedef struct _BT_EXT_C2H {
-	u8	extendId;
-	u8	statusCode:4;
-	u8	retLen:4;
-	u8	opCodeVer:4;
-	u8	reqNum:4;
-	u8	buf[100];
+	u1Byte	extendId;
+	u1Byte	statusCode:4;
+	u1Byte	retLen:4;
+	u1Byte	opCodeVer:4;
+	u1Byte	reqNum:4;
+	u1Byte	buf[100];
 } BT_EXT_C2H, *PBT_EXT_C2H;
 
 

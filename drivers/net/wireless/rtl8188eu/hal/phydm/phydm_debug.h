@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 
 #ifndef	__ODM_DBG_H__
@@ -114,9 +130,19 @@
 
 #define	config_phydm_read_txagc_check(data)		(data != INVALID_TXAGC_DATA)
 
-#define dbg_print	printk
-#define RT_PRINTK(fmt, args...)	dbg_print("%s(): " fmt, __func__, ## args);
-#define	RT_DISP(dbgtype, dbgflag, printstr)
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+	#define	dbg_print				DbgPrint
+	#define	dcmd_printf				DCMD_Printf
+	#define	dcmd_scanf				DCMD_Scanf
+	#define RT_PRINTK				dbg_print
+#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
+	#define dbg_print	printk
+	#define RT_PRINTK(fmt, args...)	dbg_print("%s(): " fmt, __FUNCTION__, ## args);
+	#define	RT_DISP(dbgtype, dbgflag, printstr)
+#else
+	#define dbg_print	panic_printk
+	#define RT_PRINTK(fmt, args...)	dbg_print("%s(): " fmt, __FUNCTION__, ## args);
+#endif
 
 #ifndef ASSERT
 	#define ASSERT(expr)
@@ -158,15 +184,15 @@
 #define ODM_RT_ASSERT(p_dm_odm, expr, fmt)											 do {\
 		if (!(expr)) {																	\
 			dbg_print("Assertion failed! %s at ......\n", #expr);								\
-			dbg_print("      ......%s,%s, line=%d\n", __FILE__, __func__, __LINE__);			\
+			dbg_print("      ......%s,%s, line=%d\n", __FILE__, __FUNCTION__, __LINE__);			\
 			RT_PRINTK fmt;															\
 			ASSERT(false);															\
 		}	\
 	} while (0)
 
-#define ODM_dbg_enter() { dbg_print(" == > %s\n", __func__); }
-#define ODM_dbg_exit() { dbg_print("< == %s\n", __func__); }
-#define ODM_dbg_trace(str) { dbg_print("%s:%s\n", __func__, str); }
+#define ODM_dbg_enter() { dbg_print(" == > %s\n", __FUNCTION__); }
+#define ODM_dbg_exit() { dbg_print("< == %s\n", __FUNCTION__); }
+#define ODM_dbg_trace(str) { dbg_print("%s:%s\n", __FUNCTION__, str); }
 
 #define ODM_PRINT_ADDR(p_dm_odm, comp, level, title_str, ptr)							 do {\
 		if (((comp) & p_dm_odm->debug_components) && (level <= p_dm_odm->debug_level)) { \
@@ -198,7 +224,29 @@ phydm_init_debug_setting(struct PHY_DM_STRUCT		*p_dm_odm);
 
 void phydm_basic_dbg_message(void			*p_dm_void);
 
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 #define	PHYDM_DBGPRINT		0
+#define	PHYDM_SSCANF(x, y, z)	dcmd_scanf(x, y, z)
+#define	PHYDM_VAST_INFO_SNPRINTF	PHYDM_SNPRINTF
+#if (PHYDM_DBGPRINT == 1)
+#define	PHYDM_SNPRINTF(msg)	\
+	do {\
+		rsprintf msg;\
+		dbg_print(output);\
+	} while (0)
+#else
+#define	PHYDM_SNPRINTF(msg)	\
+	do {\
+		rsprintf msg;\
+		dcmd_printf(output);\
+	} while (0)
+#endif
+#else
+#if (DM_ODM_SUPPORT_TYPE == ODM_CE) || defined(__OSK__)
+	#define	PHYDM_DBGPRINT		0
+#else
+	#define	PHYDM_DBGPRINT		1
+#endif
 #define	MAX_ARGC				20
 #define	MAX_ARGV				16
 #define	DCMD_DECIMAL			"%d"
@@ -226,6 +274,8 @@ void phydm_basic_dbg_message(void			*p_dm_void);
 			used += snprintf msg;\
 	} while (0)
 #endif
+#endif
+
 
 void phydm_basic_profile(
 	void			*p_dm_void,
@@ -233,6 +283,7 @@ void phydm_basic_profile(
 	char				*output,
 	u32			*_out_len
 );
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_AP))
 s32
 phydm_cmd(
 	struct PHY_DM_STRUCT	*p_dm_odm,
@@ -242,7 +293,7 @@ phydm_cmd(
 	char	*output,
 	u32	out_len
 );
-
+#endif
 void
 phydm_cmd_parser(
 	struct PHY_DM_STRUCT	*p_dm_odm,
@@ -260,6 +311,20 @@ phydm_api_trx_mode(
 	enum odm_rf_path_e			rx_path,
 	bool					is_tx2_path
 );
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+void phydm_sbd_check(
+	struct PHY_DM_STRUCT					*p_dm_odm
+);
+
+void phydm_sbd_callback(
+	struct timer_list		*p_timer
+);
+
+void phydm_sbd_workitem_callback(
+	void            *p_context
+);
+#endif
 
 void
 phydm_fw_trace_en_h2c(

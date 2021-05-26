@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 /* ************************************************************
  * include files
@@ -34,7 +50,7 @@ phydm_drp_get_statistic(
 {
 	struct PHY_DM_STRUCT					*p_dm_odm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _DYNAMIC_RX_PATH_						*p_dm_drp_table = &(p_dm_odm->dm_drp_table);
-	struct false_ALARM_STATISTICS		*false_alm_cnt = (struct false_ALARM_STATISTICS *)phydm_get_structure(p_dm_odm, PHYDMfalseALMCNT);
+	struct _FALSE_ALARM_STATISTICS		*false_alm_cnt = (struct _FALSE_ALARM_STATISTICS *)phydm_get_structure(p_dm_odm, PHYDM_FALSEALMCNT);
 
 	odm_false_alarm_counter_statistics(p_dm_odm);
 
@@ -56,7 +72,7 @@ phydm_dynamic_rx_path(
 	u8		curr_drp_state;
 	u32		rx_ok_cal;
 	u32		RSSI = 0;
-	struct false_ALARM_STATISTICS		*false_alm_cnt = (struct false_ALARM_STATISTICS *)phydm_get_structure(p_dm_odm, PHYDMfalseALMCNT);
+	struct _FALSE_ALARM_STATISTICS		*false_alm_cnt = (struct _FALSE_ALARM_STATISTICS *)phydm_get_structure(p_dm_odm, PHYDM_FALSEALMCNT);
 
 	if (!(p_dm_odm->support_ability & ODM_BB_DYNAMIC_RX_PATH)) {
 		ODM_RT_TRACE(p_dm_odm, ODM_COMP_DYNAMIC_RX_PATH, ODM_DBG_LOUD, ("[Return Init]   Not Support Dynamic RX PAth\n"));
@@ -94,10 +110,33 @@ phydm_dynamic_rx_path(
 		training_set_timmer_en = true;
 
 	} else if (p_dm_drp_table->drp_state == DRP_TRAINING_STATE_1) {
+
 		phydm_drp_get_statistic(p_dm_odm);
+
 		p_dm_drp_table->curr_cca_all_cnt_1 = false_alm_cnt->cnt_cca_all;
 		p_dm_drp_table->curr_fa_all_cnt_1 = false_alm_cnt->cnt_all;
+
+#if 1
 		p_dm_drp_table->drp_state  = DRP_DECISION_STATE;
+#else
+
+		if (p_dm_odm->mp_mode) {
+			rx_ok_cal = p_dm_odm->phy_dbg_info.num_qry_phy_status_cck + p_dm_odm->phy_dbg_info.num_qry_phy_status_ofdm;
+			RSSI = (rx_ok_cal != 0) ? p_dm_odm->rx_pwdb_ave / rx_ok_cal : 0;
+			ODM_RT_TRACE(p_dm_odm, ODM_COMP_DYNAMIC_RX_PATH, ODM_DBG_LOUD, ("MP RSSI = ((%d))\n", RSSI));
+		}
+
+		if (RSSI > p_dm_drp_table->rssi_threshold)
+
+			p_dm_drp_table->drp_state  = DRP_DECISION_STATE;
+
+		else  {
+
+			p_dm_drp_table->drp_state  = DRP_TRAINING_STATE_2;
+			p_dm_drp_table->curr_rx_path = PHYDM_A;
+			training_set_timmer_en = true;
+		}
+#endif
 	} else if (p_dm_drp_table->drp_state == DRP_TRAINING_STATE_2) {
 
 		phydm_drp_get_statistic(p_dm_odm);
@@ -146,6 +185,45 @@ phydm_dynamic_rx_path(
 
 }
 
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+void
+phydm_dynamic_rx_path_callback(
+	struct timer_list		*p_timer
+)
+{
+	struct _ADAPTER		*adapter = (struct _ADAPTER *)p_timer->adapter;
+	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(adapter);
+	struct PHY_DM_STRUCT		*p_dm_odm = &(p_hal_data->DM_OutSrc);
+	struct _DYNAMIC_RX_PATH_			*p_dm_drp_table = &(p_dm_odm->dm_drp_table);
+
+#if DEV_BUS_TYPE == RT_PCI_INTERFACE
+#if USE_WORKITEM
+	odm_schedule_work_item(&(p_dm_drp_table->phydm_dynamic_rx_path_workitem));
+#else
+	{
+		/* dbg_print("phydm_dynamic_rx_path\n"); */
+		phydm_dynamic_rx_path(p_dm_odm);
+	}
+#endif
+#else
+	odm_schedule_work_item(&(p_dm_drp_table->phydm_dynamic_rx_path_workitem));
+#endif
+}
+
+void
+phydm_dynamic_rx_path_workitem_callback(
+	void		*p_context
+)
+{
+	struct _ADAPTER		*p_adapter = (struct _ADAPTER *)p_context;
+	HAL_DATA_TYPE	*p_hal_data = GET_HAL_DATA(p_adapter);
+	struct PHY_DM_STRUCT		*p_dm_odm = &(p_hal_data->DM_OutSrc);
+
+	/* dbg_print("phydm_dynamic_rx_path\n"); */
+	phydm_dynamic_rx_path(p_dm_odm);
+}
+#else if (DM_ODM_SUPPORT_TYPE == ODM_CE)
+
 void
 phydm_dynamic_rx_path_callback(
 	void *function_context
@@ -154,9 +232,17 @@ phydm_dynamic_rx_path_callback(
 	struct PHY_DM_STRUCT	*p_dm_odm = (struct PHY_DM_STRUCT *)function_context;
 	struct _ADAPTER	*padapter = p_dm_odm->adapter;
 
-	if (padapter->net_closed == true)
+	if (padapter->net_closed == _TRUE)
 		return;
+
+#if 0 /* Can't do I/O in timer callback*/
+	odm_s0s1_sw_ant_div(p_dm_odm, SWAW_STEP_DETERMINE);
+#else
+	/*rtw_run_in_thread_cmd(padapter, odm_sw_antdiv_workitem_callback, padapter);*/
+#endif
 }
+
+#endif
 
 void
 phydm_dynamic_rx_path_timers(

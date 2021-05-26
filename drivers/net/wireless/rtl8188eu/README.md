@@ -1,47 +1,52 @@
-IMPORTANT - PLEASE READ:
-
-Beginning on November 4, 2019, I will NO LONGER support people that have downloaded the source
-as a zip file. Using git has much more flexibility. In addition, there is much less liklihood
-that a user will contact me with a problem that is ALREADY fixed.
-
-If your system says that /lib/modules/...../build does not exist, you have not
-installed the kernel headers, you have done it incorrectly, or you are not running
-the kernel for which the headers have been installed. The necessary steps are
-dependent on which distro you are using. Creating a new issue and asking at
-GitHub will not be productive.
-
-Unsolicited E-mail sent to my private address will be ignored!!
-
-If a build fails that previously worked, perform a 'git pull' and retry before
-reporting a problem. As noted, if you had downloaded the source in zip form, then you would
-need to get an entirely new source file. That is why using git, which downloads only the changed
-lines, is required.
-
-rtl8188eu
-=========
-
-Repository for the stand-alone RTL8188EU driver.
+# rtl8188eus
+Wifi driver support for rtl8188eu, rtl8188eus and rtl8188etv chips and working under the new linux kernel (5.1.x).
+More information about your wifi device can be found here: https://wikidevi.com.
 
 Compiling & Building
 ---------
 ### Dependencies
 To compile the driver, you need to have make and a compiler installed. In addition,
 you must have the kernel headers installed. If you do not understand what this means,
-consult your distro.
-### Compiling
+consult your distro. if compile a new kernel, you will need to set two parameters
+with make: KSRC=path_to_kernel_source and KVER=kernel_version. The same goes for installation.
 
-> make all
+### Download
+```
+git clone -b v5.2.2.4 https://github.com/quickreflex/rtl8188eus.git
+cd rtl8188eu
+```
 
-### Installing
+### Compiling & Installing
+```
+make all
+make install
+```
 
-> sudo make install
+Or with DKMS
+```
+dkms add .
+dkms build 8188eu/1.0
+dkms install 8188eu/1.0
+```
 
-Submitting Issues
+Switch modes
 ---------
-
-Frequently asked Questions
----------
-
-### The network manager says: "Device is not ready"!
-Make sure you copied the firmware (rtl8188eufw.bin) to /lib/firmware/rtlwifi/
-
+### Supported interface modes
+```
+* IBSS
+* managed
+* AP
+* monitor
+* P2P-client
+* P2P-GO
+```
+### For setting interface modes
+```
+ifconfig wlan0 down
+iw dev wlan0 set type managed
+ifconfig wlan0 up
+```
+### For setting TX power
+```
+iw wlan0 set txpower fixed 1300
+```

@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2015 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #define _RTW_MI_C_
 
 #include <drv_types.h>
@@ -17,7 +33,7 @@ void rtw_mi_update_union_chan_inf(_adapter *adapter, u8 ch, u8 offset , u8 bw)
 }
 
 /* Find union about ch, bw, ch_offset of all linked/linking interfaces */
-static int _rtw_mi_get_ch_setting_union(_adapter *adapter, u8 *ch, u8 *bw, u8 *offset, bool include_self)
+int _rtw_mi_get_ch_setting_union(_adapter *adapter, u8 *ch, u8 *bw, u8 *offset, bool include_self)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	_adapter *iface;
@@ -45,7 +61,7 @@ static int _rtw_mi_get_ch_setting_union(_adapter *adapter, u8 *ch, u8 *bw, u8 *o
 		if (check_fwstate(&iface->mlmepriv, WIFI_OP_CH_SWITCHING))
 			continue;
 
-		if (include_self == false && adapter == iface)
+		if (include_self == _FALSE && adapter == iface)
 			continue;
 
 		if (num == 0) {
@@ -95,51 +111,51 @@ inline int rtw_mi_get_ch_setting_union_no_self(_adapter *adapter, u8 *ch, u8 *bw
 }
 
 /* For now, not return union_ch/bw/offset */
-static void _rtw_mi_status(_adapter *adapter, struct mi_state *mstate, bool include_self)
+void _rtw_mi_status(_adapter *adapter, struct mi_state *mstate, bool include_self)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	_adapter *iface;
 	int i;
 
-	memset(mstate, 0, sizeof(struct mi_state));
+	_rtw_memset(mstate, 0, sizeof(struct mi_state));
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
 		iface = dvobj->padapters[i];
 
-		if (include_self == false && iface == adapter)
+		if (include_self == _FALSE && iface == adapter)
 			continue;
 
-		if (check_fwstate(&iface->mlmepriv, WIFI_STATION_STATE) == true) {
+		if (check_fwstate(&iface->mlmepriv, WIFI_STATION_STATE) == _TRUE) {
 			MSTATE_STA_NUM(mstate)++;
-			if (check_fwstate(&iface->mlmepriv, _FW_LINKED) == true)
+			if (check_fwstate(&iface->mlmepriv, _FW_LINKED) == _TRUE)
 				MSTATE_STA_LD_NUM(mstate)++;
 
-			if (check_fwstate(&iface->mlmepriv, _FW_UNDER_LINKING) == true)
+			if (check_fwstate(&iface->mlmepriv, _FW_UNDER_LINKING) == _TRUE)
 				MSTATE_STA_LG_NUM(mstate)++;
 
-		} else if (check_fwstate(&iface->mlmepriv, WIFI_AP_STATE) == true
-			&& check_fwstate(&iface->mlmepriv, _FW_LINKED) == true
+		} else if (check_fwstate(&iface->mlmepriv, WIFI_AP_STATE) == _TRUE
+			&& check_fwstate(&iface->mlmepriv, _FW_LINKED) == _TRUE
 		) {
 			MSTATE_AP_NUM(mstate)++;
 			if (iface->stapriv.asoc_sta_count > 2)
 				MSTATE_AP_LD_NUM(mstate)++;
 
-		} else if (check_fwstate(&iface->mlmepriv, WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE) == true
-			&& check_fwstate(&iface->mlmepriv, _FW_LINKED) == true
+		} else if (check_fwstate(&iface->mlmepriv, WIFI_ADHOC_STATE | WIFI_ADHOC_MASTER_STATE) == _TRUE
+			&& check_fwstate(&iface->mlmepriv, _FW_LINKED) == _TRUE
 		) {
 			MSTATE_ADHOC_NUM(mstate)++;
 			if (iface->stapriv.asoc_sta_count > 2)
 				MSTATE_ADHOC_LD_NUM(mstate)++;
 		}
 
-		if (check_fwstate(&iface->mlmepriv, WIFI_UNDER_WPS) == true)
+		if (check_fwstate(&iface->mlmepriv, WIFI_UNDER_WPS) == _TRUE)
 			MSTATE_WPS_NUM(mstate)++;
 
 #ifdef CONFIG_IOCTL_CFG80211
 		if (rtw_cfg80211_get_is_mgmt_tx(iface))
 			MSTATE_MGMT_TX_NUM(mstate)++;
 		#ifdef CONFIG_P2P
-		if (rtw_cfg80211_get_is_roch(iface) == true)
+		if (rtw_cfg80211_get_is_roch(iface) == _TRUE)
 			MSTATE_ROCH_NUM(mstate)++;
 		#endif
 #endif /* CONFIG_IOCTL_CFG80211 */
@@ -207,7 +223,7 @@ inline void rtw_mi_update_iface_status(struct mlme_priv *pmlmepriv, sint state)
 		RTW_INFO("%s => will change or clean state to 0x%08x\n", __func__, state);
 
 	rtw_mi_status(adapter, &tmp_mstate);
-	memcpy(iface_state, &tmp_mstate, sizeof(struct mi_state));
+	_rtw_memcpy(iface_state, &tmp_mstate, sizeof(struct mi_state));
 
 	if (rtw_mi_get_ch_setting_union(adapter, &u_ch, &u_bw, &u_offset))
 		rtw_mi_update_union_chan_inf(adapter , u_ch, u_offset , u_bw);
@@ -227,7 +243,7 @@ u8 rtw_mi_check_status(_adapter *adapter, u8 type)
 {
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct mi_state *iface_state = &dvobj->iface_state;
-	u8 ret = false;
+	u8 ret = _FALSE;
 
 #ifdef DBG_IFACE_STATUS
 	DBG_IFACE_STATUS_DUMP(adapter);
@@ -237,46 +253,46 @@ u8 rtw_mi_check_status(_adapter *adapter, u8 type)
 	switch (type) {
 	case MI_LINKED:
 		if (MSTATE_STA_LD_NUM(iface_state) || MSTATE_AP_NUM(iface_state) || MSTATE_ADHOC_NUM(iface_state)) /*check_fwstate(&iface->mlmepriv, _FW_LINKED)*/
-			ret = true;
+			ret = _TRUE;
 		break;
 	case MI_ASSOC:
 		if (MSTATE_STA_LD_NUM(iface_state) || MSTATE_AP_LD_NUM(iface_state) || MSTATE_ADHOC_LD_NUM(iface_state))
-			ret = true;
+			ret = _TRUE;
 		break;
 	case MI_UNDER_WPS:
 		if (MSTATE_WPS_NUM(iface_state))
-			ret = true;
+			ret = _TRUE;
 		break;
 
 	case MI_AP_MODE:
 		if (MSTATE_AP_NUM(iface_state))
-			ret = true;
+			ret = _TRUE;
 		break;
 	case MI_AP_ASSOC:
 		if (MSTATE_AP_LD_NUM(iface_state))
-			ret = true;
+			ret = _TRUE;
 		break;
 
 	case MI_ADHOC:
 		if (MSTATE_ADHOC_NUM(iface_state))
-			ret = true;
+			ret = _TRUE;
 		break;
 	case MI_ADHOC_ASSOC:
 		if (MSTATE_ADHOC_LD_NUM(iface_state))
-			ret = true;
+			ret = _TRUE;
 		break;
 
 	case MI_STA_NOLINK: /* this is misleading, but not used now */
 		if (MSTATE_STA_NUM(iface_state) && (!(MSTATE_STA_LD_NUM(iface_state) || MSTATE_STA_LG_NUM(iface_state))))
-			ret = true;
+			ret = _TRUE;
 		break;
 	case MI_STA_LINKED:
 		if (MSTATE_STA_LD_NUM(iface_state))
-			ret = true;
+			ret = _TRUE;
 		break;
 	case MI_STA_LINKING:
 		if (MSTATE_STA_LG_NUM(iface_state))
-			ret = true;
+			ret = _TRUE;
 		break;
 
 	default:
@@ -297,20 +313,20 @@ u8 rtw_mi_mp_mode_check(_adapter *padapter)
 		iface = dvobj->padapters[i];
 
 		if ((iface) && (iface->registrypriv.mp_mode == 1))
-			return true;
+			return _TRUE;
 	}
 #else
 	if (padapter->registrypriv.mp_mode == 1)
-		return true;
+		return _TRUE;
 #endif
 #endif /* CONFIG_MP_INCLUDED */
-	return false;
+	return _FALSE;
 }
 
 /*
 * return value : 0 is failed or have not interface meet condition
 * return value : !0 is success or interface numbers which meet condition
-* return value of ops_func must be true or false
+* return value of ops_func must be _TRUE or _FALSE
 */
 static u8 _rtw_mi_process(_adapter *padapter, bool exclude_self,
 		  void *data, u8(*ops_func)(_adapter *padapter, void *data))
@@ -329,7 +345,7 @@ static u8 _rtw_mi_process(_adapter *padapter, bool exclude_self,
 				continue;
 
 			if (ops_func)
-				if (ops_func(iface, data))
+				if (_TRUE == ops_func(iface, data))
 					ret++;
 		}
 	}
@@ -343,19 +359,19 @@ static u8 _rtw_mi_netif_stop_queue(_adapter *padapter, void *data)
 	if (carrier_off)
 		netif_carrier_off(pnetdev);
 	rtw_netif_stop_queue(pnetdev);
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_netif_stop_queue(_adapter *padapter, bool carrier_off)
 {
 	bool in_data = carrier_off;
 
-	return _rtw_mi_process(padapter, false, &in_data, _rtw_mi_netif_stop_queue);
+	return _rtw_mi_process(padapter, _FALSE, &in_data, _rtw_mi_netif_stop_queue);
 }
 u8 rtw_mi_buddy_netif_stop_queue(_adapter *padapter, bool carrier_off)
 {
 	bool in_data = carrier_off;
 
-	return _rtw_mi_process(padapter, true, &in_data, _rtw_mi_netif_stop_queue);
+	return _rtw_mi_process(padapter, _TRUE, &in_data, _rtw_mi_netif_stop_queue);
 }
 
 static u8 _rtw_mi_netif_wake_queue(_adapter *padapter, void *data)
@@ -364,15 +380,15 @@ static u8 _rtw_mi_netif_wake_queue(_adapter *padapter, void *data)
 
 	if (pnetdev)
 		rtw_netif_wake_queue(pnetdev);
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_netif_wake_queue(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_netif_wake_queue);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_netif_wake_queue);
 }
 u8 rtw_mi_buddy_netif_wake_queue(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_netif_wake_queue);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_netif_wake_queue);
 }
 
 static u8 _rtw_mi_netif_carrier_on(_adapter *padapter, void *data)
@@ -381,15 +397,15 @@ static u8 _rtw_mi_netif_carrier_on(_adapter *padapter, void *data)
 
 	if (pnetdev)
 		rtw_netif_carrier_on(pnetdev);
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_netif_carrier_on(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_netif_carrier_on);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_netif_carrier_on);
 }
 u8 rtw_mi_buddy_netif_carrier_on(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_netif_carrier_on);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_netif_carrier_on);
 }
 
 static u8 _rtw_mi_scan_abort(_adapter *adapter, void *data)
@@ -401,104 +417,104 @@ static u8 _rtw_mi_scan_abort(_adapter *adapter, void *data)
 	else
 		rtw_scan_abort_no_wait(adapter);
 
-	return true;
+	return _TRUE;
 }
 void rtw_mi_scan_abort(_adapter *adapter, bool bwait)
 {
 	bool in_data = bwait;
 
-	_rtw_mi_process(adapter, false, &in_data, _rtw_mi_scan_abort);
+	_rtw_mi_process(adapter, _FALSE, &in_data, _rtw_mi_scan_abort);
 
 }
 void rtw_mi_buddy_scan_abort(_adapter *adapter, bool bwait)
 {
 	bool in_data = bwait;
 
-	_rtw_mi_process(adapter, true, &in_data, _rtw_mi_scan_abort);
+	_rtw_mi_process(adapter, _TRUE, &in_data, _rtw_mi_scan_abort);
 }
 
 static u8 _rtw_mi_start_drv_threads(_adapter *adapter, void *data)
 {
 	rtw_start_drv_threads(adapter);
-	return true;
+	return _TRUE;
 }
 void rtw_mi_start_drv_threads(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, false, NULL, _rtw_mi_start_drv_threads);
+	_rtw_mi_process(adapter, _FALSE, NULL, _rtw_mi_start_drv_threads);
 }
 void rtw_mi_buddy_start_drv_threads(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, true, NULL, _rtw_mi_start_drv_threads);
+	_rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_start_drv_threads);
 }
 
 static u8 _rtw_mi_stop_drv_threads(_adapter *adapter, void *data)
 {
 	rtw_stop_drv_threads(adapter);
-	return true;
+	return _TRUE;
 }
 void rtw_mi_stop_drv_threads(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, false, NULL, _rtw_mi_stop_drv_threads);
+	_rtw_mi_process(adapter, _FALSE, NULL, _rtw_mi_stop_drv_threads);
 }
 void rtw_mi_buddy_stop_drv_threads(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, true, NULL, _rtw_mi_stop_drv_threads);
+	_rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_stop_drv_threads);
 }
 
 static u8 _rtw_mi_cancel_all_timer(_adapter *adapter, void *data)
 {
 	rtw_cancel_all_timer(adapter);
-	return true;
+	return _TRUE;
 }
 void rtw_mi_cancel_all_timer(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, false, NULL, _rtw_mi_cancel_all_timer);
+	_rtw_mi_process(adapter, _FALSE, NULL, _rtw_mi_cancel_all_timer);
 }
 void rtw_mi_buddy_cancel_all_timer(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, true, NULL, _rtw_mi_cancel_all_timer);
+	_rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_cancel_all_timer);
 }
 
 static u8 _rtw_mi_reset_drv_sw(_adapter *adapter, void *data)
 {
 	rtw_reset_drv_sw(adapter);
-	return true;
+	return _TRUE;
 }
 void rtw_mi_reset_drv_sw(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, false, NULL, _rtw_mi_reset_drv_sw);
+	_rtw_mi_process(adapter, _FALSE, NULL, _rtw_mi_reset_drv_sw);
 }
 void rtw_mi_buddy_reset_drv_sw(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, true, NULL, _rtw_mi_reset_drv_sw);
+	_rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_reset_drv_sw);
 }
 
 static u8 _rtw_mi_intf_start(_adapter *adapter, void *data)
 {
 	rtw_intf_start(adapter);
-	return true;
+	return _TRUE;
 }
 void rtw_mi_intf_start(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, false, NULL, _rtw_mi_intf_start);
+	_rtw_mi_process(adapter, _FALSE, NULL, _rtw_mi_intf_start);
 }
 void rtw_mi_buddy_intf_start(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, true, NULL, _rtw_mi_intf_start);
+	_rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_intf_start);
 }
 
 static u8 _rtw_mi_intf_stop(_adapter *adapter, void *data)
 {
 	rtw_intf_stop(adapter);
-	return true;
+	return _TRUE;
 }
 void rtw_mi_intf_stop(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, false, NULL, _rtw_mi_intf_stop);
+	_rtw_mi_process(adapter, _FALSE, NULL, _rtw_mi_intf_stop);
 }
 void rtw_mi_buddy_intf_stop(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, true, NULL, _rtw_mi_intf_stop);
+	_rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_intf_stop);
 }
 
 static u8 _rtw_mi_suspend_free_assoc_resource(_adapter *padapter, void *data)
@@ -507,11 +523,11 @@ static u8 _rtw_mi_suspend_free_assoc_resource(_adapter *padapter, void *data)
 }
 void rtw_mi_suspend_free_assoc_resource(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, false, NULL, _rtw_mi_suspend_free_assoc_resource);
+	_rtw_mi_process(adapter, _FALSE, NULL, _rtw_mi_suspend_free_assoc_resource);
 }
 void rtw_mi_buddy_suspend_free_assoc_resource(_adapter *adapter)
 {
-	_rtw_mi_process(adapter, true, NULL, _rtw_mi_suspend_free_assoc_resource);
+	_rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_suspend_free_assoc_resource);
 }
 
 static u8 _rtw_mi_is_scan_deny(_adapter *adapter, void *data)
@@ -521,12 +537,12 @@ static u8 _rtw_mi_is_scan_deny(_adapter *adapter, void *data)
 
 u8 rtw_mi_is_scan_deny(_adapter *adapter)
 {
-	return _rtw_mi_process(adapter, false, NULL, _rtw_mi_is_scan_deny);
+	return _rtw_mi_process(adapter, _FALSE, NULL, _rtw_mi_is_scan_deny);
 
 }
 u8 rtw_mi_buddy_is_scan_deny(_adapter *adapter)
 {
-	return _rtw_mi_process(adapter, true, NULL, _rtw_mi_is_scan_deny);
+	return _rtw_mi_process(adapter, _TRUE, NULL, _rtw_mi_is_scan_deny);
 }
 
 #ifdef CONFIG_SET_SCAN_DENY_TIMER
@@ -535,19 +551,19 @@ static u8 _rtw_mi_set_scan_deny(_adapter *adapter, void *data)
 	u32 ms = *(u32 *)data;
 
 	rtw_set_scan_deny(adapter, ms);
-	return true;
+	return _TRUE;
 }
 void rtw_mi_set_scan_deny(_adapter *adapter, u32 ms)
 {
 	u32 in_data = ms;
 
-	_rtw_mi_process(adapter, false, &in_data, _rtw_mi_set_scan_deny);
+	_rtw_mi_process(adapter, _FALSE, &in_data, _rtw_mi_set_scan_deny);
 }
 void rtw_mi_buddy_set_scan_deny(_adapter *adapter, u32 ms)
 {
 	u32 in_data = ms;
 
-	_rtw_mi_process(adapter, true, &in_data, _rtw_mi_set_scan_deny);
+	_rtw_mi_process(adapter, _TRUE, &in_data, _rtw_mi_set_scan_deny);
 }
 #endif
 
@@ -562,12 +578,12 @@ static u8 _rtw_mi_issue_nulldata(_adapter *padapter, void *data)
 {
 	struct nulldata_param *pnulldata_param = (struct nulldata_param *)data;
 
-	if (is_client_associated_to_ap(padapter) == true) {
+	if (is_client_associated_to_ap(padapter) == _TRUE) {
 		/* TODO: TDLS peers */
 		issue_nulldata(padapter, pnulldata_param->da, pnulldata_param->power_mode, pnulldata_param->try_cnt, pnulldata_param->wait_ms);
-		return true;
+		return _TRUE;
 	}
-	return false;
+	return _FALSE;
 }
 
 u8 rtw_mi_issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int power_mode, int try_cnt, int wait_ms)
@@ -579,7 +595,7 @@ u8 rtw_mi_issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int pow
 	nparam.try_cnt = try_cnt;
 	nparam.wait_ms = wait_ms;
 
-	return _rtw_mi_process(padapter, false, &nparam, _rtw_mi_issue_nulldata);
+	return _rtw_mi_process(padapter, _FALSE, &nparam, _rtw_mi_issue_nulldata);
 }
 u8 rtw_mi_buddy_issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int power_mode, int try_cnt, int wait_ms)
 {
@@ -590,7 +606,7 @@ u8 rtw_mi_buddy_issue_nulldata(_adapter *padapter, unsigned char *da, unsigned i
 	nparam.try_cnt = try_cnt;
 	nparam.wait_ms = wait_ms;
 
-	return _rtw_mi_process(padapter, true, &nparam, _rtw_mi_issue_nulldata);
+	return _rtw_mi_process(padapter, _TRUE, &nparam, _rtw_mi_issue_nulldata);
 }
 
 static u8 _rtw_mi_beacon_update(_adapter *padapter, void *data)
@@ -598,21 +614,21 @@ static u8 _rtw_mi_beacon_update(_adapter *padapter, void *data)
 	struct mlme_ext_priv *mlmeext = &padapter->mlmeextpriv;
 
 	if (mlmeext_msr(mlmeext) == WIFI_FW_AP_STATE
-	    && check_fwstate(&padapter->mlmepriv, _FW_LINKED) == true) {
+	    && check_fwstate(&padapter->mlmepriv, _FW_LINKED) == _TRUE) {
 		RTW_INFO(ADPT_FMT"-WIFI_FW_AP_STATE - update_beacon\n", ADPT_ARG(padapter));
-		update_beacon(padapter, 0, NULL, true);
+		update_beacon(padapter, 0, NULL, _TRUE);
 	}
-	return true;
+	return _TRUE;
 }
 
 void rtw_mi_beacon_update(_adapter *padapter)
 {
-	_rtw_mi_process(padapter, false, NULL, _rtw_mi_beacon_update);
+	_rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_beacon_update);
 }
 
 void rtw_mi_buddy_beacon_update(_adapter *padapter)
 {
-	_rtw_mi_process(padapter, true, NULL, _rtw_mi_beacon_update);
+	_rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_beacon_update);
 }
 
 static u8 _rtw_mi_hal_dump_macaddr(_adapter *padapter, void *data)
@@ -621,50 +637,69 @@ static u8 _rtw_mi_hal_dump_macaddr(_adapter *padapter, void *data)
 
 	rtw_hal_get_macaddr_port(padapter, mac_addr);
 	RTW_INFO(ADPT_FMT"MAC Address ="MAC_FMT"\n", ADPT_ARG(padapter), MAC_ARG(mac_addr));
-	return true;
+	return _TRUE;
 }
 void rtw_mi_hal_dump_macaddr(_adapter *padapter)
 {
-	_rtw_mi_process(padapter, false, NULL, _rtw_mi_hal_dump_macaddr);
+	_rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_hal_dump_macaddr);
 }
 void rtw_mi_buddy_hal_dump_macaddr(_adapter *padapter)
 {
-	_rtw_mi_process(padapter, true, NULL, _rtw_mi_hal_dump_macaddr);
+	_rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_hal_dump_macaddr);
 }
 
-static u8 _rtw_mi_busy_traffic_check(_adapter *padapter, void *data)
+#ifdef CONFIG_PCI_HCI
+static u8 _rtw_mi_xmit_tasklet_schedule(_adapter *padapter, void *data)
+{
+	if (rtw_txframes_pending(padapter)) {
+		/* try to deal with the pending packets */
+		tasklet_hi_schedule(&(padapter->xmitpriv.xmit_tasklet));
+	}
+	return _TRUE;
+}
+void rtw_mi_xmit_tasklet_schedule(_adapter *padapter)
+{
+	_rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_xmit_tasklet_schedule);
+}
+void rtw_mi_buddy_xmit_tasklet_schedule(_adapter *padapter)
+{
+	_rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_xmit_tasklet_schedule);
+}
+#endif
+
+u8 _rtw_mi_busy_traffic_check(_adapter *padapter, void *data)
 {
 	u32 passtime;
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	bool check_sc_interval = *(bool *)data;
 
-	if (pmlmepriv->LinkDetectInfo.bBusyTraffic == true) {
+	if (pmlmepriv->LinkDetectInfo.bBusyTraffic == _TRUE) {
 		if (check_sc_interval) {
 			/* Miracast can't do AP scan*/
 			passtime = rtw_get_passing_time_ms(pmlmepriv->lastscantime);
-			pmlmepriv->lastscantime = jiffies;
+			pmlmepriv->lastscantime = rtw_get_current_time();
 			if (passtime > BUSY_TRAFFIC_SCAN_DENY_PERIOD) {
-				RTW_INFO(ADPT_FMT" bBusyTraffic == true\n", ADPT_ARG(padapter));
-				return true;
+				RTW_INFO(ADPT_FMT" bBusyTraffic == _TRUE\n", ADPT_ARG(padapter));
+				return _TRUE;
 			}
 		} else
-			return true;
+			return _TRUE;
 	}
 
-	return false;
+	return _FALSE;
 }
 
 u8 rtw_mi_busy_traffic_check(_adapter *padapter, bool check_sc_interval)
 {
 	bool in_data = check_sc_interval;
 
-	return _rtw_mi_process(padapter, false, &in_data, _rtw_mi_busy_traffic_check);
+	return _rtw_mi_process(padapter, _FALSE, &in_data, _rtw_mi_busy_traffic_check);
 }
 u8 rtw_mi_buddy_busy_traffic_check(_adapter *padapter, bool check_sc_interval)
 {
 	bool in_data = check_sc_interval;
 
-	return _rtw_mi_process(padapter, true, &in_data, _rtw_mi_busy_traffic_check);
+	return _rtw_mi_process(padapter, _TRUE, &in_data, _rtw_mi_busy_traffic_check);
 }
 static u8 _rtw_mi_check_mlmeinfo_state(_adapter *padapter, void *data)
 {
@@ -673,23 +708,23 @@ static u8 _rtw_mi_check_mlmeinfo_state(_adapter *padapter, void *data)
 
 	/*if (mlmeext_msr(mlmeext) == state)*/
 	if (check_mlmeinfo_state(mlmeext, state))
-		return true;
+		return _TRUE;
 	else
-		return false;
+		return _FALSE;
 }
 
 u8 rtw_mi_check_mlmeinfo_state(_adapter *padapter, u32 state)
 {
 	u32 in_data = state;
 
-	return _rtw_mi_process(padapter, false, &in_data, _rtw_mi_check_mlmeinfo_state);
+	return _rtw_mi_process(padapter, _FALSE, &in_data, _rtw_mi_check_mlmeinfo_state);
 }
 
 u8 rtw_mi_buddy_check_mlmeinfo_state(_adapter *padapter, u32 state)
 {
 	u32 in_data = state;
 
-	return _rtw_mi_process(padapter, true, &in_data, _rtw_mi_check_mlmeinfo_state);
+	return _rtw_mi_process(padapter, _TRUE, &in_data, _rtw_mi_check_mlmeinfo_state);
 }
 
 /*#define DBG_DUMP_FW_STATE*/
@@ -699,25 +734,25 @@ static void rtw_dbg_dump_fwstate(_adapter *padapter, sint state)
 	u8 buf[32] = {0};
 
 	if (state & WIFI_FW_NULL_STATE) {
-		memset(buf, 0, 32);
+		_rtw_memset(buf, 0, 32);
 		sprintf(buf, "WIFI_FW_NULL_STATE");
 		RTW_INFO(FUNC_ADPT_FMT"fwstate-%s\n", FUNC_ADPT_ARG(padapter), buf);
 	}
 
 	if (state & _FW_LINKED) {
-		memset(buf, 0, 32);
+		_rtw_memset(buf, 0, 32);
 		sprintf(buf, "_FW_LINKED");
 		RTW_INFO(FUNC_ADPT_FMT"fwstate-%s\n", FUNC_ADPT_ARG(padapter), buf);
 	}
 
 	if (state & _FW_UNDER_LINKING) {
-		memset(buf, 0, 32);
+		_rtw_memset(buf, 0, 32);
 		sprintf(buf, "_FW_UNDER_LINKING");
 		RTW_INFO(FUNC_ADPT_FMT"fwstate-%s\n", FUNC_ADPT_ARG(padapter), buf);
 	}
 
 	if (state & _FW_UNDER_SURVEY) {
-		memset(buf, 0, 32);
+		_rtw_memset(buf, 0, 32);
 		sprintf(buf, "_FW_UNDER_SURVEY");
 		RTW_INFO(FUNC_ADPT_FMT"fwstate-%s\n", FUNC_ADPT_ARG(padapter), buf);
 	}
@@ -726,15 +761,15 @@ static void rtw_dbg_dump_fwstate(_adapter *padapter, sint state)
 
 static u8 _rtw_mi_check_fwstate(_adapter *padapter, void *data)
 {
-	u8 ret = false;
+	u8 ret = _FALSE;
 
 	sint state = *(sint *)data;
 
 	if ((state == WIFI_FW_NULL_STATE) &&
 	    (padapter->mlmepriv.fw_state == WIFI_FW_NULL_STATE))
-		ret = true;
-	else if (check_fwstate(&padapter->mlmepriv, state))
-		ret = true;
+		ret = _TRUE;
+	else if (_TRUE == check_fwstate(&padapter->mlmepriv, state))
+		ret = _TRUE;
 #ifdef DBG_DUMP_FW_STATE
 	if (ret)
 		rtw_dbg_dump_fwstate(padapter, state);
@@ -745,13 +780,13 @@ u8 rtw_mi_check_fwstate(_adapter *padapter, sint state)
 {
 	sint in_data = state;
 
-	return _rtw_mi_process(padapter, false, &in_data, _rtw_mi_check_fwstate);
+	return _rtw_mi_process(padapter, _FALSE, &in_data, _rtw_mi_check_fwstate);
 }
 u8 rtw_mi_buddy_check_fwstate(_adapter *padapter, sint state)
 {
 	sint in_data = state;
 
-	return _rtw_mi_process(padapter, true, &in_data, _rtw_mi_check_fwstate);
+	return _rtw_mi_process(padapter, _TRUE, &in_data, _rtw_mi_check_fwstate);
 }
 
 static u8 _rtw_mi_traffic_statistics(_adapter *padapter , void *data)
@@ -767,11 +802,11 @@ static u8 _rtw_mi_traffic_statistics(_adapter *padapter , void *data)
 	pdvobjpriv->traffic_stat.rx_bytes += padapter->recvpriv.rx_bytes;
 	pdvobjpriv->traffic_stat.rx_pkts += padapter->recvpriv.rx_pkts;
 	pdvobjpriv->traffic_stat.rx_drop += padapter->recvpriv.rx_drop;
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_traffic_statistics(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_traffic_statistics);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_traffic_statistics);
 }
 
 static u8 _rtw_mi_check_miracast_enabled(_adapter *padapter , void *data)
@@ -780,7 +815,7 @@ static u8 _rtw_mi_check_miracast_enabled(_adapter *padapter , void *data)
 }
 u8 rtw_mi_check_miracast_enabled(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_check_miracast_enabled);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_check_miracast_enabled);
 }
 
 #ifdef CONFIG_XMIT_THREAD_MODE
@@ -792,14 +827,43 @@ static u8 _rtw_mi_check_pending_xmitbuf(_adapter *padapter , void *data)
 }
 u8 rtw_mi_check_pending_xmitbuf(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_check_pending_xmitbuf);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_check_pending_xmitbuf);
 }
 u8 rtw_mi_buddy_check_pending_xmitbuf(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_check_pending_xmitbuf);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_check_pending_xmitbuf);
 }
 #endif
 
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+static u8 _rtw_mi_dequeue_writeport(_adapter *padapter , bool exclude_self)
+{
+	int i;
+	u8	queue_empty = _TRUE;
+	_adapter *iface;
+	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
+
+	for (i = 0; i < dvobj->iface_nums; i++) {
+		iface = dvobj->padapters[i];
+		if ((iface) && rtw_is_adapter_up(iface)) {
+
+			if ((exclude_self) && (iface == padapter))
+				continue;
+
+			queue_empty &= _dequeue_writeport(iface);
+		}
+	}
+	return queue_empty;
+}
+u8 rtw_mi_dequeue_writeport(_adapter *padapter)
+{
+	return _rtw_mi_dequeue_writeport(padapter, _FALSE);
+}
+u8 rtw_mi_buddy_dequeue_writeport(_adapter *padapter)
+{
+	return _rtw_mi_dequeue_writeport(padapter, _TRUE);
+}
+#endif
 static void _rtw_mi_adapter_reset(_adapter *padapter , u8 exclude_self)
 {
 	int i;
@@ -816,68 +880,68 @@ static void _rtw_mi_adapter_reset(_adapter *padapter , u8 exclude_self)
 
 void rtw_mi_adapter_reset(_adapter *padapter)
 {
-	_rtw_mi_adapter_reset(padapter, false);
+	_rtw_mi_adapter_reset(padapter, _FALSE);
 }
 
 void rtw_mi_buddy_adapter_reset(_adapter *padapter)
 {
-	_rtw_mi_adapter_reset(padapter, true);
+	_rtw_mi_adapter_reset(padapter, _TRUE);
 }
 
-static u8 _rtw_mi_dynamic_check_timer_handler(_adapter *adapter, void *data)
+static u8 _rtw_mi_dynamic_check_timer_handlder(_adapter *adapter, void *data)
 {
-	rtw_iface_dynamic_check_timer_handler(adapter);
-	return true;
+	rtw_iface_dynamic_check_timer_handlder(adapter);
+	return _TRUE;
 }
-u8 rtw_mi_dynamic_check_timer_handler(_adapter *padapter)
+u8 rtw_mi_dynamic_check_timer_handlder(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_dynamic_check_timer_handler);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_dynamic_check_timer_handlder);
 }
-u8 rtw_mi_buddy_dynamic_check_timer_handler(_adapter *padapter)
+u8 rtw_mi_buddy_dynamic_check_timer_handlder(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_dynamic_check_timer_handler);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_dynamic_check_timer_handlder);
 }
 
 static u8 _rtw_mi_dev_unload(_adapter *adapter, void *data)
 {
 	rtw_dev_unload(adapter);
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_dev_unload(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_dev_unload);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_dev_unload);
 }
 u8 rtw_mi_buddy_dev_unload(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_dev_unload);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_dev_unload);
 }
 
 static u8 _rtw_mi_dynamic_chk_wk_hdl(_adapter *adapter, void *data)
 {
 	rtw_iface_dynamic_chk_wk_hdl(adapter);
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_dynamic_chk_wk_hdl(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_dynamic_chk_wk_hdl);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_dynamic_chk_wk_hdl);
 }
 u8 rtw_mi_buddy_dynamic_chk_wk_hdl(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_dynamic_chk_wk_hdl);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_dynamic_chk_wk_hdl);
 }
 
 static u8 _rtw_mi_os_xmit_schedule(_adapter *adapter, void *data)
 {
 	rtw_os_xmit_schedule(adapter);
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_os_xmit_schedule(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_os_xmit_schedule);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_os_xmit_schedule);
 }
 u8 rtw_mi_buddy_os_xmit_schedule(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_os_xmit_schedule);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_os_xmit_schedule);
 }
 
 static u8 _rtw_mi_report_survey_event(_adapter *adapter, void *data)
@@ -885,15 +949,15 @@ static u8 _rtw_mi_report_survey_event(_adapter *adapter, void *data)
 	union recv_frame *precv_frame = (union recv_frame *)data;
 
 	report_survey_event(adapter, precv_frame);
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_report_survey_event(_adapter *padapter, union recv_frame *precv_frame)
 {
-	return _rtw_mi_process(padapter, false, precv_frame, _rtw_mi_report_survey_event);
+	return _rtw_mi_process(padapter, _FALSE, precv_frame, _rtw_mi_report_survey_event);
 }
 u8 rtw_mi_buddy_report_survey_event(_adapter *padapter, union recv_frame *precv_frame)
 {
-	return _rtw_mi_process(padapter, true, precv_frame, _rtw_mi_report_survey_event);
+	return _rtw_mi_process(padapter, _TRUE, precv_frame, _rtw_mi_report_survey_event);
 }
 
 static u8 _rtw_mi_sreset_adapter_hdl(_adapter *adapter, void *data)
@@ -904,39 +968,41 @@ static u8 _rtw_mi_sreset_adapter_hdl(_adapter *adapter, void *data)
 		sreset_start_adapter(adapter);
 	else
 		sreset_stop_adapter(adapter);
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_sreset_adapter_hdl(_adapter *padapter, u8 bstart)
 {
 	u8 in_data = bstart;
 
-	return _rtw_mi_process(padapter, false, &in_data, _rtw_mi_sreset_adapter_hdl);
+	return _rtw_mi_process(padapter, _FALSE, &in_data, _rtw_mi_sreset_adapter_hdl);
 }
 u8 rtw_mi_buddy_sreset_adapter_hdl(_adapter *padapter, u8 bstart)
 {
 	u8 in_data = bstart;
 
-	return _rtw_mi_process(padapter, true, &in_data, _rtw_mi_sreset_adapter_hdl);
+	return _rtw_mi_process(padapter, _TRUE, &in_data, _rtw_mi_sreset_adapter_hdl);
 }
 static u8 _rtw_mi_tx_beacon_hdl(_adapter *adapter, void *data)
 {
-	if (check_fwstate(&adapter->mlmepriv, WIFI_AP_STATE) == true
-	    && check_fwstate(&adapter->mlmepriv, WIFI_ASOC_STATE) == true
+	if (check_fwstate(&adapter->mlmepriv, WIFI_AP_STATE) == _TRUE
+	    && check_fwstate(&adapter->mlmepriv, WIFI_ASOC_STATE) == _TRUE
 	   ) {
-		adapter->mlmepriv.update_bcn = true;
+		adapter->mlmepriv.update_bcn = _TRUE;
 #ifndef CONFIG_INTERRUPT_BASED_TXBCN
+#if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 		tx_beacon_hdl(adapter, NULL);
 #endif
+#endif
 	}
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_tx_beacon_hdl(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_tx_beacon_hdl);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_tx_beacon_hdl);
 }
 u8 rtw_mi_buddy_tx_beacon_hdl(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_sreset_adapter_hdl);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_sreset_adapter_hdl);
 }
 
 static u8 _rtw_mi_set_tx_beacon_cmd(_adapter *adapter, void *data)
@@ -944,18 +1010,18 @@ static u8 _rtw_mi_set_tx_beacon_cmd(_adapter *adapter, void *data)
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
 
 	if (check_fwstate(pmlmepriv, WIFI_AP_STATE)) {
-		if (pmlmepriv->update_bcn == true)
+		if (pmlmepriv->update_bcn == _TRUE)
 			set_tx_beacon_cmd(adapter);
 	}
-	return true;
+	return _TRUE;
 }
 u8 rtw_mi_set_tx_beacon_cmd(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_set_tx_beacon_cmd);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_set_tx_beacon_cmd);
 }
 u8 rtw_mi_buddy_set_tx_beacon_cmd(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_set_tx_beacon_cmd);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_set_tx_beacon_cmd);
 }
 
 #ifdef CONFIG_P2P
@@ -970,29 +1036,29 @@ u8 rtw_mi_p2p_chk_state(_adapter *padapter, enum P2P_STATE p2p_state)
 {
 	u8 in_data = p2p_state;
 
-	return _rtw_mi_process(padapter, false, &in_data, _rtw_mi_p2p_chk_state);
+	return _rtw_mi_process(padapter, _FALSE, &in_data, _rtw_mi_p2p_chk_state);
 }
 u8 rtw_mi_buddy_p2p_chk_state(_adapter *padapter, enum P2P_STATE p2p_state)
 {
 	u8 in_data  = p2p_state;
 
-	return _rtw_mi_process(padapter, true, &in_data, _rtw_mi_p2p_chk_state);
+	return _rtw_mi_process(padapter, _TRUE, &in_data, _rtw_mi_p2p_chk_state);
 }
 static u8 _rtw_mi_stay_in_p2p_mode(_adapter *adapter, void *data)
 {
 	struct wifidirect_info *pwdinfo = &(adapter->wdinfo);
 
 	if (rtw_p2p_role(pwdinfo) != P2P_ROLE_DISABLE)
-		return true;
-	return false;
+		return _TRUE;
+	return _FALSE;
 }
 u8 rtw_mi_stay_in_p2p_mode(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, false, NULL, _rtw_mi_stay_in_p2p_mode);
+	return _rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_stay_in_p2p_mode);
 }
 u8 rtw_mi_buddy_stay_in_p2p_mode(_adapter *padapter)
 {
-	return _rtw_mi_process(padapter, true, NULL, _rtw_mi_stay_in_p2p_mode);
+	return _rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_stay_in_p2p_mode);
 }
 #endif /*CONFIG_P2P*/
 
@@ -1013,13 +1079,13 @@ _adapter *rtw_get_iface_by_macddr(_adapter *padapter, u8 *mac_addr)
 {
 	int i;
 	_adapter *iface = NULL;
-	u8 bmatch = false;
+	u8 bmatch = _FALSE;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
 		iface = dvobj->padapters[i];
-		if ((iface) && (!memcmp(mac_addr, adapter_mac_addr(iface), ETH_ALEN))) {
-			bmatch = true;
+		if ((iface) && (_rtw_memcmp(mac_addr, adapter_mac_addr(iface), ETH_ALEN))) {
+			bmatch = _TRUE;
 			break;
 		}
 	}
@@ -1033,13 +1099,13 @@ _adapter *rtw_get_iface_by_hwport(_adapter *padapter, u8 hw_port)
 {
 	int i;
 	_adapter *iface = NULL;
-	u8 bmatch = false;
+	u8 bmatch = _FALSE;
 	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
 		iface = dvobj->padapters[i];
 		if ((iface) && (hw_port == iface->hw_port)) {
-			bmatch = true;
+			bmatch = _TRUE;
 			break;
 		}
 	}
@@ -1052,7 +1118,7 @@ _adapter *rtw_get_iface_by_hwport(_adapter *padapter, u8 hw_port)
 /*#define CONFIG_SKB_ALLOCATED*/
 #define DBG_SKB_PROCESS
 #ifdef DBG_SKB_PROCESS
-static void rtw_dbg_skb_process(_adapter *padapter, union recv_frame *precvframe, union recv_frame *pcloneframe)
+void rtw_dbg_skb_process(_adapter *padapter, union recv_frame *precvframe, union recv_frame *pcloneframe)
 {
 	_pkt *pkt_copy, *pkt_org;
 
@@ -1089,10 +1155,10 @@ static void rtw_dbg_skb_process(_adapter *padapter, union recv_frame *precvframe
 	if (precvframe->u.hdr.len != pcloneframe->u.hdr.len)
 		RTW_INFO("%s [WARN]  recv_frame length(%d:%d) compare failed\n", __func__, precvframe->u.hdr.len, pcloneframe->u.hdr.len);
 
-	if (!memcmp(&precvframe->u.hdr.attrib, &pcloneframe->u.hdr.attrib, sizeof(struct rx_pkt_attrib)) == false)
+	if (_rtw_memcmp(&precvframe->u.hdr.attrib, &pcloneframe->u.hdr.attrib, sizeof(struct rx_pkt_attrib)) == _FALSE)
 		RTW_INFO("%s [WARN]  recv_frame attrib compare failed\n", __func__);
 
-	if (!memcmp(precvframe->u.hdr.rx_data, pcloneframe->u.hdr.rx_data, precvframe->u.hdr.len) == false)
+	if (_rtw_memcmp(precvframe->u.hdr.rx_data, pcloneframe->u.hdr.rx_data, precvframe->u.hdr.len) == _FALSE)
 		RTW_INFO("%s [WARN]  recv_frame rx_data compare failed\n", __func__);
 
 }
@@ -1108,11 +1174,11 @@ static s32 _rtw_mi_buddy_clone_bcmc_packet(_adapter *adapter, union recv_frame *
 	if (pcloneframe) {
 		pcloneframe->u.hdr.adapter = adapter;
 
-		INIT_LIST_HEAD(&pcloneframe->u.hdr.list);
+		_rtw_init_listhead(&pcloneframe->u.hdr.list);
 		pcloneframe->u.hdr.precvbuf = NULL;	/*can't access the precvbuf for new arch.*/
 		pcloneframe->u.hdr.len = 0;
 
-		memcpy(&pcloneframe->u.hdr.attrib, &precvframe->u.hdr.attrib, sizeof(struct rx_pkt_attrib));
+		_rtw_memcpy(&pcloneframe->u.hdr.attrib, &precvframe->u.hdr.attrib, sizeof(struct rx_pkt_attrib));
 
 		pattrib = &pcloneframe->u.hdr.attrib;
 #ifdef CONFIG_SKB_ALLOCATED
@@ -1156,7 +1222,7 @@ void rtw_mi_buddy_clone_bcmc_packet(_adapter *padapter, union recv_frame *precvf
 		iface = dvobj->padapters[i];
 		if (!iface || iface == padapter)
 			continue;
-		if (rtw_is_adapter_up(iface) == false || iface->registered == 0)
+		if (rtw_is_adapter_up(iface) == _FALSE || iface->registered == 0)
 			continue;
 
 		pcloneframe = rtw_alloc_recvframe(pfree_recv_queue);
@@ -1171,6 +1237,28 @@ void rtw_mi_buddy_clone_bcmc_packet(_adapter *padapter, union recv_frame *precvf
 	}
 
 }
+
+#ifdef CONFIG_PCI_HCI
+/*API be created temporary for MI, caller is interrupt-handler, PCIE's interrupt handler cannot apply to multi-AP*/
+_adapter *rtw_mi_get_ap_adapter(_adapter *padapter)
+{
+	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
+	int i;
+	_adapter *iface = NULL;
+
+	for (i = 0; i < dvobj->iface_nums; i++) {
+		iface = dvobj->padapters[i];
+		if (!iface)
+			continue;
+
+		if (check_fwstate(&iface->mlmepriv, WIFI_AP_STATE) == _TRUE
+		    && check_fwstate(&iface->mlmepriv, WIFI_ASOC_STATE) == _TRUE)
+			break;
+
+	}
+	return iface;
+}
+#endif
 
 void rtw_mi_update_ap_bmc_camid(_adapter *padapter, u8 camid_a, u8 camid_b)
 {

@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 /* ************************************************************
  * include files
@@ -9,6 +25,7 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
+/* #if( DM_ODM_SUPPORT_TYPE & (ODM_WIN |ODM_CE)) */
 #if (defined(CONFIG_ANT_DETECTION))
 
 /* IS_ANT_DETECT_SUPPORT_SINGLE_TONE(adapter)
@@ -683,7 +700,7 @@ odm_single_dual_antenna_detection_psd(
 	while (odm_get_bb_reg(p_dm_odm, 0xdf4, BIT(6))) {
 		i++;
 		if (i > 1000000) {
-			ODM_RT_TRACE(p_dm_odm, ODM_COMP_ANT_DIV, ODM_DBG_LOUD, ("Wait in %s() more than %d times!\n", __func__, i));
+			ODM_RT_TRACE(p_dm_odm, ODM_COMP_ANT_DIV, ODM_DBG_LOUD, ("Wait in %s() more than %d times!\n", __FUNCTION__, i));
 			break;
 		}
 	}

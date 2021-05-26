@@ -5,7 +5,7 @@
 #define		BTC_COEX_OFFLOAD			0
 #define		BTC_TMP_BUF_SHORT		20
 
-extern u8	gl_btc_trace_buf[];
+extern u1Byte	gl_btc_trace_buf[];
 #define		BTC_SPRINTF			rsprintf
 #define		BTC_TRACE(_MSG_)\
 do {\
@@ -49,11 +49,11 @@ do {\
 #define		BTC_ANT_PATH_WIFI5G			3
 #define		BTC_ANT_PATH_AUTO			4
 /* dual Antenna definition */
-#define		BTC_ANT_WIFI_AT_MA	0
+#define		BTC_ANT_WIFI_AT_MAIN		0
 #define		BTC_ANT_WIFI_AT_AUX			1
 #define		BTC_ANT_WIFI_AT_DIVERSITY	2
 /* coupler Antenna definition */
-#define		BTC_ANT_WIFI_AT_CPL_MA0
+#define		BTC_ANT_WIFI_AT_CPL_MAIN	0
 #define		BTC_ANT_WIFI_AT_CPL_AUX		1
 
 typedef enum _BTC_POWERSAVE_TYPE {
@@ -109,15 +109,15 @@ struct btc_board_info {
 	u8				btdm_ant_num_by_ant_det;	/* ant number for btdm after antenna detection */
 	u8				btdm_ant_pos;		/* Bryant Add to indicate Antenna Position for (pg_ant_num = 2) && (btdm_ant_num =1)  (DPDT+1Ant case) */
 	u8				single_ant_path;	/* current used for 8723b only, 1=>s0,  0=>s1 */
-	bool			tfbga_package;    /* for Antenna detect threshold */
-	bool			btdm_ant_det_finish;
-	bool			btdm_ant_det_already_init_phydm;
+	boolean			tfbga_package;    /* for Antenna detect threshold */
+	boolean			btdm_ant_det_finish;
+	boolean			btdm_ant_det_already_init_phydm;
 	u8				ant_type;
 	u8				rfe_type;
 	u8				ant_div_cfg;
-	bool			btdm_ant_det_complete_fail;
+	boolean			btdm_ant_det_complete_fail;
 	u8				ant_det_result;
-	bool			ant_det_result_five_complete;
+	boolean			ant_det_result_five_complete;
 	u32				antdetval;
 };
 
@@ -232,7 +232,7 @@ typedef enum _BTC_VENDOR {
 
 /* defined for BFP_BTC_GET */
 typedef enum _BTC_GET_TYPE {
-	/* type bool */
+	/* type BOOLEAN */
 	BTC_GET_BL_HS_OPERATION,
 	BTC_GET_BL_HS_CONNECTING,
 	BTC_GET_BL_WIFI_FW_READY,
@@ -254,7 +254,7 @@ typedef enum _BTC_GET_TYPE {
 	BTC_GET_S4_WIFI_RSSI,
 	BTC_GET_S4_HS_RSSI,
 
-	/* type u32 */
+	/* type u4Byte */
 	BTC_GET_U4_WIFI_BW,
 	BTC_GET_U4_WIFI_TRAFFIC_DIRECTION,
 	BTC_GET_U4_WIFI_FW_VER,
@@ -267,7 +267,7 @@ typedef enum _BTC_GET_TYPE {
 	BTC_GET_U4_WIFI_IQK_OK,
 	BTC_GET_U4_WIFI_IQK_FAIL,
 
-	/* type u8 */
+	/* type u1Byte */
 	BTC_GET_U1_WIFI_DOT11_CHNL,
 	BTC_GET_U1_WIFI_CENTRAL_CHNL,
 	BTC_GET_U1_WIFI_HS_CHNL,
@@ -285,7 +285,7 @@ typedef enum _BTC_GET_TYPE {
 
 /* defined for BFP_BTC_SET */
 typedef enum _BTC_SET_TYPE {
-	/* type bool */
+	/* type BOOLEAN */
 	BTC_SET_BL_BT_DISABLE,
 	BTC_SET_BL_BT_ENABLE_DISABLE_CHANGE,
 	BTC_SET_BL_BT_TRAFFIC_BUSY,
@@ -297,7 +297,7 @@ typedef enum _BTC_SET_TYPE {
 	BTC_SET_BL_BT_TX_RX_MASK,
 	BTC_SET_BL_MIRACAST_PLUS_BT,
 
-	/* type u8 */
+	/* type u1Byte */
 	BTC_SET_U1_RSSI_ADJ_VAL_FOR_AGC_TABLE_ON,
 	BTC_SET_U1_AGG_BUF_SIZE,
 
@@ -306,9 +306,9 @@ typedef enum _BTC_SET_TYPE {
 	BTC_SET_ACT_AGGREGATE_CTRL,
 	BTC_SET_ACT_ANTPOSREGRISTRY_CTRL,
 	/*===== for 1Ant ======*/
-	/* type bool */
+	/* type BOOLEAN */
 
-	/* type u8 */
+	/* type u1Byte */
 	BTC_SET_U1_RSSI_ADJ_VAL_FOR_1ANT_COEX_TYPE,
 	BTC_SET_U1_LPS_VAL,
 	BTC_SET_U1_RPWM_VAL,
@@ -399,27 +399,27 @@ typedef enum _BTC_BT_OFFON {
 For following block is for coex offload
 ==================================================*/
 typedef struct _COL_H2C {
-	u8	opcode;
-	u8	opcode_ver:4;
-	u8	req_num:4;
-	u8	buf[1];
+	u1Byte	opcode;
+	u1Byte	opcode_ver:4;
+	u1Byte	req_num:4;
+	u1Byte	buf[1];
 } COL_H2C, *PCOL_H2C;
 
 #define	COL_C2H_ACK_HDR_LEN	3
 typedef struct _COL_C2H_ACK {
-	u8	status;
-	u8	opcode_ver:4;
-	u8	req_num:4;
-	u8	ret_len;
-	u8	buf[1];
+	u1Byte	status;
+	u1Byte	opcode_ver:4;
+	u1Byte	req_num:4;
+	u1Byte	ret_len;
+	u1Byte	buf[1];
 } COL_C2H_ACK, *PCOL_C2H_ACK;
 
 #define	COL_C2H_IND_HDR_LEN	3
 typedef struct _COL_C2H_IND {
-	u8	type;
-	u8	version;
-	u8	length;
-	u8	data[1];
+	u1Byte	type;
+	u1Byte	version;
+	u1Byte	length;
+	u1Byte	data[1];
 } COL_C2H_IND, *PCOL_C2H_IND;
 
 /*============================================
@@ -437,7 +437,7 @@ typedef enum _COL_H2C_STATUS {
 	/* other COL status start from here */
 	COL_STATUS_C2H_REQ_NUM_MISMATCH			, /* c2h req_num mismatch, means this c2h is not we expected. */
 	COL_STATUS_H2C_HALMAC_FAIL					, /* HALMAC return fail. */
-	COL_STATUS_H2C_TIMT					, /* not received the c2h response from fw */
+	COL_STATUS_H2C_TIMTOUT						, /* not received the c2h response from fw */
 	COL_STATUS_INVALID_C2H_LEN					, /* invalid coex offload c2h ack length, must >= 3 */
 	COL_STATUS_COEX_DATA_OVERFLOW				, /* coex returned length over the c2h ack length. */
 	COL_STATUS_MAX
@@ -466,292 +466,292 @@ typedef enum _COL_IND_TYPE {
 } COL_IND_TYPE, *PCOL_IND_TYPE;
 
 typedef struct _COL_SINGLE_H2C_RECORD {
-	u8					h2c_buf[COL_H2C_BUF_LEN];	/* the latest sent h2c buffer */
-	u32					h2c_len;
-	u8					c2h_ack_buf[COL_H2C_BUF_LEN];	/* the latest received c2h buffer */
-	u32					c2h_ack_len;
-	u32					count;									/* the total number of the sent h2c command */
-	u32					status[COL_STATUS_MAX];					/* the c2h status for the sent h2c command */
+	u1Byte					h2c_buf[COL_H2C_BUF_LEN];	/* the latest sent h2c buffer */
+	u4Byte					h2c_len;
+	u1Byte					c2h_ack_buf[COL_H2C_BUF_LEN];	/* the latest received c2h buffer */
+	u4Byte					c2h_ack_len;
+	u4Byte					count;									/* the total number of the sent h2c command */
+	u4Byte					status[COL_STATUS_MAX];					/* the c2h status for the sent h2c command */
 } COL_SINGLE_H2C_RECORD, *PCOL_SINGLE_H2C_RECORD;
 
 typedef struct _COL_SINGLE_C2H_IND_RECORD {
-	u8					ind_buf[COL_H2C_BUF_LEN];	/* the latest received c2h indication buffer */
-	u32					ind_len;
-	u32					count;									/* the total number of the rcvd c2h indication */
-	u32					status[COL_STATUS_MAX];					/* the c2h indication verified status */
+	u1Byte					ind_buf[COL_H2C_BUF_LEN];	/* the latest received c2h indication buffer */
+	u4Byte					ind_len;
+	u4Byte					count;									/* the total number of the rcvd c2h indication */
+	u4Byte					status[COL_STATUS_MAX];					/* the c2h indication verified status */
 } COL_SINGLE_C2H_IND_RECORD, *PCOL_SINGLE_C2H_IND_RECORD;
 
 typedef struct _BTC_OFFLOAD {
 	/* H2C command related */
-	u8					h2c_req_num;
-	u32					cnt_h2c_sent;
+	u1Byte					h2c_req_num;
+	u4Byte					cnt_h2c_sent;
 	COL_SINGLE_H2C_RECORD	h2c_record[COL_OP_WIFI_OPCODE_MAX];
 
 	/* C2H Ack related */
-	u32					cnt_c2h_ack;
-	u32					status[COL_STATUS_MAX];
+	u4Byte					cnt_c2h_ack;
+	u4Byte					status[COL_STATUS_MAX];
 	struct completion		c2h_event[COL_MAX_H2C_REQ_NUM];	/* for req_num = 1~COL_MAX_H2C_REQ_NUM */
-	u8					c2h_ack_buf[COL_MAX_H2C_REQ_NUM][COL_H2C_BUF_LEN];
-	u8					c2h_ack_len[COL_MAX_H2C_REQ_NUM];
+	u1Byte					c2h_ack_buf[COL_MAX_H2C_REQ_NUM][COL_H2C_BUF_LEN];
+	u1Byte					c2h_ack_len[COL_MAX_H2C_REQ_NUM];
 
 	/* C2H Indication related */
-	u32						cnt_c2h_ind;
+	u4Byte						cnt_c2h_ind;
 	COL_SINGLE_C2H_IND_RECORD	c2h_ind_record[COL_IND_MAX];
-	u32						c2h_ind_status[COL_STATUS_MAX];
-	u8						c2h_ind_buf[COL_H2C_BUF_LEN];
-	u8						c2h_ind_len;
+	u4Byte						c2h_ind_status[COL_STATUS_MAX];
+	u1Byte						c2h_ind_buf[COL_H2C_BUF_LEN];
+	u1Byte						c2h_ind_len;
 } BTC_OFFLOAD, *PBTC_OFFLOAD;
 extern BTC_OFFLOAD				gl_coex_offload;
 /*==================================================*/
 
-typedef u8
+typedef u1Byte
 (*BFP_BTC_R1)(
-	void *			pBtcContext,
-	u32			RegAddr
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr
 	);
-typedef u16
+typedef u2Byte
 (*BFP_BTC_R2)(
-	void *			pBtcContext,
-	u32			RegAddr
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr
 	);
-typedef u32
+typedef u4Byte
 (*BFP_BTC_R4)(
-	void *			pBtcContext,
-	u32			RegAddr
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_W1)(
-	void *			pBtcContext,
-	u32			RegAddr,
-	u8			Data
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr,
+	IN	u1Byte			Data
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_W1_BIT_MASK)(
-	void *			pBtcContext,
-	u32			regAddr,
-	u8			bitMask,
-	u8			data1b
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			regAddr,
+	IN	u1Byte			bitMask,
+	IN	u1Byte			data1b
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_W2)(
-	void *			pBtcContext,
-	u32			RegAddr,
-	u16			Data
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr,
+	IN	u2Byte			Data
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_W4)(
-	void *			pBtcContext,
-	u32			RegAddr,
-	u32			Data
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr,
+	IN	u4Byte			Data
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_LOCAL_REG_W1)(
-	void *			pBtcContext,
-	u32			RegAddr,
-	u8			Data
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr,
+	IN	u1Byte			Data
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_SET_BB_REG)(
-	void *			pBtcContext,
-	u32			RegAddr,
-	u32			BitMask,
-	u32			Data
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr,
+	IN	u4Byte			BitMask,
+	IN	u4Byte			Data
 	);
-typedef u32
+typedef u4Byte
 (*BFP_BTC_GET_BB_REG)(
-	void *			pBtcContext,
-	u32			RegAddr,
-	u32			BitMask
+	IN	PVOID			pBtcContext,
+	IN	u4Byte			RegAddr,
+	IN	u4Byte			BitMask
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_SET_RF_REG)(
-	void *			pBtcContext,
-	u8			eRFPath,
-	u32			RegAddr,
-	u32			BitMask,
-	u32			Data
+	IN	PVOID			pBtcContext,
+	IN	u1Byte			eRFPath,
+	IN	u4Byte			RegAddr,
+	IN	u4Byte			BitMask,
+	IN	u4Byte			Data
 	);
-typedef u32
+typedef u4Byte
 (*BFP_BTC_GET_RF_REG)(
-	void *			pBtcContext,
-	u8			eRFPath,
-	u32			RegAddr,
-	u32			BitMask
+	IN	PVOID			pBtcContext,
+	IN	u1Byte			eRFPath,
+	IN	u4Byte			RegAddr,
+	IN	u4Byte			BitMask
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_FILL_H2C)(
-	void *			pBtcContext,
-	u8			elementId,
-	u32			cmdLen,
-	u8 *			pCmdBuffer
+	IN	PVOID			pBtcContext,
+	IN	u1Byte			elementId,
+	IN	u4Byte			cmdLen,
+	IN	pu1Byte			pCmdBuffer
 	);
 
-typedef	bool
+typedef	BOOLEAN
 (*BFP_BTC_GET)(
-	void *			pBtCoexist,
-	u8			getType,
-	void *			pOutBuf
+	IN	PVOID			pBtCoexist,
+	IN	u1Byte			getType,
+	OUT	PVOID			pOutBuf
 	);
 
-typedef	bool
+typedef	BOOLEAN
 (*BFP_BTC_SET)(
-	void *			pBtCoexist,
-	u8			setType,
-	void *			pInBuf
+	IN	PVOID			pBtCoexist,
+	IN	u1Byte			setType,
+	OUT	PVOID			pInBuf
 	);
-typedef u16
+typedef u2Byte
 (*BFP_BTC_SET_BT_REG)(
-	void *			pBtcContext,
-	u8			regType,
-	u32			offset,
-	u32			value
+	IN	PVOID			pBtcContext,
+	IN	u1Byte			regType,
+	IN	u4Byte			offset,
+	IN	u4Byte			value
 	);
-typedef bool
+typedef BOOLEAN
 (*BFP_BTC_SET_BT_ANT_DETECTION)(
-	void *			pBtcContext,
-	u8			txTime,
-	u8			btChnl
+	IN	PVOID			pBtcContext,
+	IN	u1Byte			txTime,
+	IN	u1Byte			btChnl
 	);
 
-typedef bool
+typedef BOOLEAN
 (*BFP_BTC_SET_BT_TRX_MASK)(
-	void *			pBtcContext,
-	u8			bt_trx_mask
+	IN	PVOID			pBtcContext,
+	IN	u1Byte			bt_trx_mask
 	);
 
-typedef u32
+typedef u4Byte
 (*BFP_BTC_GET_BT_REG)(
-	void *			pBtcContext,
-	u8			regType,
-	u32			offset
+	IN	PVOID			pBtcContext,
+	IN	u1Byte			regType,
+	IN	u4Byte			offset
 	);
-typedef void
+typedef VOID
 (*BFP_BTC_DISP_DBG_MSG)(
-	void *			pBtCoexist,
-	u8			dispType
+	IN	PVOID			pBtCoexist,
+	IN	u1Byte			dispType
 	);
 
 typedef COL_H2C_STATUS
 (*BFP_BTC_COEX_H2C_PROCESS)(
-	void *			pBtCoexist,
-	u8			opcode,
-	u8			opcode_ver,
-	u8 *			ph2c_par,
-	u8			h2c_par_len
+	IN	PVOID			pBtCoexist,
+	IN	u1Byte			opcode,
+	IN	u1Byte			opcode_ver,
+	IN	pu1Byte			ph2c_par,
+	IN	u1Byte			h2c_par_len
 	);
 
-typedef u32
+typedef u4Byte
 (*BFP_BTC_GET_BT_COEX_SUPPORTED_FEATURE)(
-	void *			pBtcContext
+	IN	PVOID			pBtcContext
 	);
 
-typedef u32
+typedef u4Byte
 (*BFP_BTC_GET_BT_COEX_SUPPORTED_VERSION)(
-	void *			pBtcContext
+	IN	PVOID			pBtcContext
 	);
 
-typedef u32
+typedef u4Byte
 (*BFP_BTC_GET_PHYDM_VERSION)(
-	void *			pBtcContext
+	IN	PVOID			pBtcContext
 	);
 
-typedef void
+typedef VOID
 (*BTC_PHYDM_MODIFY_RA_PCR_THRESHLOD)(
-	void *		pDM_Odm,
-	u8		RA_offset_direction,
-	u8		RA_threshold_offset
+	IN	PVOID		pDM_Odm,
+	IN	u1Byte		RA_offset_direction,
+	IN	u1Byte		RA_threshold_offset
 	);
 
-typedef u32
+typedef u4Byte
 (*BTC_PHYDM_CMNINFOQUERY)(
-		void *	pDM_Odm,
-		u8	info_type
+	IN		PVOID	pDM_Odm,
+	IN		u1Byte	info_type
 	);
 
-typedef u8
+typedef u1Byte
 (*BFP_BTC_GET_ANT_DET_VAL_FROM_BT)(
 
-	void *			pBtcContext
+	IN	PVOID			pBtcContext
 	);
 
-typedef u8
+typedef u1Byte
 (*BFP_BTC_GET_BLE_SCAN_TYPE_FROM_BT)(
-	void *			pBtcContext
+	IN	PVOID			pBtcContext
 	);
 
-typedef u32
+typedef u4Byte
 (*BFP_BTC_GET_BLE_SCAN_PARA_FROM_BT)(
-	void *			pBtcContext,
-	u8			scanType
+	IN	PVOID			pBtcContext,
+	IN  u1Byte			scanType
 	);
 
-typedef bool
+typedef BOOLEAN
 (*BFP_BTC_GET_BT_AFH_MAP_FROM_BT)(
-	void *			pBtcContext,
-	u8			mapType,
-	u8 *			afhMap
+	IN	PVOID			pBtcContext,
+	IN	u1Byte			mapType,
+	OUT	pu1Byte			afhMap
 	);
 
 struct  btc_bt_info {
-	bool					bt_disabled;
-	bool				bt_enable_disable_change;
+	boolean					bt_disabled;
+	boolean				bt_enable_disable_change;
 	u8					rssi_adjust_for_agc_table_on;
 	u8					rssi_adjust_for_1ant_coex_type;
-	bool					pre_bt_ctrl_agg_buf_size;
-	bool					bt_ctrl_agg_buf_size;
-	bool					pre_reject_agg_pkt;
-	bool					reject_agg_pkt;
-	bool					increase_scan_dev_num;
-	bool					bt_tx_rx_mask;
+	boolean					pre_bt_ctrl_agg_buf_size;
+	boolean					bt_ctrl_agg_buf_size;
+	boolean					pre_reject_agg_pkt;
+	boolean					reject_agg_pkt;
+	boolean					increase_scan_dev_num;
+	boolean					bt_tx_rx_mask;
 	u8					pre_agg_buf_size;
 	u8					agg_buf_size;
-	bool					bt_busy;
-	bool					limited_dig;
+	boolean					bt_busy;
+	boolean					limited_dig;
 	u16					bt_hci_ver;
 	u16					bt_real_fw_ver;
 	u8					bt_fw_ver;
 	u32					get_bt_fw_ver_cnt;
 	u32					bt_get_fw_ver;
-	bool					miracast_plus_bt;
+	boolean					miracast_plus_bt;
 
-	bool					bt_disable_low_pwr;
+	boolean					bt_disable_low_pwr;
 
-	bool					bt_ctrl_lps;
-	bool					bt_lps_on;
-	bool					force_to_roam;	/* for 1Ant solution */
+	boolean					bt_ctrl_lps;
+	boolean					bt_lps_on;
+	boolean					force_to_roam;	/* for 1Ant solution */
 	u8					lps_val;
 	u8					rpwm_val;
 	u32					ra_mask;
 };
 
 struct btc_stack_info {
-	bool					profile_notified;
+	boolean					profile_notified;
 	u16					hci_version;	/* stack hci version */
 	u8					num_of_link;
-	bool					bt_link_exist;
-	bool					sco_exist;
-	bool					acl_exist;
-	bool					a2dp_exist;
-	bool					hid_exist;
+	boolean					bt_link_exist;
+	boolean					sco_exist;
+	boolean					acl_exist;
+	boolean					a2dp_exist;
+	boolean					hid_exist;
 	u8					num_of_hid;
-	bool					pan_exist;
-	bool					unknown_acl_exist;
+	boolean					pan_exist;
+	boolean					unknown_acl_exist;
 	s8					min_bt_rssi;
 };
 
 struct btc_bt_link_info {
-	bool					bt_link_exist;
-	bool					bt_hi_pri_link_exist;
-	bool					sco_exist;
-	bool					sco_only;
-	bool					a2dp_exist;
-	bool					a2dp_only;
-	bool					hid_exist;
-	bool					hid_only;
-	bool					pan_exist;
-	bool					pan_only;
-	bool					slave_role;
-	bool					acl_busy;
+	boolean					bt_link_exist;
+	boolean					bt_hi_pri_link_exist;
+	boolean					sco_exist;
+	boolean					sco_only;
+	boolean					a2dp_exist;
+	boolean					a2dp_only;
+	boolean					hid_exist;
+	boolean					hid_only;
+	boolean					pan_exist;
+	boolean					pan_only;
+	boolean					slave_role;
+	boolean					acl_busy;
 };
 
 struct btc_statistics {
@@ -775,22 +775,22 @@ struct btc_statistics {
 };
 
 struct btc_coexist {
-	bool				bBinded;		/*make sure only one adapter can bind the data context*/
-	void *				Adapter;		/*default adapter*/
+	BOOLEAN				bBinded;		/*make sure only one adapter can bind the data context*/
+	PVOID				Adapter;		/*default adapter*/
 	struct  btc_board_info		board_info;
 	struct  btc_bt_info			bt_info;		/*some bt info referenced by non-bt module*/
 	struct  btc_stack_info		stack_info;
 	struct  btc_bt_link_info		bt_link_info;
 	BTC_CHIP_INTERFACE		chip_interface;
-	void *					odm_priv;
+	PVOID					odm_priv;
 
-	bool					initilized;
-	bool					stop_coex_dm;
-	bool					manual_control;
-	bool					bdontenterLPS;
-	u8 *					cli_buf;
+	BOOLEAN					initilized;
+	BOOLEAN					stop_coex_dm;
+	BOOLEAN					manual_control;
+	BOOLEAN					bdontenterLPS;
+	pu1Byte					cli_buf;
 	struct btc_statistics		statistics;
-	u8				pwrModeVal[10];
+	u1Byte				pwrModeVal[10];
 
 	/* function pointers */
 	/* io related */
@@ -839,147 +839,153 @@ typedef struct btc_coexist *PBTC_COEXIST;
 
 extern struct btc_coexist	GLBtCoexist;
 
-bool
+BOOLEAN
 EXhalbtcoutsrc_InitlizeVariables(
-	void *		Adapter
+	IN	PVOID		Adapter
 	);
-void
+VOID
 EXhalbtcoutsrc_PowerOnSetting(
-	PBTC_COEXIST		pBtCoexist
+	IN	PBTC_COEXIST		pBtCoexist
 	);
-void
+VOID
 EXhalbtcoutsrc_PreLoadFirmware(
-	PBTC_COEXIST		pBtCoexist
+	IN	PBTC_COEXIST		pBtCoexist
 	);
-void
+VOID
 EXhalbtcoutsrc_InitHwConfig(
-	PBTC_COEXIST		pBtCoexist,
-	bool				bWifiOnly
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	BOOLEAN				bWifiOnly
 	);
-void
+VOID
 EXhalbtcoutsrc_InitCoexDm(
-	PBTC_COEXIST		pBtCoexist
+	IN	PBTC_COEXIST		pBtCoexist
 	);
-void
+VOID
 EXhalbtcoutsrc_IpsNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8			type
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	u1Byte			type
 	);
-void
+VOID
 EXhalbtcoutsrc_LpsNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8			type
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	u1Byte			type
 	);
-void
+VOID
 EXhalbtcoutsrc_ScanNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8			type
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	u1Byte			type
 	);
-void
+VOID
 EXhalbtcoutsrc_SetAntennaPathNotify(
-	PBTC_COEXIST	pBtCoexist,
-	u8			type
+	IN	PBTC_COEXIST	pBtCoexist,
+	IN	u1Byte			type
 	);
-void
+VOID
 EXhalbtcoutsrc_ConnectNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8			action
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	u1Byte			action
 	);
-void
+VOID
 EXhalbtcoutsrc_MediaStatusNotify(
-	PBTC_COEXIST		pBtCoexist,
-	RT_MEDIA_STATUS	mediaStatus
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	RT_MEDIA_STATUS	mediaStatus
 	);
-void
+VOID
 EXhalbtcoutsrc_SpecificPacketNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8			pktType
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	u1Byte			pktType
 	);
-void
+VOID
 EXhalbtcoutsrc_BtInfoNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8 *			tmpBuf,
-	u8			length
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	pu1Byte			tmpBuf,
+	IN	u1Byte			length
 	);
-void
+VOID
 EXhalbtcoutsrc_RfStatusNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8				type
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	u1Byte				type
 	);
-void
+VOID
 EXhalbtcoutsrc_StackOperationNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8			type
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	u1Byte			type
 	);
-void
+VOID
 EXhalbtcoutsrc_HaltNotify(
-	PBTC_COEXIST		pBtCoexist
+	IN	PBTC_COEXIST		pBtCoexist
 	);
-void
+VOID
 EXhalbtcoutsrc_PnpNotify(
-	PBTC_COEXIST		pBtCoexist,
-	u8			pnpState
+	IN	PBTC_COEXIST		pBtCoexist,
+	IN	u1Byte			pnpState
 	);
-void
+VOID
 EXhalbtcoutsrc_CoexDmSwitch(
-	PBTC_COEXIST		pBtCoexist
+	IN	PBTC_COEXIST		pBtCoexist
 	);
-void
+VOID
 EXhalbtcoutsrc_Periodical(
-	PBTC_COEXIST		pBtCoexist
+	IN	PBTC_COEXIST		pBtCoexist
 	);
-void
+VOID
 EXhalbtcoutsrc_DbgControl(
-	PBTC_COEXIST			pBtCoexist,
-	u8				opCode,
-	u8				opLen,
-	u8 *				pData
+	IN	PBTC_COEXIST			pBtCoexist,
+	IN	u1Byte				opCode,
+	IN	u1Byte				opLen,
+	IN	pu1Byte				pData
 	);
-void
+VOID
 EXhalbtcoutsrc_AntennaDetection(
-	PBTC_COEXIST			pBtCoexist,
-	u32					centFreq,
-	u32					offset,
-	u32					span,
-	u32					seconds
+	IN	PBTC_COEXIST			pBtCoexist,
+	IN	u4Byte					centFreq,
+	IN	u4Byte					offset,
+	IN	u4Byte					span,
+	IN	u4Byte					seconds
 	);
-void
+VOID
 EXhalbtcoutsrc_StackUpdateProfileInfo(
-	void
+	VOID
 	);
-void
+VOID
 EXhalbtcoutsrc_SetHciVersion(
-	u16	hciVersion
+	IN	u2Byte	hciVersion
 	);
-void
+VOID
 EXhalbtcoutsrc_SetBtPatchVersion(
-	u16	btHciVersion,
-	u16	btPatchVersion
+	IN	u2Byte	btHciVersion,
+	IN	u2Byte	btPatchVersion
 	);
-void
+VOID
 EXhalbtcoutsrc_UpdateMinBtRssi(
-	s8	btRssi
+	IN	s1Byte	btRssi
 	);
-void
+#if 0
+VOID
+EXhalbtcoutsrc_SetBtExist(
+	IN	BOOLEAN		bBtExist
+	);
+#endif
+VOID
 EXhalbtcoutsrc_SetChipType(
-	u8		chipType
+	IN	u1Byte		chipType
 	);
-void
+VOID
 EXhalbtcoutsrc_SetAntNum(
-	u8		type,
-	u8		antNum
+	IN	u1Byte		type,
+	IN	u1Byte		antNum
 	);
-void
+VOID
 EXhalbtcoutsrc_SetSingleAntPath(
-	u8		singleAntPath
+	IN	u1Byte		singleAntPath
 	);
-void
+VOID
 EXhalbtcoutsrc_DisplayBtCoexInfo(
-	PBTC_COEXIST		pBtCoexist
+	IN	PBTC_COEXIST		pBtCoexist
 	);
-void
+VOID
 EXhalbtcoutsrc_DisplayAntDetection(
-	PBTC_COEXIST		pBtCoexist
+	IN	PBTC_COEXIST		pBtCoexist
 	);
 
 #define	MASKBYTE0		0xff

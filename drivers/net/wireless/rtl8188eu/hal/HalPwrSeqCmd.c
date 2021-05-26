@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 /*++
 Copyright (c) Realtek Semiconductor Corp. All rights reserved.
 
@@ -37,7 +53,7 @@ u8 HalPwrSeqCmdParsing(
 	WLAN_PWR_CFG	PwrSeqCmd[])
 {
 	WLAN_PWR_CFG	PwrCfgCmd = {0};
-	u8				bPollingBit = false;
+	u8				bPollingBit = _FALSE;
 	u32				AryIdx = 0;
 	u8				value = 0;
 	u32				offset = 0;
@@ -93,7 +109,7 @@ u8 HalPwrSeqCmdParsing(
 
 			case PWR_CMD_POLLING:
 
-				bPollingBit = false;
+				bPollingBit = _FALSE;
 				offset = GET_PWR_CFG_OFFSET(PwrCfgCmd);
 #ifdef CONFIG_GSPI_HCI
 				if (GET_PWR_CFG_BASE(PwrCfgCmd) == PWR_BASEADDR_SDIO)
@@ -109,13 +125,13 @@ u8 HalPwrSeqCmdParsing(
 
 					value = value & GET_PWR_CFG_MASK(PwrCfgCmd);
 					if (value == (GET_PWR_CFG_VALUE(PwrCfgCmd) & GET_PWR_CFG_MASK(PwrCfgCmd)))
-						bPollingBit = true;
+						bPollingBit = _TRUE;
 					else
 						rtw_udelay_os(10);
 
 					if (pollingCount++ > maxPollingCnt) {
 						RTW_ERR("HalPwrSeqCmdParsing: Fail to polling Offset[%#x]=%02x\n", offset, value);
-						return false;
+						return _FALSE;
 					}
 				} while (!bPollingBit);
 
@@ -130,7 +146,7 @@ u8 HalPwrSeqCmdParsing(
 
 			case PWR_CMD_END:
 				/* When this command is parsed, end the process */
-				return true;
+				return _TRUE;
 				break;
 
 			default:
@@ -141,5 +157,5 @@ u8 HalPwrSeqCmdParsing(
 		AryIdx++;/* Add Array Index */
 	} while (1);
 
-	return true;
+	return _TRUE;
 }

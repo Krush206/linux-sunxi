@@ -1,16 +1,38 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef _LINUX_WIRELESS_H
 #define _LINUX_WIRELESS_H
 
 /***************************** INCLUDES *****************************/
 
-#define __user
-/* typedef uint16_t	__u16; */
-#include <sys/socket.h>			/* for "struct sockaddr" et al	*/
-#include <net/if.h>			/* for IFNAMSIZ and co... */
+#if 0
+	#include <linux/types.h>		/* for __u* and __s* typedefs */
+	#include <linux/socket.h>		/* for "struct sockaddr" et al	*/
+	#include <linux/if.h>			/* for IFNAMSIZ and co... */
+#else
+	#define __user
+	/* typedef uint16_t	__u16; */
+	#include <sys/socket.h>			/* for "struct sockaddr" et al	*/
+	#include <net/if.h>			/* for IFNAMSIZ and co... */
+#endif
 
 /****************************** TYPES ******************************/
 #ifdef CONFIG_COMPAT

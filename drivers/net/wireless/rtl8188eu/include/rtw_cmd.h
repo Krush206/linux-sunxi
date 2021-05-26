@@ -1,11 +1,29 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_CMD_H_
 #define __RTW_CMD_H_
 
 
 #define C2H_MEM_SZ (16*1024)
+
+#ifndef CONFIG_RTL8711FW
 
 #define FREE_CMDOBJ_SZ	128
 
@@ -13,7 +31,11 @@
 #define MAX_RSPSZ	512
 #define MAX_EVTSZ	1024
 
-#define CMDBUFF_ALIGN_SZ 512
+#ifdef PLATFORM_OS_CE
+	#define CMDBUFF_ALIGN_SZ 4
+#else
+	#define CMDBUFF_ALIGN_SZ 512
+#endif
 
 struct cmd_obj {
 	_adapter *padapter;
@@ -96,13 +118,16 @@ struct	evt_priv {
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	u8	*c2h_mem;
 	u8	*allocated_c2h_mem;
+#ifdef PLATFORM_OS_XP
+	PMDL	pc2h_mdl;
+#endif
 #endif
 
 };
 
 #define init_h2fwcmd_w_parm_no_rsp(pcmd, pparm, code) \
 	do {\
-		INIT_LIST_HEAD(&pcmd->list);\
+		_rtw_init_listhead(&pcmd->list);\
 		pcmd->cmdcode = code;\
 		pcmd->parmbuf = (u8 *)(pparm);\
 		pcmd->cmdsz = sizeof (*pparm);\
@@ -112,7 +137,7 @@ struct	evt_priv {
 
 #define init_h2fwcmd_w_parm_no_parm_rsp(pcmd, code) \
 	do {\
-		INIT_LIST_HEAD(&pcmd->list);\
+		_rtw_init_listhead(&pcmd->list);\
 		pcmd->cmdcode = code;\
 		pcmd->parmbuf = NULL;\
 		pcmd->cmdsz = 0;\
@@ -186,6 +211,10 @@ u8 p2p_roch_cmd(_adapter *adapter
 u8 p2p_cancel_roch_cmd(_adapter *adapter, u64 cookie, struct wireless_dev *wdev, u8 flags);
 #endif /* CONFIG_IOCTL_CFG80211 */
 #endif /* CONFIG_P2P */
+
+#else
+/* #include <ieee80211.h> */
+#endif	/* CONFIG_RTL8711FW */
 
 enum rtw_drvextra_cmd_id {
 	NONE_WK_CID,
@@ -304,6 +333,21 @@ struct createbss_parm {
 	s8 req_bw;
 	s8 req_offset;
 };
+
+#if 0
+/* Caller Mode: AP, Ad-HoC, Infra */
+/* Notes: To set the NIC mode of RTL8711 */
+/* Command Mode */
+/* The definition of mode: */
+
+#define IW_MODE_AUTO	0	/*  Let the driver decides which AP to join */
+#define IW_MODE_ADHOC	1	/*  Single cell network (Ad-Hoc Clients) */
+#define IW_MODE_INFRA	2	/*  Multi cell network, roaming, .. */
+#define IW_MODE_MASTER	3	/*  Synchronisation master or Access Point */
+#define IW_MODE_REPEAT	4	/*  Wireless Repeater (forwarder) */
+#define IW_MODE_SECOND	5	/*  Secondary master/repeater (backup) */
+#define IW_MODE_MONITOR	6	/*  Passive monitor (listen only) */
+#endif
 
 struct	setopmode_parm {
 	u8	mode;
@@ -922,7 +966,7 @@ struct SetChannelPlan_param {
 
 /*H2C Handler index: 60 */
 struct LedBlink_param {
-	void *	 pLed;
+	PVOID	 pLed;
 };
 
 /*H2C Handler index: 61 */
@@ -1030,11 +1074,7 @@ extern u8 rtw_ps_cmd(_adapter *padapter);
 u8 rtw_chk_hi_queue_cmd(_adapter *padapter);
 #ifdef CONFIG_DFS_MASTER
 u8 rtw_dfs_master_cmd(_adapter *adapter, bool enqueue);
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 void rtw_dfs_master_timer_hdl(RTW_TIMER_HDL_ARGS);
-#else
-void rtw_dfs_master_timer_hdl(struct timer_list *t);
-#endif
 void rtw_dfs_master_enable(_adapter *adapter, u8 ch, u8 bw, u8 offset);
 void rtw_dfs_master_disable(_adapter *adapter, u8 ch, u8 bw, u8 offset, bool by_others);
 enum {
@@ -1061,7 +1101,7 @@ u8 rtw_set_ch_cmd(_adapter *padapter, u8 ch, u8 bw, u8 ch_offset, u8 enqueue);
 u8 rtw_set_chplan_cmd(_adapter *adapter, int flags, u8 chplan, u8 swconfig);
 u8 rtw_set_country_cmd(_adapter *adapter, int flags, const char *country_code, u8 swconfig);
 
-extern u8 rtw_led_blink_cmd(_adapter *padapter, void * pLed);
+extern u8 rtw_led_blink_cmd(_adapter *padapter, PVOID pLed);
 extern u8 rtw_set_csa_cmd(_adapter *padapter, u8 new_ch_no);
 extern u8 rtw_tdls_cmd(_adapter *padapter, u8 *addr, u8 option);
 
@@ -1193,7 +1233,7 @@ enum rtw_h2c_cmd {
 #define _SetRFReg_CMD_		_Write_RFREG_CMD_
 
 #ifdef _RTW_CMD_C_
-static struct _cmd_callback	rtw_cmd_callback[] = {
+struct _cmd_callback	rtw_cmd_callback[] = {
 	{GEN_CMD_CODE(_Read_MACREG), &rtw_getmacreg_cmdrsp_callback}, /*0*/
 	{GEN_CMD_CODE(_Write_MACREG), NULL},
 	{GEN_CMD_CODE(_Read_BBREG), &rtw_getbbrfreg_cmdrsp_callback},

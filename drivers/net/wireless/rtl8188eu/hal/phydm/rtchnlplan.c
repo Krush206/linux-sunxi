@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2012 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 /******************************************************************************
 
@@ -34,21 +50,21 @@
 	3		2G_FCC1		5G_NULL		22h		US 2G			NA
 	4		2G_MKK1		5G_NULL		23h		Japan 2G		NA
 	5		2G_ETSI2	5G_NULL		24h		France 2G		NA
-	6		2G_FCC1		5G_FCC1		25h		US 2G			US 5G					ï¿½Kï¿½jï¿½ï¿½{ï¿½ï¿½
-	7		2G_WORLD	5G_ETSI1	26h		Worldwird 13	Europe					ï¿½Kï¿½jï¿½ï¿½{ï¿½ï¿½
-	8		2G_MKK1		5G_MKK1		27h		Japan 2G		Japan 5G				ï¿½Kï¿½jï¿½ï¿½{ï¿½ï¿½
-	9		2G_WORLD	5G_KCC1		28h		Worldwird 13	Korea					ï¿½Kï¿½jï¿½ï¿½{ï¿½ï¿½
+	6		2G_FCC1		5G_FCC1		25h		US 2G			US 5G					¤K¤j°ê»{ÃÒ
+	7		2G_WORLD	5G_ETSI1	26h		Worldwird 13	Europe					¤K¤j°ê»{ÃÒ
+	8		2G_MKK1		5G_MKK1		27h		Japan 2G		Japan 5G				¤K¤j°ê»{ÃÒ
+	9		2G_WORLD	5G_KCC1		28h		Worldwird 13	Korea					¤K¤j°ê»{ÃÒ
 	10		2G_WORLD	5G_FCC2		29h		Worldwird 13	US o/w DFS Channels
 	11		2G_WORLD	5G_FCC3		30h		Worldwird 13	India, Mexico
 	12		2G_WORLD	5G_FCC4		31h		Worldwird 13	Venezuela
 	13		2G_WORLD	5G_FCC5		32h		Worldwird 13	China
 	14		2G_WORLD	5G_FCC6		33h		Worldwird 13	Israel
-	15		2G_FCC1		5G_FCC7		34h		US 2G			US/Canada				ï¿½Kï¿½jï¿½ï¿½{ï¿½ï¿½
-	16		2G_WORLD	5G_ETSI2	35h		Worldwird 13	Australia, New Zealand	ï¿½Kï¿½jï¿½ï¿½{ï¿½ï¿½
+	15		2G_FCC1		5G_FCC7		34h		US 2G			US/Canada				¤K¤j°ê»{ÃÒ
+	16		2G_WORLD	5G_ETSI2	35h		Worldwird 13	Australia, New Zealand	¤K¤j°ê»{ÃÒ
 	17		2G_WORLD	5G_ETSI3	36h		Worldwird 13	Russia
 	18		2G_MKK1		5G_MKK2		37h		Japan 2G		Japan (W52, W53)
 	19		2G_MKK1		5G_MKK3		38h		Japan 2G		Japan (W56)
-	20		2G_FCC1		5G_NCC1		39h		US 2G			Taiwan					ï¿½Kï¿½jï¿½ï¿½{ï¿½ï¿½
+	20		2G_FCC1		5G_NCC1		39h		US 2G			Taiwan					¤K¤j°ê»{ÃÒ
 
 	NA		2G_WORLD	5G_FCC1		7F		FCC	FCC DFS Channels	Realtek Define
 
@@ -213,10 +229,10 @@
 	173	5865	P	P	P			P
 	177	5885	P	P				P
 channel count			28	28	14	7	0	28	24	20	24	19	5	13	8	19	20	22	15	12
-			E: FCC accepted the ask for CH144 from Accord.					PS: 160MHz ï¿½ï¿½ 80MHz+80MHzï¿½ï¿½{ï¿½H			Argentina	Belgium (ï¿½ï¿½Qï¿½ï¿½)		India	Israel			Russia
-			P: Customer's requirement from James.								Australia	The Netherlands (ï¿½ï¿½ï¿½ï¿½)		Mexico	Turkey			Ukraine
-											New Zealand	UK (ï¿½^ï¿½ï¿½)		Singapore
-											Brazil	Switzerland (ï¿½ï¿½h)
+			E: FCC accepted the ask for CH144 from Accord.					PS: 160MHz ¥Î 80MHz+80MHz¹ê²{¡H			Argentina	Belgium (¤ñ§Q®É)		India	Israel			Russia
+			P: Customer's requirement from James.								Australia	The Netherlands (²üÄõ)		Mexico	Turkey			Ukraine
+											New Zealand	UK (­^°ê)		Singapore
+											Brazil	Switzerland (·ç¤h)
 
 
 */
@@ -272,16 +288,188 @@ static	struct _RT_CHANNEL_PLAN_MAXPWR	chnl_plan_pwr_max_2g[] = {
 	/* ...... */
 };
 
+
+#if 0
+/* ===========================================1:(2G_WORLD, 5G_NULL) */
+
+struct _RT_CHANNEL_PLAN_MAXPWR	RT_DOMAIN_01 = {{{01, 13, 20}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}}, 1}
+
+/* ===========================================2:(2G_ETSI1, 5G_NULL) */
+
+RT_DOMAIN_02 = {{{01, 13, 20}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}}, 1}
+
+/* ===========================================3:(2G_FCC1, 5G_NULL) */
+
+RT_DOMAIN_03 = {{{01, 11, 30}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}}, 1}
+
+/* ===========================================4:(2G_MKK1, 5G_NULL) */
+
+RT_DOMAIN_04 = {{{01, 14, 23}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}}, 1}
+
+/* ===========================================5:(2G_ETSI2, 5G_NULL) */
+
+RT_DOMAIN_05 = {{{10, 13, 20}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}}, 1}
+
+/* ===========================================6:(2G_FCC1, 5G_FCC1) */
+
+RT_DOMAIN_06 = {{{01, 13, 30}, {36, 48, 17}, {52, 64, 24}, {100, 140, 24}, {149, 165, 30}}, 5}
+
+/* ===========================================7:(2G_WORLD, 5G_ETSI1) */
+
+RT_DOMAIN_07 = {{{01, 13, 20}, {36, 48, 23}, {52, 64, 23}, {100, 140, 30}, {NR, NR, 0}}, 4}
+
+/* ===========================================8:(2G_MKK1, 5G_MKK1) */
+
+RT_DOMAIN_08 = {{{01, 14, 23}, {36, 48, 23}, {52, 64, 23}, {100, 140, 23}, {NR, NR, 0}}, 4}
+
+/* ===========================================9:(2G_WORLD, 5G_KCC1) */
+
+RT_DOMAIN_09 = {{{01, 13, 20}, {36, 48, 17}, {52, 64, 23}, {100, 124, 23}, {149, 165, 23}}, 5}
+
+/* ===========================================10:(2G_WORLD, 5G_FCC2) */
+
+RT_DOMAIN_10 = {{{01, 13, 20}, {36, 48, 17}, {NR, NR, 0}, {NR, NR, 0}, {149, 165, 30}}, 3}
+
+/* ===========================================11:(2G_WORLD, 5G_FCC3) */
+RT_DOMAIN_11 = {{{01, 13, 20}, {36, 48, 23}, {52, 64, 23}, {NR, NR, 0}, {149, 165, 23}}, 4}
+
+/* ===========================================12:(2G_WORLD, 5G_FCC4) */
+RT_DOMAIN_12 = {{{01, 13, 20}, {36, 48, 24}, {52, 64, 24}, {NR, NR, 0}, {149, 161, 27}}, 4}
+
+/* ===========================================13:(2G_WORLD, 5G_FCC5) */
+RT_DOMAIN_13 = {{{01, 13, 20}, {NR, NR, 0}, {NR, NR, 0}, {NR, NR, 0}, {149, 165, 27}}, 2}
+
+/* ===========================================14:(2G_WORLD, 5G_FCC6) */
+RT_DOMAIN_14 = {{{01, 13, 20}, {36, 48, 17}, {52, 64, 17}, {NR, NR, 0}, {NR, NR, 0}}, 3}
+
+/* ===========================================15:(2G_FCC1, 5G_FCC7) */
+RT_DOMAIN_15 = {{{01, 11, 30}, {36, 48, 23}, {52, 64, 24}, {100, 140, 24}, {149, 165, 30}}, 5}
+
+/* ===========================================16:(2G_WORLD, 5G_ETSI2) */
+RT_DOMAIN_16 = {{{01, 13, 20}, {36, 48, 23}, {52, 64, 23}, {100, 140, 30}, {149, 165, 30}}, 5}
+
+/* ===========================================17:(2G_WORLD, 5G_ETSI3) */
+RT_DOMAIN_17 = {{{01, 13, 20}, {36, 48, 23}, {52, 64, 23}, {100, 132, 30}, {149, 165, 20}}, 5}
+
+/* ===========================================18:(2G_MKK1, 5G_MKK2) */
+RT_DOMAIN_18 = {{{01, 14, 23}, {36, 48, 23}, {52, 64, 23}, {NR, NR, 0}, {NR, NR, 0}}, 3}
+
+/* ===========================================19:(2G_MKK1, 5G_MKK3) */
+RT_DOMAIN_19 = {{{01, 14, 23}, {NR, NR, 0}, {NR, NR, 0}, {100, 140, 23}, {NR, NR, 0}}, 2}
+
+/* ===========================================20:(2G_FCC1, 5G_NCC1) */
+RT_DOMAIN_20 = {{{01, 11, 30}, {NR, NR, 0}, {56, 64, 23}, {100, 140, 24}, {149, 165, 30}}, 4}
+
+/* ===========================================21:(2G_FCC1, 5G_NCC2) */
+RT_DOMAIN_21 = {{{01, 11, 30}, {NR, NR, 0}, {56, 64, 23}, {NR, NR, 0}, {149, 165, 30}}, 3}
+
+/* ===========================================22:(2G_WORLD, 5G_FCC3) */
+RT_DOMAIN_22 = {{{01, 13, 24}, {36, 48, 20}, {52, 64, 24}, {NR, NR, 0}, {149, 165, 30}}, 4}
+
+/* ===========================================23:(2G_WORLD, 5G_ETSI2) */
+RT_DOMAIN_23 = {{{01, 13, 20}, {36, 48, 23}, {52, 64, 23}, {100, 140, 30}, {149, 165, 30}}, 5}
+
+#endif
+
 /*
  * counter & Realtek channel plan transfer table.
  *   */
 struct _RT_CHANNEL_PLAN_COUNTRY_TRANSFER_TABLE	rt_ctry_chnl_tbl[] = {
 
 	{
-		RT_CTRY_AL,							/*	"Albaniaï¿½ï¿½ï¿½ï¿½ï¿½Ú¥ï¿½ï¿½ï¿½" */
+		RT_CTRY_AL,							/*	"Albaniaªüº¸¤Ú¥§¨È" */
 		"AL",
 		RT_2G_WORLD,
 		RT_5G_WORLD,
 		RT_CHANNEL_DOMAIN_UNDEFINED			/* 2G/5G world. */
 	},
+#if 0
+	{
+		RT_CTRY_BB,							/* "Barbados¤Ú¤Ú¦h´µ" */
+		"BB",
+		RT_2G_WORLD,
+		RT_5G_NULL,
+		RT_CHANNEL_DOMAIN_EFUSE_0x20		/* 2G world. 5G_NULL */
+	},
+
+	{
+		RT_CTRY_DE,							/* "Germany¼w°ê" */
+		"DE",
+		RT_2G_WORLD,
+		RT_5G_ETSI1,
+		RT_CHANNEL_DOMAIN_EFUSE_0x26
+	},
+
+	{
+		RT_CTRY_US,							/* "Germany¼w°ê" */
+		"US",
+		RT_2G_FCC1,
+		RT_5G_FCC7,
+		RT_CHANNEL_DOMAIN_EFUSE_0x34
+	},
+
+	{
+		RT_CTRY_JP,							/* "Germany¼w°ê" */
+		"JP",
+		RT_2G_MKK1,
+		RT_5G_MKK1,
+		RT_CHANNEL_DOMAIN_EFUSE_0x34
+	},
+
+	{
+		RT_CTRY_TW,							/* "Germany¼w°ê" */
+		"TW",
+		RT_2G_FCC1,
+		RT_5G_NCC1,
+		RT_CHANNEL_DOMAIN_EFUSE_0x39
+	},
+#endif
+
 };	/* rt_ctry_chnl_tbl */
+
+/*
+ * Realtek Defined channel plan.
+ *   */
+#if 0
+
+static	struct _RT_CHANNEL_PLAN_NEW		rt_chnl_plan[] = {
+	/* channel Plan   0x20. */
+	{
+		&rt_ctry_chnl_tbl[1],					/* struct _RT_CHANNEL_PLAN_COUNTRY_TRANSFER_TABLE Country & channel plan transfer table. */
+		RT_CHANNEL_DOMAIN_EFUSE_0x20,		/* RT_CHANNEL_DOMAIN RT channel Plan Define */
+		RT_2G_WORLD,						/* enum rt_regulation_2g */
+		RT_5G_NULL,							/* enum rt_regulation_5g */
+		RT_WORLD,							/* enum rt_regulation_cmn RT Regulatory domain definition. */
+		RT_SREQ_NA,							/* RT channel plan special & customerize requirement. */
+
+		CHNL_RT_2G_WORLD,
+		CHNL_RT_2G_WORLD_SCAN_TYPE,
+		&chnl_plan_pwr_max_2g[0],
+
+		CHNL_RT_5G_NULL,
+		CHNL_RT_5G_NULL_SCAN_TYPE,
+
+
+	},
+
+	/* channel Plan   0x26. */
+	{
+		&rt_ctry_chnl_tbl[1],					/* struct _RT_CHANNEL_PLAN_COUNTRY_TRANSFER_TABLE Country & channel plan transfer table. */
+		RT_CHANNEL_DOMAIN_EFUSE_0x26,		/* RT_CHANNEL_DOMAIN RT channel Plan Define */
+		RT_2G_WORLD,						/* enum rt_regulation_2g */
+		RT_5G_ETSI1,						/* enum rt_regulation_5g */
+		RT_WORLD,							/* enum rt_regulation_cmn RT Regulatory domain definition. */
+		RT_SREQ_NA,							/* RT channel plan special & customerize requirement. */
+
+		CHNL_RT_2G_WORLD,					/* 2G workd cannel */
+		CHNL_RT_2G_WORLD_SCAN_TYPE,
+		&chnl_plan_pwr_max_2g[1],
+
+		CHNL_RT_5G_ETSI1,
+		CHNL_RT_5G_ETSI1_SCAN_TYPE,
+
+	}
+
+
+};
+#endif

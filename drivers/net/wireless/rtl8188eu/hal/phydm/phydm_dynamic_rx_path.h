@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef	__PHYDMDYMICRXPATH_H__
 #define    __PHYDMDYMICRXPATH_H__
@@ -48,7 +64,14 @@ struct _DYNAMIC_RX_PATH_ {
 	u8			drp_skip_counter;
 	u8			drp_period;
 	u8			drp_init_finished;
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+#if USE_WORKITEM
+	RT_WORK_ITEM	phydm_dynamic_rx_path_workitem;
+#endif
+#endif
 	struct timer_list		phydm_dynamic_rx_path_timer;
+
 };
 
 
@@ -60,9 +83,30 @@ phydm_process_phy_status_for_dynamic_rx_path(
 	void			*p_pkt_info_void
 );
 
-void phydm_dynamic_rx_path(void *p_dm_void);
+void
+phydm_dynamic_rx_path(
+	void			*p_dm_void
+);
 
-void phydm_dynamic_rx_path_callback(void *function_context);
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+void
+phydm_dynamic_rx_path_callback(
+	struct timer_list		*p_timer
+);
+
+void
+phydm_dynamic_rx_path_workitem_callback(
+	void		*p_context
+);
+
+#else if (DM_ODM_SUPPORT_TYPE == ODM_CE)
+
+void
+phydm_dynamic_rx_path_callback(
+	void *function_context
+);
+
+#endif
 
 void
 phydm_dynamic_rx_path_timers(

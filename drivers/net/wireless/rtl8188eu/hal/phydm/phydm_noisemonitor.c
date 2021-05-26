@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 /* ************************************************************
  * include files
@@ -23,7 +39,9 @@
 #define VALID_MAX			10
 #define VALID_CNT				5
 
-static s16 odm_inband_noise_monitor_n_series(struct PHY_DM_STRUCT	*p_dm_odm, u8 is_pause_dig, u8 igi_value, u32 max_time)
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_WIN))
+
+s16 odm_inband_noise_monitor_n_series(struct PHY_DM_STRUCT	*p_dm_odm, u8 is_pause_dig, u8 igi_value, u32 max_time)
 {
 	u32				tmp4b;
 	u8				max_rf_path = 0, rf_path;
@@ -109,7 +127,7 @@ static s16 odm_inband_noise_monitor_n_series(struct PHY_DM_STRUCT	*p_dm_odm, u8 
 		/* printk("####### valid_done:%d #############\n",valid_done); */
 		if ((valid_done == max_rf_path) || (odm_get_progressing_time(p_dm_odm, start) > max_time)) {
 			for (rf_path = ODM_RF_PATH_A; rf_path < max_rf_path; rf_path++) {
-				/* printk("%s PATH_%d - sum = %d, VALID_CNT = %d\n",__func__,rf_path,noise_data.sum[rf_path], noise_data.valid_cnt[rf_path]); */
+				/* printk("%s PATH_%d - sum = %d, VALID_CNT = %d\n",__FUNCTION__,rf_path,noise_data.sum[rf_path], noise_data.valid_cnt[rf_path]); */
 				if (noise_data.valid_cnt[rf_path])
 					noise_data.sum[rf_path] /= noise_data.valid_cnt[rf_path];
 				else
@@ -149,7 +167,7 @@ static s16 odm_inband_noise_monitor_n_series(struct PHY_DM_STRUCT	*p_dm_odm, u8 
 
 }
 
-static s16
+s16
 odm_inband_noise_monitor_ac_series(struct PHY_DM_STRUCT	*p_dm_odm, u8 is_pause_dig, u8 igi_value, u32 max_time
 				  )
 {
@@ -258,6 +276,8 @@ odm_inband_noise_monitor_ac_series(struct PHY_DM_STRUCT	*p_dm_odm, u8 is_pause_d
 	return p_dm_odm->noise_level.noise_all;
 }
 
+
+
 s16
 odm_inband_noise_monitor(void *p_dm_void, u8 is_pause_dig, u8 igi_value, u32 max_time)
 {
@@ -268,3 +288,5 @@ odm_inband_noise_monitor(void *p_dm_void, u8 is_pause_dig, u8 igi_value, u32 max
 	else
 		return odm_inband_noise_monitor_n_series(p_dm_odm, is_pause_dig, igi_value, max_time);
 }
+
+#endif

@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef	__PHYDMDIG_H__
 #define    __PHYDMDIG_H__
@@ -77,9 +93,27 @@ struct _dynamic_initial_gain_threshold_ {
 
 	u32		cck_fa_ma;
 	enum dig_goupcheck_level		dig_go_up_check_level;
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
+	bool					is_tp_target;
+	bool					is_noise_est;
+	u32					tp_train_th_min;
+	u8					igi_offset_a;
+	u8					igi_offset_b;
+#endif
+
+#if (RTL8822B_SUPPORT == 1 || RTL8197F_SUPPORT == 1 || RTL8821C_SUPPORT == 1)
+	u8		rf_gain_idx;
+	u8		agc_table_idx;
+	u8		big_jump_lmt[16];
+	u8		enable_adjust_big_jump:1;
+	u8		big_jump_step1:3;
+	u8		big_jump_step2:2;
+	u8		big_jump_step3:2;
+#endif
 };
 
-struct false_ALARM_STATISTICS {
+struct _FALSE_ALARM_STATISTICS {
 	u32		cnt_parity_fail;
 	u32		cnt_rate_illegal;
 	u32		cnt_crc8_fail;
@@ -180,8 +214,8 @@ enum phydm_pause_level {
 #define		DM_DIG_THRESH_HIGH			40
 #define		DM_DIG_THRESH_LOW			35
 
-#define		DMfalseALARM_THRESH_LOW	400
-#define		DMfalseALARM_THRESH_HIGH	1000
+#define		DM_FALSEALARM_THRESH_LOW	400
+#define		DM_FALSEALARM_THRESH_HIGH	1000
 
 #define		DM_DIG_MAX_NIC				0x3e
 #define		DM_DIG_MIN_NIC				0x20
@@ -198,10 +232,24 @@ enum phydm_pause_level {
 #define		DM_DIG_MAX_AP_HP				0x42
 #define		DM_DIG_MIN_AP_HP				0x30
 
+#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
+	#define		DM_DIG_MAX_AP_COVERAGR		0x26
+	#define		DM_DIG_MIN_AP_COVERAGE		0x1c
+	#define		DM_DIG_MAX_OF_MIN_COVERAGE	0x22
+
+	#define		dm_dig_tp_target_th0			500
+	#define		dm_dig_tp_target_th1			1000
+	#define		dm_dig_tp_training_period		10
+#endif
+
 /* vivi 92c&92d has different definition, 20110504
  * this is for 92c */
-#ifdef CONFIG_SPECIAL_SETTING_FOR_FUNAI_TV
-	#define		DM_DIG_FA_TH0				0x80/* 0x20 */
+#if (DM_ODM_SUPPORT_TYPE & ODM_CE)
+	#ifdef CONFIG_SPECIAL_SETTING_FOR_FUNAI_TV
+		#define		DM_DIG_FA_TH0				0x80/* 0x20 */
+	#else
+		#define		DM_DIG_FA_TH0				0x200/* 0x20 */
+	#endif
 #else
 	#define		DM_DIG_FA_TH0				0x200/* 0x20 */
 #endif
@@ -288,5 +336,33 @@ bool
 phydm_dig_go_up_check(
 	void		*p_dm_void
 );
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+void
+odm_mpt_dig_callback(
+	struct timer_list						*p_timer
+);
+
+void
+odm_mpt_dig_work_item_callback(
+	void			*p_context
+);
+
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
+void
+odm_mpt_dig_callback(
+	void					*p_dm_void
+);
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE != ODM_CE)
+void
+ODM_MPT_DIG(
+	void					*p_dm_void
+);
+#endif
+
 
 #endif

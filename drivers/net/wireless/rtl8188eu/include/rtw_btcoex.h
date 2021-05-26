@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2013 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_BTCOEX_H__
 #define __RTW_BTCOEX_H__
 
@@ -77,35 +93,35 @@ typedef enum _BTCOEX_SUSPEND_STATE {
 #define BT_INFO_LEN 8
 
 typedef struct _HCI_LINK_INFO {
-	u16					ConnectHandle;
-	u8					IncomingTrafficMode;
-	u8					OutgoingTrafficMode;
-	u8					BTProfile;
-	u8					BTCoreSpec;
+	u2Byte					ConnectHandle;
+	u1Byte					IncomingTrafficMode;
+	u1Byte					OutgoingTrafficMode;
+	u1Byte					BTProfile;
+	u1Byte					BTCoreSpec;
 	s1Byte					BT_RSSI;
-	u8					TrafficProfile;
-	u8					linkRole;
+	u1Byte					TrafficProfile;
+	u1Byte					linkRole;
 } HCI_LINK_INFO, *PHCI_LINK_INFO;
 
 #define	MAX_BT_ACL_LINK_NUM				8
 
 typedef struct _HCI_EXT_CONFIG {
 	HCI_LINK_INFO				aclLink[MAX_BT_ACL_LINK_NUM];
-	u8					btOperationCode;
-	u16					CurrentConnectHandle;
-	u8					CurrentIncomingTrafficMode;
-	u8					CurrentOutgoingTrafficMode;
+	u1Byte					btOperationCode;
+	u2Byte					CurrentConnectHandle;
+	u1Byte					CurrentIncomingTrafficMode;
+	u1Byte					CurrentOutgoingTrafficMode;
 
-	u8					NumberOfACL;
-	u8					NumberOfSCO;
-	u8					CurrentBTStatus;
-	u16					HCIExtensionVer;
+	u1Byte					NumberOfACL;
+	u1Byte					NumberOfSCO;
+	u1Byte					CurrentBTStatus;
+	u2Byte					HCIExtensionVer;
 
-	bool					bEnableWifiScanNotify;
+	BOOLEAN					bEnableWifiScanNotify;
 } HCI_EXT_CONFIG, *PHCI_EXT_CONFIG;
 
 typedef struct _HCI_PHY_LINK_BSS_INFO {
-	u16						bdCap;			/* capability information */
+	u2Byte						bdCap;			/* capability information */
 
 	/* Qos related. Added by Annie, 2005-11-01. */
 	/* BSS_QOS						BssQos;		 */
@@ -298,34 +314,34 @@ typedef enum _HCI_EXT_BT_OPERATION {
 } HCI_EXT_BT_OPERATION, *PHCI_EXT_BT_OPERATION;
 
 typedef struct _BT_MGNT {
-	bool				bBTConnectInProgress;
-	bool				bLogLinkInProgress;
-	bool				bPhyLinkInProgress;
-	bool				bPhyLinkInProgressStartLL;
-	u8				BtCurrentPhyLinkhandle;
-	u16				BtCurrentLogLinkhandle;
-	u8				CurrentConnectEntryNum;
-	u8				DisconnectEntryNum;
-	u8				CurrentBTConnectionCnt;
+	BOOLEAN				bBTConnectInProgress;
+	BOOLEAN				bLogLinkInProgress;
+	BOOLEAN				bPhyLinkInProgress;
+	BOOLEAN				bPhyLinkInProgressStartLL;
+	u1Byte				BtCurrentPhyLinkhandle;
+	u2Byte				BtCurrentLogLinkhandle;
+	u1Byte				CurrentConnectEntryNum;
+	u1Byte				DisconnectEntryNum;
+	u1Byte				CurrentBTConnectionCnt;
 	BT_CONNECT_TYPE		BTCurrentConnectType;
 	BT_CONNECT_TYPE		BTReceiveConnectPkt;
-	u8				BTAuthCount;
-	u8				BTAsocCount;
-	bool				bStartSendSupervisionPkt;
-	bool				BtOperationOn;
-	bool				BTNeedAMPStatusChg;
-	bool				JoinerNeedSendAuth;
+	u1Byte				BTAuthCount;
+	u1Byte				BTAsocCount;
+	BOOLEAN				bStartSendSupervisionPkt;
+	BOOLEAN				BtOperationOn;
+	BOOLEAN				BTNeedAMPStatusChg;
+	BOOLEAN				JoinerNeedSendAuth;
 	HCI_PHY_LINK_BSS_INFO	bssDesc;
 	HCI_EXT_CONFIG		ExtConfig;
-	bool				bNeedNotifyAMPNoCap;
-	bool				bCreateSpportQos;
-	bool				bSupportProfile;
-	u8				BTChannel;
-	bool				CheckChnlIsSuit;
-	bool				bBtScan;
-	bool				btLogoTest;
-	bool				bRfStatusNotified;
-	bool				bBtRsvedPageDownload;
+	BOOLEAN				bNeedNotifyAMPNoCap;
+	BOOLEAN				bCreateSpportQos;
+	BOOLEAN				bSupportProfile;
+	u1Byte				BTChannel;
+	BOOLEAN				CheckChnlIsSuit;
+	BOOLEAN				bBtScan;
+	BOOLEAN				btLogoTest;
+	BOOLEAN				bRfStatusNotified;
+	BOOLEAN				bBtRsvedPageDownload;
 } BT_MGNT, *PBT_MGNT;
 
 struct bt_coex_info {

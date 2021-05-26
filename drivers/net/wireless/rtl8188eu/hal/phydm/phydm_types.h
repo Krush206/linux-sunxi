@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __ODM_TYPES_H__
 #define __ODM_TYPES_H__
 
@@ -16,11 +32,17 @@
 #define	ODM_ENDIAN_BIG	0
 #define	ODM_ENDIAN_LITTLE	1
 
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->DM_OutSrc)))
+#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->odmpriv)))
+#endif
 
+#if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
 	#define	RT_PCI_INTERFACE				1
 	#define	RT_USB_INTERFACE				2
 	#define	RT_SDIO_INTERFACE				3
+#endif
 
 enum hal_status {
 	HAL_STATUS_SUCCESS,
@@ -33,6 +55,10 @@ enum hal_status {
 	RT_STATUS_OS_API_FAILED,*/
 };
 
+#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
+	#define		MP_DRIVER		0
+#endif
+#if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
 
 #define		VISTA_USB_RX_REVISE			0
 
@@ -86,14 +112,137 @@ enum rt_spinlock_type {
 	RT_LAST_SPINLOCK,
 };
 
-	#include <drv_types.h>
-	#define DEV_BUS_TYPE	RT_USB_INTERFACE
+#endif
 
-	#if defined(__LITTLE_ENDIAN)
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+	#define sta_info 	_RT_WLAN_STA
+	#define	__func__		__FUNCTION__
+	#define	PHYDM_TESTCHIP_SUPPORT	TESTCHIP_SUPPORT
+	#define MASKH3BYTES			0xffffff00
+	#define SUCCESS	0
+	#define FAIL	(-1)
+
+	#define	u8 		u1Byte
+	#define	s8 		s1Byte
+
+	#define	u16		u2Byte
+	#define	s16		s2Byte
+
+	#define	u32 	u4Byte
+	#define	s32 		s4Byte
+
+	#define	u64		u8Byte
+	#define	s64		s8Byte
+
+	#define	bool	BOOLEAN
+
+	#define	timer_list	_RT_TIMER
+
+#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
+
+	/* To let ADSL/AP project compile ok; it should be removed after all conflict are solved. Added by Annie, 2011-10-07. */
+	#define ADSL_AP_BUILD_WORKAROUND
+	#define AP_BUILD_WORKAROUND
+
+	#ifdef AP_BUILD_WORKAROUND
+		#include "../typedef.h"
+	#else
+		typedef void					void, *void *;
+		typedef unsigned char			bool, *bool *;
+		typedef unsigned char			u8, *u8 *;
+		typedef unsigned short			u16, *u16 *;
+		typedef unsigned int			u32, *u32 *;
+		typedef unsigned long long		u64, *u64 *;
+		#if 1
+			/* In ARM platform, system would use the type -- "char" as "unsigned char"
+			* And we only use s8/s8* as INT8 now, so changes the type of s8.*/
+			typedef signed char				s8, *s8 *;
+		#else
+			typedef char					s8, *s8 *;
+		#endif
+		typedef short					s16, *s16 *;
+		typedef long					s32, *s32 *;
+		typedef long long				s64, *s64 *;
+	#endif
+	
+	#ifdef CONFIG_PCI_HCI
+		#define DEV_BUS_TYPE		RT_PCI_INTERFACE
+	#endif
+
+	#define _TRUE				1
+	#define _FALSE				0
+
+	#if (defined(TESTCHIP_SUPPORT))
+		#define	PHYDM_TESTCHIP_SUPPORT 1
+	#else
+		#define	PHYDM_TESTCHIP_SUPPORT 0
+	#endif
+
+	#define	sta_info stat_info
+
+#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
+	#include <drv_types.h>
+	#if 0
+		typedef u8					u8, *u8 *;
+		typedef u16					u16, *u16 *;
+		typedef u32					u32, *u32 *;
+		typedef u64					u64, *u64 *;
+		typedef s8					s8, *s8 *;
+		typedef s16					s16, *s16 *;
+		typedef s32					s32, *s32 *;
+		typedef s64					s64, *s64 *;
+	#elif 0
+		#define u8		u8
+		#define	u8 *u8*
+
+		#define u16		u16
+		#define	u16 *u16*
+
+		#define u32		u32
+		#define	u32 *u32*
+
+		#define u64		u64
+		#define	u64*	u64*
+
+		#define s8		s8
+		#define	s8*	s8*
+
+		#define s16		s16
+		#define	s16*	s16*
+
+		#define s32		s32
+		#define	s32*	s32*
+
+		#define s64		s64
+		#define	s64*	s64*
+
+	#endif
+	#ifdef CONFIG_USB_HCI
+		#define DEV_BUS_TYPE	RT_USB_INTERFACE
+	#elif defined(CONFIG_PCI_HCI)
+		#define DEV_BUS_TYPE	RT_PCI_INTERFACE
+	#elif defined(CONFIG_SDIO_HCI)
+		#define DEV_BUS_TYPE	RT_SDIO_INTERFACE
+	#elif defined(CONFIG_GSPI_HCI)
+		#define DEV_BUS_TYPE	RT_SDIO_INTERFACE
+	#endif
+
+
+	#if defined(CONFIG_LITTLE_ENDIAN)
 		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_LITTLE
-	#elif defined (__BIG_ENDIAN)
+	#elif defined (CONFIG_BIG_ENDIAN)
 		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_BIG
 	#endif
+
+	//#define	struct sta_info			struct sta_info
+	//#define	struct sta_info*		struct sta_info *
+
+
+
+	#define true	_TRUE
+	#define false	_FALSE
+
 
 	#define SET_TX_DESC_ANTSEL_A_88E(__ptx_desc, __value) SET_BITS_TO_LE_4BYTE(__ptx_desc+8, 24, 1, __value)
 	#define SET_TX_DESC_ANTSEL_B_88E(__ptx_desc, __value) SET_BITS_TO_LE_4BYTE(__ptx_desc+8, 25, 1, __value)
@@ -110,6 +259,7 @@ enum rt_spinlock_type {
 	#else
 		#define	PHYDM_TESTCHIP_SUPPORT 0
 	#endif
+#endif
 
 #define READ_NEXT_PAIR(v1, v2, i) do { if (i+2 >= array_len) break; i += 2; v1 = array[i]; v2 = array[i+1]; } while (0)
 #define COND_ELSE  2

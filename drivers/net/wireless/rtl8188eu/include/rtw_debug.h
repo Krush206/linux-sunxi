@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_DEBUG_H__
 #define __RTW_DEBUG_H__
 
@@ -17,18 +33,37 @@ enum {
 
 #define DRIVER_PREFIX "RTW: "
 
-#define RTW_PRINT(x, ...) do {} while (0)
-#define RTW_ERR(x, ...) do {} while (0)
-#define RTW_WARN(x,...) do {} while (0)
-#define RTW_INFO(x,...) do {} while (0)
-#define RTW_DBG(x,...) do {} while (0)
-#define RTW_PRINT_SEL(x,...) do {} while (0)
-#define _RTW_PRINT(x, ...) do {} while (0)
-#define _RTW_ERR(x, ...) do {} while (0)
-#define _RTW_WARN(x,...) do {} while (0)
-#define _RTW_INFO(x,...) do {} while (0)
-#define _RTW_DBG(x,...) do {} while (0)
-#define _RTW_PRINT_SEL(x,...) do {} while (0)
+#ifdef PLATFORM_OS_CE
+extern void rtl871x_cedbg(const char *fmt, ...);
+#endif
+
+#ifdef PLATFORM_WINDOWS
+	#define RTW_PRINT do {} while (0)
+	#define RTW_ERR do {} while (0)
+	#define RTW_WARN do {} while (0)
+	#define RTW_INFO do {} while (0)
+	#define RTW_DBG do {} while (0)
+	#define RTW_PRINT_SEL do {} while (0)
+	#define _RTW_PRINT do {} while (0)
+	#define _RTW_ERR do {} while (0)
+	#define _RTW_WARN do {} while (0)
+	#define _RTW_INFO do {} while (0)
+	#define _RTW_DBG do {} while (0)
+	#define _RTW_PRINT_SEL do {} while (0)
+#else
+	#define RTW_PRINT(x, ...) do {} while (0)
+	#define RTW_ERR(x, ...) do {} while (0)
+	#define RTW_WARN(x,...) do {} while (0)
+	#define RTW_INFO(x,...) do {} while (0)
+	#define RTW_DBG(x,...) do {} while (0)
+	#define RTW_PRINT_SEL(x,...) do {} while (0)
+	#define _RTW_PRINT(x, ...) do {} while (0)
+	#define _RTW_ERR(x, ...) do {} while (0)
+	#define _RTW_WARN(x,...) do {} while (0)
+	#define _RTW_INFO(x,...) do {} while (0)
+	#define _RTW_DBG(x,...) do {} while (0)
+	#define _RTW_PRINT_SEL(x,...) do {} while (0)
+#endif
 
 #define RTW_INFO_DUMP(_TitleString, _HexData, _HexDataLen) do {} while (0)
 #define RTW_DBG_DUMP(_TitleString, _HexData, _HexDataLen) do {} while (0)
@@ -38,7 +73,7 @@ enum {
 
 #define RTW_DBG_EXPR(EXPR) do {} while (0)
 
-#define RTW_DBGDUMP NULL /* 'stream' for _dbgdump */
+#define RTW_DBGDUMP 0 /* 'stream' for _dbgdump */
 
 /* don't use these 3 APIs anymore, will be removed later */
 #define RT_TRACE(_Comp, _Level, Fmt) do {} while (0)
@@ -47,12 +82,25 @@ enum {
 #undef _dbgdump
 #undef _seqdump
 
-#define _dbgdump printk
-#define _seqdump seq_printf
+#if defined(PLATFORM_WINDOWS) && defined(PLATFORM_OS_XP)
+	#define _dbgdump DbgPrint
+	#define _seqdump(sel, fmt, arg...) _dbgdump(fmt, ##arg)
+#elif defined(PLATFORM_WINDOWS) && defined(PLATFORM_OS_CE)
+	#define _dbgdump rtl871x_cedbg
+	#define _seqdump(sel, fmt, arg...) _dbgdump(fmt, ##arg)
+#elif defined PLATFORM_LINUX
+	#define _dbgdump printk
+	#define _seqdump seq_printf
+#elif defined PLATFORM_FREEBSD
+	#define _dbgdump printf
+	#define _seqdump(sel, fmt, arg...) _dbgdump(fmt, ##arg)
+#endif
 
 #ifdef CONFIG_RTW_DEBUG
 
+#ifndef _OS_INTFS_C_
 extern uint rtw_drv_log_level;
+#endif
 
 #if defined(_dbgdump)
 
@@ -60,7 +108,7 @@ extern uint rtw_drv_log_level;
 #undef RTW_PRINT
 #define RTW_PRINT(fmt, arg...)     \
 	do {\
-		if (RTW_LOG_LEVEL <= rtw_drv_log_level) {\
+		if (_DRV_ALWAYS_ <= rtw_drv_log_level) {\
 			_dbgdump(DRIVER_PREFIX fmt, ##arg);\
 		} \
 	} while (0)
@@ -236,33 +284,28 @@ extern uint rtw_drv_log_level;
 #undef RTW_PRINT_SEL
 #define RTW_PRINT_SEL(sel, fmt, arg...) \
 	do {\
-	if (RTW_LOG_LEVEL <= rtw_drv_log_level) {\
 		if (sel == RTW_DBGDUMP)\
 			RTW_PRINT(fmt, ##arg); \
 		else {\
 			_seqdump(sel, fmt, ##arg) /*rtw_warn_on(1)*/; \
 		} \
-	} \
 	} while (0)
 
 /* dump message to selected 'stream' */
 #undef _RTW_PRINT_SEL
 #define _RTW_PRINT_SEL(sel, fmt, arg...) \
 	do {\
-	if (RTW_LOG_LEVEL <= rtw_drv_log_level) {\
 		if (sel == RTW_DBGDUMP)\
 			_RTW_PRINT(fmt, ##arg); \
 		else {\
 			_seqdump(sel, fmt, ##arg) /*rtw_warn_on(1)*/; \
 		} \
-	} \
 	} while (0)
 
 /* dump message to selected 'stream' */
 #undef _RTW_DUMP_SEL
 #define _RTW_DUMP_SEL(sel, _HexData, _HexDataLen) \
 	do {\
-	if (RTW_LOG_LEVEL <= rtw_drv_log_level) {\
 		if (sel == RTW_DBGDUMP) {\
 			int __i;								\
 			u8	*ptr = (u8 *)_HexData;				\
@@ -283,7 +326,6 @@ extern uint rtw_drv_log_level;
 			}								\
 			_seqdump(sel, "\n");							\
 		} \
-	} \
 	} while (0)
 
 #endif /* defined(_seqdump) */
@@ -396,6 +438,10 @@ int proc_get_tx_stat(struct seq_file *m, void *v);
 int proc_get_all_sta_info(struct seq_file *m, void *v);
 #endif /* CONFIG_AP_MODE */
 
+#ifdef DBG_MEMORY_LEAK
+int proc_get_malloc_cnt(struct seq_file *m, void *v);
+#endif /* DBG_MEMORY_LEAK */
+
 #ifdef CONFIG_FIND_BEST_CHANNEL
 int proc_get_best_channel(struct seq_file *m, void *v);
 ssize_t proc_set_best_channel(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
@@ -408,6 +454,7 @@ ssize_t proc_set_rx_signal(struct file *file, const char __user *buffer, size_t 
 int proc_get_hw_status(struct seq_file *m, void *v);
 ssize_t proc_set_hw_status(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 
+#ifdef CONFIG_80211N_HT
 int proc_get_ht_enable(struct seq_file *m, void *v);
 ssize_t proc_set_ht_enable(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 
@@ -451,9 +498,16 @@ ssize_t proc_set_tx_amsdu(struct file *file, const char __user *buffer, size_t c
 int proc_get_tx_amsdu_rate(struct seq_file *m, void *v);
 ssize_t proc_set_tx_amsdu_rate(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 #endif
+#endif /* CONFIG_80211N_HT */
 
 int proc_get_en_fwps(struct seq_file *m, void *v);
 ssize_t proc_set_en_fwps(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
+
+#if 0
+int proc_get_two_path_rssi(struct seq_file *m, void *v);
+int proc_get_rssi_disp(struct seq_file *m, void *v);
+ssize_t proc_set_rssi_disp(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
+#endif
 
 #ifdef CONFIG_BT_COEXIST
 int proc_get_btcoex_dbg(struct seq_file *m, void *v);

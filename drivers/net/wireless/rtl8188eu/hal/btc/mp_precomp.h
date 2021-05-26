@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2013 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __MP_PRECOMP_H__
 #define __MP_PRECOMP_H__
 
@@ -9,7 +25,11 @@
 
 #define BT_TMP_BUF_SIZE	100
 
+#ifdef PLATFORM_LINUX
 #define rsprintf snprintf
+#elif defined(PLATFORM_WINDOWS)
+#define rsprintf sprintf_s
+#endif
 
 #define DCMD_Printf			DBG_BT_INFO
 
@@ -25,7 +45,7 @@ typedef enum _BTC_MSG_COMP_TYPE {
 	COMP_COEX		= 0,
 	COMP_MAX
 } BTC_MSG_COMP_TYPE;
-extern u32 GLBtcDbgType[];
+extern u4Byte GLBtcDbgType[];
 
 #define DBG_OFF			0
 #define DBG_SEC			1
@@ -45,5 +65,26 @@ extern u32 GLBtcDbgType[];
 #endif
 
 #include "halbtcoutsrc.h"
+#include "halbtc8192e1ant.h"
+#include "halbtc8192e2ant.h"
+#include "halbtc8723b1ant.h"
+#include "halbtc8723b2ant.h"
+#include "halbtc8812a1ant.h"
+#include "halbtc8812a2ant.h"
+#include "halbtc8821a1ant.h"
+#include "halbtc8821a2ant.h"
+#include "halbtc8703b1ant.h"
+#include "halbtc8723d1ant.h"
+#include "halbtc8723d2ant.h"
+#include "halbtc8822b1ant.h"
+#include "halbtc8822b2ant.h"
+#include "halbtc8821c1ant.h"
+#include "halbtc8821c2ant.h"
+
+/* for wifi only mode */
+#include "hal_btcoex_wifionly.h"
+#include "halbtc8723bwifionly.h"
+#include "halbtc8822bwifionly.h"
+#include "halbtc8821cwifionly.h"
 
 #endif /*  __MP_PRECOMP_H__ */

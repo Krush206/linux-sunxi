@@ -1,12 +1,28 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 /* ***** temporarily flag ******* */
 #define CONFIG_SINGLE_IMG
 
 /* #define CONFIG_DISABLE_ODM */
 /* for FPGA VERIFICATION config */
-#define RTL8188E_FPGAtrue_PHY_VERIFICATION 0
+#define RTL8188E_FPGA_TRUE_PHY_VERIFICATION 0
 
 /* ***** temporarily flag ******* */
 /*
@@ -16,9 +32,11 @@
 #define RTL871X_MODULE_NAME "88EU"
 #define DRV_NAME "rtl8188eu"
 
+#define CONFIG_USB_HCI
+
 #define PLATFORM_LINUX
 
-#define CONFIG_IOCTL_CFG80211
+/* #define CONFIG_IOCTL_CFG80211 */
 
 #if defined(CONFIG_PLATFORM_ACTIONS_ATM702X)
 	#ifndef CONFIG_IOCTL_CFG80211
@@ -53,6 +71,7 @@
 #ifdef CONFIG_XMIT_ACK
 	#define CONFIG_ACTIVE_KEEP_ALIVE_CHECK
 #endif
+#define CONFIG_80211N_HT
 
 #define CONFIG_RECV_REORDERING_CTRL
 
@@ -332,6 +351,8 @@
 /* #define DBG_ROAMING_TEST */
 
 /* #define DBG_HAL_INIT_PROFILING */
+
+/* #define DBG_MEMORY_LEAK */
 
 /* TX use 1 urb */
 /* #define CONFIG_SINGLE_XMIT_BUF */

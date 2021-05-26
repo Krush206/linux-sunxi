@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTL8188E_HAL_H__
 #define __RTL8188E_HAL_H__
 
@@ -35,6 +51,8 @@
 #define Rtl8188E_NIC_LPS_ENTER_FLOW			rtl8188E_enter_lps_flow
 #define Rtl8188E_NIC_LPS_LEAVE_FLOW			rtl8188E_leave_lps_flow
 
+
+#if 1 /* download firmware related data structure */
 #define MAX_FW_8188E_SIZE			0x8000 /* 32768, 32k / 16384, 16k */
 
 #define FW_8188E_SIZE				0x4000 /* 16384, 16k */
@@ -64,12 +82,12 @@ typedef struct _RT_8188E_FIRMWARE_HDR {
 	/* 8-byte alinment required */
 
 	/* --- LONG WORD 0 ---- */
-	__le16		Signature;	/* 92C0: test chip; 92C, 88C0: test chip; 88C1: MP A-cut; 92C1: MP A-cut */
+	u16		Signature;	/* 92C0: test chip; 92C, 88C0: test chip; 88C1: MP A-cut; 92C1: MP A-cut */
 	u8		Category;	/* AP/NIC and USB/PCI */
 	u8		Function;	/* Reserved for different FW function indcation, for further use when driver needs to download different FW in different conditions */
-	__le16		Version;		/* FW Version */
+	u16		Version;		/* FW Version */
 	u8		Subversion;	/* FW Subversion, default 0x00 */
-	__le16		Rsvd1;
+	u16		Rsvd1;
 
 
 	/* --- LONG WORD 1 ---- */
@@ -77,18 +95,19 @@ typedef struct _RT_8188E_FIRMWARE_HDR {
 	u8		Date;	/* Release time Date field */
 	u8		Hour;	/* Release time Hour field */
 	u8		Minute;	/* Release time Minute field */
-	__le16		RamCodeSize;	/* The size of RAM code */
+	u16		RamCodeSize;	/* The size of RAM code */
 	u8		Foundry;
 	u8		Rsvd2;
 
 	/* --- LONG WORD 2 ---- */
-	__le32		SvnIdx;	/* The SVN entry index */
-	__le32		Rsvd3;
+	u32		SvnIdx;	/* The SVN entry index */
+	u32		Rsvd3;
 
 	/* --- LONG WORD 3 ---- */
-	__le32		Rsvd4;
-	__le32		Rsvd5;
+	u32		Rsvd4;
+	u32		Rsvd5;
 } RT_8188E_FIRMWARE_HDR, *PRT_8188E_FIRMWARE_HDR;
+#endif /* download firmware related data structure */
 
 
 #define DRIVER_EARLY_INT_TIME_8188E			0x05
@@ -96,7 +115,11 @@ typedef struct _RT_8188E_FIRMWARE_HDR {
 
 
 /* #define MAX_RX_DMA_BUFFER_SIZE_88E	      0x2400 */ /* 9k for 88E nornal chip , */ /* MaxRxBuff=10k-max(TxReportSize(64*8), WOLPattern(16*24)) */
+#ifdef CONFIG_USB_HCI
 	#define RX_DMA_SIZE_88E(__Adapter) 0x2800
+#else
+	#define RX_DMA_SIZE_88E(__Adapter) ((!IS_VENDOR_8188E_I_CUT_SERIES(__Adapter))?0x2800:0x4000)
+#endif
 
 #ifdef CONFIG_WOWLAN
 	#define RESV_FMWF	(WKFMCAM_SIZE * MAX_WKFM_CAM_NUM) /* 16 entries, for each is 24 bytes*/
@@ -129,7 +152,11 @@ Tx FIFO Size : previous CUT:22K /I_CUT after:32KB
 Tx page Size : 128B
 Total page numbers : 176(0xB0) / 256(0x100)
 */
+#ifdef CONFIG_USB_HCI
 	#define TOTAL_PAGE_NUMBER_88E(_Adapter) (0xB0 - 1)
+#else
+	#define TOTAL_PAGE_NUMBER_88E(_Adapter)	((IS_VENDOR_8188E_I_CUT_SERIES(_Adapter)?0x100:0xB0) - 1)/* must reserved 1 page for dma issue */
+#endif
 #define TX_TOTAL_PAGE_NUMBER_88E(_Adapter)	(TOTAL_PAGE_NUMBER_88E(_Adapter) - BCNQ_PAGE_NUM_88E - WOWLAN_PAGE_NUM_88E)
 #define TX_PAGE_BOUNDARY_88E(_Adapter)		(TX_TOTAL_PAGE_NUMBER_88E(_Adapter) + 1) /* beacon header start address */
 
@@ -203,13 +230,29 @@ Total page numbers : 176(0xB0) / 256(0x100)
 #define INCLUDE_MULTI_FUNC_BT(_Adapter)	(GET_HAL_DATA(_Adapter)->MultiFunc & RT_MULTI_FUNC_BT)
 #define INCLUDE_MULTI_FUNC_GPS(_Adapter)	(GET_HAL_DATA(_Adapter)->MultiFunc & RT_MULTI_FUNC_GPS)
 
-/* #define IS_MULTI_FUNC_CHIP(_Adapter)	(((((PHAL_DATA_TYPE)(_Adapter->HalData))->MultiFunc) & (RT_MULTI_FUNC_BT|RT_MULTI_FUNC_GPS)) ? true : false) */
+/* #define IS_MULTI_FUNC_CHIP(_Adapter)	(((((PHAL_DATA_TYPE)(_Adapter->HalData))->MultiFunc) & (RT_MULTI_FUNC_BT|RT_MULTI_FUNC_GPS)) ? _TRUE : _FALSE) */
 
 /* #define RT_IS_FUNC_DISABLED(__pAdapter, __FuncBits) ( (__pAdapter)->DisabledFunctions & (__FuncBits) ) */
 
+#ifdef CONFIG_PCI_HCI
+	/* according to the define in the rtw_xmit.h, rtw_recv.h */
+	#define TX_DESC_NUM_8188EE  TXDESC_NUM   /* 128 */
+	#ifdef CONFIG_CONCURRENT_MODE
+		/*#define BE_QUEUE_TX_DESC_NUM_8188EE  (TXDESC_NUM<<1)*/		/* 256 */
+		#define BE_QUEUE_TX_DESC_NUM_8188EE  ((TXDESC_NUM<<1)+(TXDESC_NUM>>1))    /* 320 */
+		/*#define BE_QUEUE_TX_DESC_NUM_8188EE  ((TXDESC_NUM<<1)+TXDESC_NUM)*/    /* 384 */
+	#else
+		#define BE_QUEUE_TX_DESC_NUM_8188EE  TXDESC_NUM /* 128 */
+		/*#define BE_QUEUE_TX_DESC_NUM_8188EE  (TXDESC_NUM+(TXDESC_NUM>>1)) */ /* 192 */
+	#endif
+
+	void InterruptRecognized8188EE(PADAPTER Adapter, PRT_ISR_CONTENT pIsrContent);
+	void UpdateInterruptMask8188EE(PADAPTER Adapter, u32 AddMSR, u32 AddMSR1, u32 RemoveMSR, u32 RemoveMSR1);
+#endif /* CONFIG_PCI_HCI */
+
 /* rtl8188e_hal_init.c */
 
-s32 rtl8188e_FirmwareDownload(PADAPTER padapter, bool  bUsedWoWLANFw);
+s32 rtl8188e_FirmwareDownload(PADAPTER padapter, BOOLEAN  bUsedWoWLANFw);
 void _8051Reset88E(PADAPTER padapter);
 void rtl8188e_InitializeFirmwareVars(PADAPTER padapter);
 
@@ -220,21 +263,21 @@ s32 InitLLTTable(PADAPTER padapter, u8 txpktbuf_bndy);
 u8 GetEEPROMSize8188E(PADAPTER padapter);
 void Hal_InitPGData88E(PADAPTER padapter);
 void Hal_EfuseParseIDCode88E(PADAPTER padapter, u8 *hwinfo);
-void Hal_ReadTxPowerInfo88E(PADAPTER padapter, u8 *hwinfo, bool	AutoLoadFail);
+void Hal_ReadTxPowerInfo88E(PADAPTER padapter, u8 *hwinfo, BOOLEAN	AutoLoadFail);
 
-void Hal_EfuseParseEEPROMVer88E(PADAPTER padapter, u8 *hwinfo, bool AutoLoadFail);
-void rtl8188e_EfuseParseChnlPlan(PADAPTER padapter, u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseCustomerID88E(PADAPTER padapter, u8 *hwinfo, bool AutoLoadFail);
-void Hal_ReadAntennaDiversity88E(PADAPTER pAdapter, u8 *PROMContent, bool AutoLoadFail);
-void Hal_ReadThermalMeter_88E(PADAPTER	Adapter, u8 *PROMContent, bool	AutoloadFail);
-void Hal_EfuseParseXtal_8188E(PADAPTER pAdapter, u8 *hwinfo, bool AutoLoadFail);
-void Hal_EfuseParseBoardType88E(PADAPTER pAdapter, u8 *hwinfo, bool AutoLoadFail);
-void Hal_ReadPowerSavingMode88E(PADAPTER pAdapter, u8 *hwinfo, bool AutoLoadFail);
-void Hal_ReadPAType_8188E(PADAPTER Adapter, u8 *PROMContent, bool AutoloadFail);
-void Hal_ReadAmplifierType_8188E(PADAPTER Adapter, u8 *PROMContent, bool AutoloadFail);
-void Hal_ReadRFEType_8188E(PADAPTER Adapter, u8 *PROMContent, bool AutoloadFail);
+void Hal_EfuseParseEEPROMVer88E(PADAPTER padapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
+void rtl8188e_EfuseParseChnlPlan(PADAPTER padapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
+void Hal_EfuseParseCustomerID88E(PADAPTER padapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
+void Hal_ReadAntennaDiversity88E(PADAPTER pAdapter, u8 *PROMContent, BOOLEAN AutoLoadFail);
+void Hal_ReadThermalMeter_88E(PADAPTER	Adapter, u8 *PROMContent, BOOLEAN	AutoloadFail);
+void Hal_EfuseParseXtal_8188E(PADAPTER pAdapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
+void Hal_EfuseParseBoardType88E(PADAPTER pAdapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
+void Hal_ReadPowerSavingMode88E(PADAPTER pAdapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
+void Hal_ReadPAType_8188E(PADAPTER Adapter, u8 *PROMContent, BOOLEAN AutoloadFail);
+void Hal_ReadAmplifierType_8188E(PADAPTER Adapter, u8 *PROMContent, BOOLEAN AutoloadFail);
+void Hal_ReadRFEType_8188E(PADAPTER Adapter, u8 *PROMContent, BOOLEAN AutoloadFail);
 
-bool HalDetectPwrDownMode88E(PADAPTER Adapter);
+BOOLEAN HalDetectPwrDownMode88E(PADAPTER Adapter);
 
 #if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
 	void Hal_DetectWoWMode(PADAPTER pAdapter);
@@ -242,7 +285,7 @@ bool HalDetectPwrDownMode88E(PADAPTER Adapter);
 
 
 #ifdef CONFIG_RF_POWER_TRIM
-	void Hal_ReadRFGainOffset(PADAPTER pAdapter, u8 *hwinfo, bool AutoLoadFail);
+	void Hal_ReadRFGainOffset(PADAPTER pAdapter, u8 *hwinfo, BOOLEAN AutoLoadFail);
 #endif /*CONFIG_RF_POWER_TRIM*/
 
 void rtl8188e_init_default_value(_adapter *adapter);
@@ -267,9 +310,9 @@ void GetHwReg8188E(PADAPTER padapter, u8 variable, u8 *val);
 
 u8
 GetHalDefVar8188E(
-	PADAPTER				Adapter,
-	HAL_DEF_VARIABLE		eVariable,
-	void *					pValue
+	IN	PADAPTER				Adapter,
+	IN	HAL_DEF_VARIABLE		eVariable,
+	IN	PVOID					pValue
 );
 #ifdef CONFIG_GPIO_API
 int rtl8188e_GpioFuncCheck(PADAPTER adapter, u8 gpio_num);

@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_P2P_H_
 #define __RTW_P2P_H_
 
@@ -81,7 +97,15 @@ static inline void _rtw_p2p_set_pre_state(struct wifidirect_info *wdinfo, enum P
 	if (wdinfo->pre_p2p_state != state)
 		wdinfo->pre_p2p_state = state;
 }
-
+#if 0
+static inline void _rtw_p2p_restore_state(struct wifidirect_info *wdinfo)
+{
+	if (wdinfo->pre_p2p_state != -1) {
+		wdinfo->p2p_state = wdinfo->pre_p2p_state;
+		wdinfo->pre_p2p_state = -1;
+	}
+}
+#endif
 static inline void _rtw_p2p_set_role(struct wifidirect_info *wdinfo, enum P2P_ROLE role)
 {
 	if (wdinfo->role != role)
@@ -113,10 +137,10 @@ void dbg_rtw_p2p_set_state(struct wifidirect_info *wdinfo, enum P2P_STATE state,
 void dbg_rtw_p2p_set_pre_state(struct wifidirect_info *wdinfo, enum P2P_STATE state, const char *caller, int line);
 /* void dbg_rtw_p2p_restore_state(struct wifidirect_info *wdinfo, const char *caller, int line); */
 void dbg_rtw_p2p_set_role(struct wifidirect_info *wdinfo, enum P2P_ROLE role, const char *caller, int line);
-#define rtw_p2p_set_state(wdinfo, state) dbg_rtw_p2p_set_state(wdinfo, state, __func__, __LINE__)
-#define rtw_p2p_set_pre_state(wdinfo, state) dbg_rtw_p2p_set_pre_state(wdinfo, state, __func__, __LINE__)
-#define rtw_p2p_set_role(wdinfo, role) dbg_rtw_p2p_set_role(wdinfo, role, __func__, __LINE__)
-/* #define rtw_p2p_restore_state(wdinfo) dbg_rtw_p2p_restore_state(wdinfo, __func__, __LINE__) */
+#define rtw_p2p_set_state(wdinfo, state) dbg_rtw_p2p_set_state(wdinfo, state, __FUNCTION__, __LINE__)
+#define rtw_p2p_set_pre_state(wdinfo, state) dbg_rtw_p2p_set_pre_state(wdinfo, state, __FUNCTION__, __LINE__)
+#define rtw_p2p_set_role(wdinfo, role) dbg_rtw_p2p_set_role(wdinfo, role, __FUNCTION__, __LINE__)
+/* #define rtw_p2p_restore_state(wdinfo) dbg_rtw_p2p_restore_state(wdinfo, __FUNCTION__, __LINE__) */
 #else /* CONFIG_DBG_P2P */
 #define rtw_p2p_set_state(wdinfo, state) _rtw_p2p_set_state(wdinfo, state)
 #define rtw_p2p_set_pre_state(wdinfo, state) _rtw_p2p_set_pre_state(wdinfo, state)

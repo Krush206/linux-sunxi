@@ -1,9 +1,43 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef _RTW_XMIT_H_
 #define _RTW_XMIT_H_
 
+
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+	#ifdef CONFIG_TX_AGGREGATION
+		#define MAX_XMITBUF_SZ	(20480)	/* 20k */
+		/* #define SDIO_TX_AGG_MAX	5 */
+	#else
+		#define MAX_XMITBUF_SZ (1664)
+		#define SDIO_TX_AGG_MAX	1
+	#endif
+
+	#if defined CONFIG_SDIO_HCI
+		#define NR_XMITBUFF	(16)
+	#endif
+	#if defined(CONFIG_GSPI_HCI)
+		#define NR_XMITBUFF	(128)
+	#endif
+
+#elif defined (CONFIG_USB_HCI)
 
 	#ifdef CONFIG_USB_TX_AGGREGATION
 		#if defined(CONFIG_PLATFORM_ARM_SUNxI) || defined(CONFIG_PLATFORM_ARM_SUN6I) || defined(CONFIG_PLATFORM_ARM_SUN7I) || defined(CONFIG_PLATFORM_ARM_SUN8I) || defined(CONFIG_PLATFORM_ARM_SUN50IW1P1)
@@ -22,12 +56,28 @@
 	#else
 		#define NR_XMITBUFF	(4)
 	#endif /* CONFIG_SINGLE_XMIT_BUF */
+#elif defined (CONFIG_PCI_HCI)
+#ifdef CONFIG_TX_AMSDU
+	#define MAX_XMITBUF_SZ	(3500)
+#else
+	#define MAX_XMITBUF_SZ	(1664)
+#endif
+	#define NR_XMITBUFF	(128)
+#endif
 
+#ifdef PLATFORM_OS_CE
+	#define XMITBUF_ALIGN_SZ 4
+#else
+	#ifdef CONFIG_PCI_HCI
+		#define XMITBUF_ALIGN_SZ 4
+	#else
 		#ifdef USB_XMITBUF_ALIGN_SZ
 			#define XMITBUF_ALIGN_SZ (USB_XMITBUF_ALIGN_SZ)
 		#else
 			#define XMITBUF_ALIGN_SZ 512
 		#endif
+	#endif
+#endif
 
 /* xmit extension buff defination */
 #define MAX_XMIT_EXTBUF_SZ	(1536)
@@ -38,7 +88,13 @@
 	#define NR_XMIT_EXTBUFF	(32)
 #endif
 
-#define MAX_CMDBUF_SZ	(5120)	/* (4096) */
+#ifdef CONFIG_RTL8812A
+	#define MAX_CMDBUF_SZ	(512*14)
+#elif defined(CONFIG_RTL8723D) && defined(CONFIG_LPS_POFF)
+	#define MAX_CMDBUF_SZ	(128*70) /*(8960)*/
+#else
+	#define MAX_CMDBUF_SZ	(5120)	/* (4096) */
+#endif
 
 #define MAX_NUMBLKS		(1)
 
@@ -57,6 +113,14 @@
 #define TXCMD_QUEUE_INX	7
 
 #define HW_QUEUE_ENTRY	8
+
+#ifdef CONFIG_PCI_HCI
+	#ifdef CONFIG_TRX_BD_ARCH
+		#define TX_BD_NUM			(128+1)	/* +1 result from ring buffer */
+	#else
+		#define TXDESC_NUM			128
+	#endif
+#endif
 
 #define WEP_IV(pattrib_iv, dot11txpn, keyidx)\
 	do {\
@@ -102,31 +166,68 @@
 * (1, 1) : AMPDU and AMSDU in AMPDU are enable. So, AMSDU is valid to send.
 */
 #define IS_AMSDU_AMPDU_NOT_VALID(pattrib)\
-	 ((pattrib->ampdu_en == true) && (pattrib->amsdu_ampdu_en == false))
+	 ((pattrib->ampdu_en == _TRUE) && (pattrib->amsdu_ampdu_en == _FALSE))
 
 #define IS_AMSDU_AMPDU_VALID(pattrib)\
-	 !((pattrib->ampdu_en == true) && (pattrib->amsdu_ampdu_en == false))
+	 !((pattrib->ampdu_en == _TRUE) && (pattrib->amsdu_ampdu_en == _FALSE))
 
 #define HWXMIT_ENTRY	4
 
 /* For Buffer Descriptor ring architecture */
 #if defined(BUF_DESC_ARCH) || defined(CONFIG_TRX_BD_ARCH)
-	#define TX_BUFFER_SEG_NUM	1 /* 0:2 seg, 1: 4 seg, 2: 8 seg. */
+	#if defined(CONFIG_RTL8192E)
+		#define TX_BUFFER_SEG_NUM	1 /* 0:2 seg, 1: 4 seg, 2: 8 seg. */
+	#elif defined(CONFIG_RTL8814A)
+		#define TX_BUFFER_SEG_NUM	1 /* 0:2 seg, 1: 4 seg, 2: 8 seg. */
+	#else
+		#define TX_BUFFER_SEG_NUM	1 /* 0:2 seg, 1: 4 seg, 2: 8 seg. */
+	#endif
 #endif
 
-#define TXDESC_SIZE 32 /* old IC (ex: 8188E) */
+#if defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) ||\
+	defined(CONFIG_RTL8723B) || defined(CONFIG_RTL8192E) ||\
+	defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8703B) ||\
+	defined(CONFIG_RTL8188F) || defined(CONFIG_RTL8723D)
+	#define TXDESC_SIZE 40
+#elif defined(CONFIG_RTL8822B)
+	#define TXDESC_SIZE 48		/* HALMAC_TX_DESC_SIZE_8822B */
+#elif defined(CONFIG_RTL8821C)
+	#define TXDESC_SIZE 48		/* HALMAC_TX_DESC_SIZE_8821C */
+#else
+	#define TXDESC_SIZE 32 /* old IC (ex: 8188E) */
+#endif
 
 #ifdef CONFIG_TX_EARLY_MODE
 	#define EARLY_MODE_INFO_SIZE	8
 #endif
 
 
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+	#define TXDESC_OFFSET TXDESC_SIZE
+#endif
+
+#ifdef CONFIG_USB_HCI
 	#ifdef USB_PACKET_OFFSET_SZ
 		#define PACKET_OFFSET_SZ (USB_PACKET_OFFSET_SZ)
 	#else
 		#define PACKET_OFFSET_SZ (8)
 	#endif
 	#define TXDESC_OFFSET (TXDESC_SIZE + PACKET_OFFSET_SZ)
+#endif
+
+#ifdef CONFIG_PCI_HCI
+	#if defined(CONFIG_RTL8192E) || defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C) || defined(CONFIG_TRX_BD_ARCH)
+		/* this section is defined for buffer descriptor ring architecture */
+		#define TX_WIFI_INFO_SIZE (TXDESC_SIZE) /* it may add 802.11 hdr or others... */
+		/* tx desc and payload are in the same buf */
+		#define TXDESC_OFFSET (TX_WIFI_INFO_SIZE)
+	#else
+		/* tx desc and payload are NOT in the same buf */
+		#define TXDESC_OFFSET (0)
+		/* 8188ee/8723be/8812ae/8821ae has extra PCI DMA info in tx desc */
+		#define TX_DESC_NEXT_DESC_OFFSET	(TXDESC_SIZE + 8)
+	#endif
+#endif /* CONFIG_PCI_HCI */
 
 enum TXDESC_SC {
 	SC_DONT_CARE = 0x00,
@@ -134,6 +235,15 @@ enum TXDESC_SC {
 	SC_LOWER = 0x02,
 	SC_DUPLICATE = 0x03
 };
+
+#ifdef CONFIG_PCI_HCI
+	#ifndef CONFIG_TRX_BD_ARCH	/* CONFIG_TRX_BD_ARCH doesn't need this */
+		#define TXDESC_64_BYTES
+	#endif
+#elif defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) || defined(CONFIG_RTL8723B) \
+	|| defined(CONFIG_RTL8188F) || defined(CONFIG_RTL8723D)
+	#define TXDESC_40_BYTES
+#endif
 
 #ifdef CONFIG_TRX_BD_ARCH
 struct tx_buf_desc {
@@ -144,34 +254,46 @@ struct tx_buf_desc {
 #endif
 	unsigned int dword[TX_BUFFER_SEG_SIZE * (2 << TX_BUFFER_SEG_NUM)];
 } __packed;
+#elif (defined(CONFIG_RTL8192E) || defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B)) && defined(CONFIG_PCI_HCI) /* 8192ee or 8814ae */
+/* 8192EE_TODO */
+struct tx_desc {
+	unsigned int txdw0;
+	unsigned int txdw1;
+	unsigned int txdw2;
+	unsigned int txdw3;
+	unsigned int txdw4;
+	unsigned int txdw5;
+	unsigned int txdw6;
+	unsigned int txdw7;
+};
 #else
 struct tx_desc {
-	__le32 txdw0;
-	__le32 txdw1;
-	__le32 txdw2;
-	__le32 txdw3;
-	__le32 txdw4;
-	__le32 txdw5;
-	__le32 txdw6;
-	__le32 txdw7;
+	unsigned int txdw0;
+	unsigned int txdw1;
+	unsigned int txdw2;
+	unsigned int txdw3;
+	unsigned int txdw4;
+	unsigned int txdw5;
+	unsigned int txdw6;
+	unsigned int txdw7;
 
 #if defined(TXDESC_40_BYTES) || defined(TXDESC_64_BYTES)
-	__le32 txdw8;
-	__le32 txdw9;
+	unsigned int txdw8;
+	unsigned int txdw9;
 #endif /* TXDESC_40_BYTES */
 
 #ifdef TXDESC_64_BYTES
-	__le32 txdw10;
-	__le32 txdw11;
+	unsigned int txdw10;
+	unsigned int txdw11;
 
 	/* 2008/05/15 MH Because PCIE HW memory R/W 4K limit. And now,  our descriptor */
 	/* size is 40 bytes. If you use more than 102 descriptor( 103*40>4096), HW will execute */
 	/* memoryR/W CRC error. And then all DMA fetch will fail. We must decrease descriptor */
 	/* number or enlarge descriptor size as 64 bytes. */
-	__le32 txdw12;
-	__le32 txdw13;
-	__le32 txdw14;
-	__le32 txdw15;
+	unsigned int txdw12;
+	unsigned int txdw13;
+	unsigned int txdw14;
+	unsigned int txdw15;
 #endif
 };
 #endif
@@ -180,6 +302,27 @@ struct tx_desc {
 union txdesc {
 	struct tx_desc txdesc;
 	unsigned int value[TXDESC_SIZE >> 2];
+};
+#endif
+
+#ifdef CONFIG_PCI_HCI
+#define PCI_MAX_TX_QUEUE_COUNT	8	/* == HW_QUEUE_ENTRY */
+
+struct rtw_tx_ring {
+	unsigned char	qid;
+#ifdef CONFIG_TRX_BD_ARCH
+	struct tx_buf_desc	*buf_desc;
+#else
+	struct tx_desc	*desc;
+#endif
+	dma_addr_t	dma;
+	unsigned int	idx;
+	unsigned int	entries;
+	_queue		queue;
+	u32		qlen;
+#ifdef CONFIG_TRX_BD_ARCH
+	u16		hw_rp_cache;
+#endif
 };
 #endif
 
@@ -192,6 +335,56 @@ struct	hw_xmit	{
 	int	accnt;
 };
 
+#if 0
+struct pkt_attrib {
+	u8	type;
+	u8	subtype;
+	u8	bswenc;
+	u8	dhcp_pkt;
+	u16	ether_type;
+	int	pktlen;		/* the original 802.3 pkt raw_data len (not include ether_hdr data) */
+	int	pkt_hdrlen;	/* the original 802.3 pkt header len */
+	int	hdrlen;		/* the WLAN Header Len */
+	int	nr_frags;
+	int	last_txcmdsz;
+	int	encrypt;	/* when 0 indicate no encrypt. when non-zero, indicate the encrypt algorith */
+	u8	iv[8];
+	int	iv_len;
+	u8	icv[8];
+	int	icv_len;
+	int	priority;
+	int	ack_policy;
+	int	mac_id;
+	int	vcs_mode;	/* virtual carrier sense method */
+
+	u8	dst[ETH_ALEN];
+	u8	src[ETH_ALEN];
+	u8	ta[ETH_ALEN];
+	u8	ra[ETH_ALEN];
+
+	u8	key_idx;
+
+	u8	qos_en;
+	u8	ht_en;
+	u8	raid;/* rate adpative id */
+	u8	bwmode;
+	u8	ch_offset;/* PRIME_CHNL_OFFSET */
+	u8	sgi;/* short GI */
+	u8	ampdu_en;/* tx ampdu enable */
+	u8	mdata;/* more data bit */
+	u8	eosp;
+
+	u8	triggered;/* for ap mode handling Power Saving sta */
+
+	u32	qsel;
+	u16	seqnum;
+
+	struct sta_info *psta;
+#ifdef CONFIG_TCP_CSUM_OFFLOAD_TX
+	u8	hw_tcp_csum;
+#endif
+};
+#else
 /* reduce size */
 struct pkt_attrib {
 	u8	type;
@@ -278,6 +471,7 @@ struct pkt_attrib {
 #endif
 
 };
+#endif
 
 #ifdef CONFIG_TX_AMSDU
 enum {
@@ -314,7 +508,9 @@ struct  submit_ctx {
 	u32 submit_time; /* */
 	u32 timeout_ms; /* <0: not synchronous, 0: wait forever, >0: up to ms waiting */
 	int status; /* status for operation */
+#ifdef PLATFORM_LINUX
 	struct completion done;
+#endif
 };
 
 enum {
@@ -359,18 +555,55 @@ struct xmit_buf {
 
 	struct submit_ctx *sctx;
 
+#ifdef CONFIG_USB_HCI
+
 	/* u32 sz[8]; */
 	u32	ff_hwaddr;
 #ifdef RTW_HALMAC
 	u8 bulkout_id; /* for halmac */
 #endif /* RTW_HALMAC */
 
+#if defined(PLATFORM_OS_XP) || defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD)
 	PURB	pxmit_urb[8];
 	dma_addr_t dma_transfer_addr;	/* (in) dma addr for transfer_buffer */
+#endif
+
+#ifdef PLATFORM_OS_XP
+	PIRP		pxmit_irp[8];
+#endif
+
+#ifdef PLATFORM_OS_CE
+	USB_TRANSFER	usb_transfer_write_port;
+#endif
 
 	u8 bpending[8];
 
 	sint last[8];
+
+#endif
+
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+	u8 *phead;
+	u8 *pdata;
+	u8 *ptail;
+	u8 *pend;
+	u32 ff_hwaddr;
+	u8	pg_num;
+	u8	agg_num;
+#ifdef PLATFORM_OS_XP
+	PMDL pxmitbuf_mdl;
+	PIRP  pxmitbuf_irp;
+	PSDBUS_REQUEST_PACKET pxmitbuf_sdrp;
+#endif
+#endif
+
+#ifdef CONFIG_PCI_HCI
+#ifdef CONFIG_TRX_BD_ARCH
+	/*struct tx_buf_desc *buf_desc;*/
+#else
+	struct tx_desc *desc;
+#endif
+#endif
 
 #if defined(DBG_XMIT_BUF) || defined(DBG_XMIT_BUF_EXT)
 	u8 no;
@@ -394,10 +627,17 @@ struct xmit_frame {
 
 	struct xmit_buf *pxmitbuf;
 
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+	u8	pg_num;
+	u8	agg_num;
+#endif
+
+#ifdef CONFIG_USB_HCI
 #ifdef CONFIG_USB_TX_AGGREGATION
 	u8	agg_num;
 #endif
 	s8	pkt_offset;
+#endif
 
 #ifdef CONFIG_XMIT_ACK
 	u8 ack_report;
@@ -518,15 +758,49 @@ struct	xmit_priv	{
 
 	u8	wmm_para_seq[4];/* sequence for wmm ac parameter strength from large to small. it's value is 0->vo, 1->vi, 2->be, 3->bk. */
 
+#ifdef CONFIG_USB_HCI
 	_sema	tx_retevt;/* all tx return event; */
 	u8		txirp_cnt;
 
+#ifdef PLATFORM_OS_CE
+	USB_TRANSFER	usb_transfer_write_port;
+	/*	USB_TRANSFER	usb_transfer_write_mem; */
+#endif
+#ifdef PLATFORM_LINUX
 	struct tasklet_struct xmit_tasklet;
+#endif
+#ifdef PLATFORM_FREEBSD
+	struct task xmit_tasklet;
+#endif
 	/* per AC pending irp */
 	int beq_cnt;
 	int bkq_cnt;
 	int viq_cnt;
 	int voq_cnt;
+
+#endif
+
+#ifdef CONFIG_PCI_HCI
+	/* Tx */
+	struct rtw_tx_ring	tx_ring[PCI_MAX_TX_QUEUE_COUNT];
+	int	txringcount[PCI_MAX_TX_QUEUE_COUNT];
+	u8 	beaconDMAing;		/* flag of indicating beacon is transmiting to HW by DMA */
+#ifdef PLATFORM_LINUX
+	struct tasklet_struct xmit_tasklet;
+#endif
+#endif
+
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#ifdef CONFIG_SDIO_TX_TASKLET
+#ifdef PLATFORM_LINUX
+	struct tasklet_struct xmit_tasklet;
+#endif /* PLATFORM_LINUX */
+#else
+	_thread_hdl_	SdioXmitThread;
+	_sema		SdioXmitSema;
+	_sema		SdioXmitTerminateSema;
+#endif /* CONFIG_SDIO_TX_TASKLET */
+#endif /* CONFIG_SDIO_HCI */
 
 	_queue free_xmitbuf_queue;
 	_queue pending_xmitbuf_queue;
@@ -544,7 +818,11 @@ struct	xmit_priv	{
 	u16	nqos_ssn;
 #ifdef CONFIG_TX_EARLY_MODE
 
+#ifdef CONFIG_SDIO_HCI
+#define MAX_AGG_PKT_NUM 20
+#else
 #define MAX_AGG_PKT_NUM 256 /* Max tx ampdu coounts		 */
+#endif
 
 	struct agg_pkt_info agg_pkt[MAX_AGG_PKT_NUM];
 #endif
@@ -557,16 +835,16 @@ struct	xmit_priv	{
 #endif
 
 #ifdef CONFIG_TX_AMSDU
-	struct timer_list amsdu_vo_timer;
+	_timer amsdu_vo_timer;
 	u8 amsdu_vo_timeout;
 
-	struct timer_list amsdu_vi_timer;
+	_timer amsdu_vi_timer;
 	u8 amsdu_vi_timeout;
 
-	struct timer_list amsdu_be_timer;
+	_timer amsdu_be_timer;
 	u8 amsdu_be_timeout;
 
-	struct timer_list amsdu_bk_timer;
+	_timer amsdu_bk_timer;
 	u8 amsdu_bk_timeout;
 
 	u32 amsdu_debug_set_timer;
@@ -581,7 +859,21 @@ struct	xmit_priv	{
 extern struct xmit_frame *__rtw_alloc_cmdxmitframe(struct xmit_priv *pxmitpriv,
 		enum cmdbuf_type buf_type);
 #define rtw_alloc_cmdxmitframe(p) __rtw_alloc_cmdxmitframe(p, CMDBUF_RSVD)
+#if defined(CONFIG_RTL8192E) && defined(CONFIG_PCI_HCI)
+extern struct xmit_frame *__rtw_alloc_cmdxmitframe_8192ee(struct xmit_priv *pxmitpriv,
+		enum cmdbuf_type buf_type);
+#define rtw_alloc_bcnxmitframe(p) __rtw_alloc_cmdxmitframe_8192ee(p, CMDBUF_BEACON)
+#elif defined(CONFIG_RTL8822B) && defined(CONFIG_PCI_HCI)
+extern struct xmit_frame *__rtw_alloc_cmdxmitframe_8822be(struct xmit_priv *pxmitpriv,
+		enum cmdbuf_type buf_type);
+#define rtw_alloc_bcnxmitframe(p) __rtw_alloc_cmdxmitframe_8822be(p, CMDBUF_BEACON)
+#elif defined(CONFIG_RTL8821C) && defined(CONFIG_PCI_HCI)
+extern struct xmit_frame *__rtw_alloc_cmdxmitframe_8821ce(struct xmit_priv *pxmitpriv,
+		enum cmdbuf_type buf_type);
+#define rtw_alloc_bcnxmitframe(p) __rtw_alloc_cmdxmitframe_8821ce(p, CMDBUF_BEACON)
+#else
 #define rtw_alloc_bcnxmitframe(p) __rtw_alloc_cmdxmitframe(p, CMDBUF_BEACON)
+#endif
 
 extern struct xmit_buf *rtw_alloc_xmitbuf_ext(struct xmit_priv *pxmitpriv);
 extern s32 rtw_free_xmitbuf_ext(struct xmit_priv *pxmitpriv, struct xmit_buf *pxmitbuf);

@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __HAL_COMMON_REG_H__
 #define __HAL_COMMON_REG_H__
 
@@ -416,15 +432,15 @@
 
 /* RXERR_RPT */
 #define RXERR_TYPE_OFDM_PPDU			0
-#define RXERR_TYPE_OFDMfalse_ALARM	1
+#define RXERR_TYPE_OFDM_FALSE_ALARM	1
 #define RXERR_TYPE_OFDM_MPDU_OK		2
 #define RXERR_TYPE_OFDM_MPDU_FAIL	3
 #define RXERR_TYPE_CCK_PPDU			4
-#define RXERR_TYPE_CCKfalse_ALARM	5
+#define RXERR_TYPE_CCK_FALSE_ALARM	5
 #define RXERR_TYPE_CCK_MPDU_OK		6
 #define RXERR_TYPE_CCK_MPDU_FAIL		7
 #define RXERR_TYPE_HT_PPDU				8
-#define RXERR_TYPE_HTfalse_ALARM	9
+#define RXERR_TYPE_HT_FALSE_ALARM	9
 #define RXERR_TYPE_HT_MPDU_TOTAL		10
 #define RXERR_TYPE_HT_MPDU_OK			11
 #define RXERR_TYPE_HT_MPDU_FAIL		12
@@ -807,8 +823,8 @@ Default: 00b.
 #define TOTAL_CAM_ENTRY		32
 #define HALF_CAM_ENTRY			16
 
-#define CAM_CONFIG_USEDK		true
-#define CAM_CONFIG_NO_USEDK	false
+#define CAM_CONFIG_USEDK		_TRUE
+#define CAM_CONFIG_NO_USEDK	_FALSE
 
 #define CAM_WRITE				BIT(16)
 #define CAM_READ				0x00000000
@@ -1711,8 +1727,12 @@ Current IOREG MAP
 #define SDIO_TX_FREE_PG_QUEUE			4	/* The number of Tx FIFO free page */
 #define SDIO_TX_FIFO_PAGE_SZ			128
 
+#ifdef CONFIG_SDIO_HCI
+	#define MAX_TX_AGG_PACKET_NUMBER	0x8
+#else
 	#define MAX_TX_AGG_PACKET_NUMBER	0xFF
 	#define MAX_TX_AGG_PACKET_NUMBER_8812	64
+#endif
 
 /* -----------------------------------------------------
  *
@@ -1773,7 +1793,11 @@ Current IOREG MAP
  * General definitions
  * ******************************************************** */
 
+#ifdef CONFIG_USB_HCI
 	#define LAST_ENTRY_OF_TX_PKT_BUFFER_8188E(__Adapter)	(175)
+#else
+	#define LAST_ENTRY_OF_TX_PKT_BUFFER_8188E(__Adapter)	(IS_VENDOR_8188E_I_CUT_SERIES(__Adapter) ? 255 : 175)
+#endif
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8812			255
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8723B		255
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8192C		255
@@ -1783,7 +1807,11 @@ Current IOREG MAP
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8723D		255
 
 #define POLLING_LLT_THRESHOLD				20
-#define POLLING_READY_TIMEOUT_COUNT		1000
+#if defined(CONFIG_RTL8723B) && defined(CONFIG_PCI_HCI)
+	#define POLLING_READY_TIMEOUT_COUNT		6000
+#else
+	#define POLLING_READY_TIMEOUT_COUNT		1000
+#endif
 
 
 /* GPIO BIT */

@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2013 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __OSDEP_LINUX_SERVICE_H_
 #define __OSDEP_LINUX_SERVICE_H_
 
@@ -14,9 +30,6 @@
 #include <linux/module.h>
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 5))
 	#include <linux/kref.h>
-#endif
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
-#include <linux/sched/signal.h>
 #endif
 /* #include <linux/smp_lock.h> */
 #include <linux/netdevice.h>
@@ -55,6 +68,10 @@
 	#include <linux/limits.h>
 #endif
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
+	#include <linux/sched/signal.h>
+#endif
+
 #ifdef RTK_DMP_PLATFORM
 	#if (LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 12))
 		#include <linux/pageremap.h>
@@ -91,12 +108,14 @@
 	#include <linux/fs.h>
 #endif
 
+#ifdef CONFIG_USB_HCI
 	#include <linux/usb.h>
 	#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 21))
 		#include <linux/usb_ch9.h>
 	#else
 		#include <linux/usb/ch9.h>
 	#endif
+#endif
 
 #ifdef CONFIG_BT_COEXIST_SOCKET_TRX
 	#include <net/sock.h>
@@ -106,12 +125,14 @@
 	#include <linux/netlink.h>
 #endif /* CONFIG_BT_COEXIST_SOCKET_TRX */
 
+#ifdef CONFIG_USB_HCI
 	typedef struct urb   *PURB;
 	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 22))
 		#ifdef CONFIG_USB_SUSPEND
 			#define CONFIG_AUTOSUSPEND	1
 		#endif
 	#endif
+#endif
 
 #if defined(CONFIG_RTW_GRO) && (!defined(CONFIG_RTW_NAPI))
 
@@ -125,15 +146,21 @@
 
 
 typedef struct	semaphore _sema;
-#ifdef CONFIG_PREEMPT_RT
-typedef	raw_spinlock_t	_lock;
-#else
 typedef	spinlock_t	_lock;
-#endif
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
 	typedef struct mutex		_mutex;
 #else
 	typedef struct semaphore	_mutex;
+#endif
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
+	typedef struct legacy_timer_emu {
+		struct timer_list t;
+		void (*function)(unsigned long);
+		unsigned long data;
+	} _timer;
+#else
+	typedef struct timer_list _timer;
 #endif
 
 struct	__queue	{
@@ -147,6 +174,8 @@ typedef unsigned char	_buffer;
 typedef struct	__queue	_queue;
 typedef struct	list_head	_list;
 typedef	int	_OS_STATUS;
+/* typedef u32	_irqL; */
+typedef unsigned long _irqL;
 typedef	struct	net_device *_nic_hdl;
 
 typedef void		*_thread_hdl_;
@@ -206,55 +235,37 @@ __inline static _list	*get_list_head(_queue	*queue)
 	((type *)((char *)(ptr)-(SIZE_T)(&((type *)0)->member)))
 
 
-#ifdef CONFIG_PREEMPT_RT
-__inline static void _enter_critical(_lock *plock, unsigned long *pirqL)
-{
-	raw_spin_lock_irqsave(plock, *pirqL);
-}
-
-__inline static void _exit_critical(_lock *plock, unsigned long *pirqL)
-{
-	raw_spin_unlock_irqrestore(plock, *pirqL);
-}
-
-__inline static void _enter_critical_ex(_lock *plock, unsigned long *pirqL)
-{
-	raw_spin_lock_irqsave(plock, *pirqL);
-}
-
-#else
-__inline static void _enter_critical(_lock *plock, unsigned long *pirqL)
+__inline static void _enter_critical(_lock *plock, _irqL *pirqL)
 {
 	spin_lock_irqsave(plock, *pirqL);
 }
 
-__inline static void _exit_critical(_lock *plock, unsigned long *pirqL)
+__inline static void _exit_critical(_lock *plock, _irqL *pirqL)
 {
 	spin_unlock_irqrestore(plock, *pirqL);
 }
 
-__inline static void _enter_critical_ex(_lock *plock, unsigned long *pirqL)
+__inline static void _enter_critical_ex(_lock *plock, _irqL *pirqL)
 {
 	spin_lock_irqsave(plock, *pirqL);
 }
 
-#endif
-__inline static void _exit_critical_ex(_lock *plock, unsigned long *pirqL)
+__inline static void _exit_critical_ex(_lock *plock, _irqL *pirqL)
 {
 	spin_unlock_irqrestore(plock, *pirqL);
 }
 
-__inline static void _enter_critical_bh(_lock *plock, unsigned long *pirqL)
+__inline static void _enter_critical_bh(_lock *plock, _irqL *pirqL)
 {
 	spin_lock_bh(plock);
 }
 
-__inline static void _exit_critical_bh(_lock *plock, unsigned long *pirqL)
+__inline static void _exit_critical_bh(_lock *plock, _irqL *pirqL)
 {
 	spin_unlock_bh(plock);
 }
 
-__inline static int _enter_critical_mutex(_mutex *pmutex, unsigned long *pirqL)
+__inline static int _enter_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 {
 	int ret = 0;
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
@@ -267,7 +278,7 @@ __inline static int _enter_critical_mutex(_mutex *pmutex, unsigned long *pirqL)
 }
 
 
-__inline static void _exit_critical_mutex(_mutex *pmutex, unsigned long *pirqL)
+__inline static void _exit_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
 	mutex_unlock(pmutex);
@@ -276,26 +287,49 @@ __inline static void _exit_critical_mutex(_mutex *pmutex, unsigned long *pirqL)
 #endif
 }
 
+__inline static void rtw_list_delete(_list *plist)
+{
+	list_del_init(plist);
+}
+
 #define RTW_TIMER_HDL_ARGS void *FunctionContext
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-__inline static void _init_timer(struct timer_list *ptimer,struct  net_device * nic_hdl,void *pfunc,void* cntx)
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
+static void legacy_timer_emu_func(struct timer_list *t)
 {
-	ptimer->function = pfunc;
-	ptimer->data = (unsigned long)cntx;
-	init_timer(ptimer);
+	struct legacy_timer_emu *lt = from_timer(lt, t, t);
+	lt->function(lt->data);
 }
 #endif
 
-__inline static void _set_timer(struct timer_list *ptimer, u32 delay_time)
+__inline static void _init_timer(_timer *ptimer, _nic_hdl nic_hdl, void *pfunc, void *cntx)
 {
-	mod_timer(ptimer , (jiffies + (delay_time * HZ / 1000)));
+	/* setup_timer(ptimer, pfunc,(u32)cntx);	 */
+	ptimer->function = pfunc;
+	ptimer->data = (unsigned long)cntx;
+	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
+		timer_setup(&ptimer->t, legacy_timer_emu_func, 0);
+	#else
+		init_timer(ptimer);
+	#endif
 }
 
-__inline static void _cancel_timer(struct timer_list *ptimer, u8 *bcancelled)
+__inline static void _set_timer(_timer *ptimer, u32 delay_time)
 {
-	del_timer_sync(ptimer);
-	*bcancelled = 1;
+	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
+		mod_timer(&ptimer->t, (jiffies + (delay_time * HZ / 1000)));
+	#else
+		mod_timer(ptimer, (jiffies + (delay_time * HZ / 1000)));
+	#endif
+}
+
+__inline static void _cancel_timer(_timer *ptimer, u8 *bcancelled)
+{
+	#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
+		*bcancelled = del_timer_sync(&ptimer->t) == 1 ? 1 : 0;
+	#else
+		*bcancelled = del_timer_sync(ptimer) == 1 ? 1 : 0;
+	#endif
 }
 
 

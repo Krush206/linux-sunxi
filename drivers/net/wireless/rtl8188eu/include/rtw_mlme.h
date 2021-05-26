@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_MLME_H_
 #define __RTW_MLME_H_
 
@@ -90,7 +106,7 @@ void rtw_wfd_st_switch(struct sta_info *sta, bool on);
 #endif /* !CONFIG_P2P */
 
 #if defined(CONFIG_IOCTL_CFG80211) && defined(CONFIG_P2P)
-#define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter) == true)
+#define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter) == _TRUE)
 #else
 #define MLME_IS_ROCH(adapter) 0
 #endif
@@ -186,19 +202,19 @@ struct sitesurvey_ctrl {
 	u64	last_tx_pkts;
 	uint	last_rx_pkts;
 	sint	traffic_busy;
-	struct timer_list sitesurvey_ctrl_timer;
+	_timer	sitesurvey_ctrl_timer;
 };
 
 typedef struct _RT_LINK_DETECT_T {
 	u32				NumTxOkInPeriod;
 	u32				NumRxOkInPeriod;
 	u32				NumRxUnicastOkInPeriod;
-	bool			bBusyTraffic;
-	bool			bTxBusyTraffic;
-	bool			bRxBusyTraffic;
-	bool			bHigherBusyTraffic; /* For interrupt migration purpose. */
-	bool			bHigherBusyRxTraffic; /* We may disable Tx interrupt according as Rx traffic. */
-	bool			bHigherBusyTxTraffic; /* We may disable Tx interrupt according as Tx traffic. */
+	BOOLEAN			bBusyTraffic;
+	BOOLEAN			bTxBusyTraffic;
+	BOOLEAN			bRxBusyTraffic;
+	BOOLEAN			bHigherBusyTraffic; /* For interrupt migration purpose. */
+	BOOLEAN			bHigherBusyRxTraffic; /* We may disable Tx interrupt according as Rx traffic. */
+	BOOLEAN			bHigherBusyTxTraffic; /* We may disable Tx interrupt according as Tx traffic. */
 	/* u8 TrafficBusyState; */
 	u8 TrafficTransitionCount;
 	u32 LowPowerTransitionCount;
@@ -292,7 +308,7 @@ struct scan_limit_info {
 
 #ifdef CONFIG_IOCTL_CFG80211
 struct cfg80211_wifidirect_info {
-	struct timer_list 				remain_on_ch_timer;
+	_timer					remain_on_ch_timer;
 	u8						restore_channel;
 	struct ieee80211_channel	remain_on_ch_channel;
 	enum nl80211_channel_type	remain_on_ch_type;
@@ -326,16 +342,16 @@ struct p2p_wowlan_info {
 
 struct wifidirect_info {
 	_adapter				*padapter;
-	struct timer_list 				find_phase_timer;
-	struct timer_list 				restore_p2p_state_timer;
+	_timer					find_phase_timer;
+	_timer					restore_p2p_state_timer;
 
 	/*	Used to do the scanning. After confirming the peer is availalble, the driver transmits the P2P frame to peer. */
-	struct timer_list 				pre_tx_scan_timer;
-	struct timer_list 				reset_ch_sitesurvey;
-	struct timer_list 				reset_ch_sitesurvey2;	/*	Just for resetting the scan limit function by using p2p nego */
+	_timer					pre_tx_scan_timer;
+	_timer					reset_ch_sitesurvey;
+	_timer					reset_ch_sitesurvey2;	/*	Just for resetting the scan limit function by using p2p nego */
 #ifdef CONFIG_CONCURRENT_MODE
 	/*	Used to switch the channel between legacy AP and listen state. */
-	struct timer_list 				ap_p2p_switch_timer;
+	_timer					ap_p2p_switch_timer;
 #endif
 	struct tx_provdisc_req_info	tx_prov_disc_info;
 	struct rx_provdisc_req_info rx_prov_disc_info;
@@ -430,7 +446,7 @@ struct wifidirect_info {
 struct tdls_ss_record {	/* signal strength record */
 	u8		macaddr[ETH_ALEN];
 	u8		RxPWDBAll;
-	u8		is_tdls_sta;	/* true: direct link sta, false: else */
+	u8		is_tdls_sta;	/* _TRUE: direct link sta, _FALSE: else */
 };
 
 struct tdls_temp_mgmt {
@@ -618,20 +634,22 @@ struct mlme_priv {
 
 	u32	auto_scan_int_ms;
 
-	struct timer_list assoc_timer;
+	_timer assoc_timer;
 
 	uint assoc_by_bssid;
 	uint assoc_by_rssi;
 
-	struct timer_list scan_to_timer; /* driver itself handles scan_timeout status. */
+	_timer scan_to_timer; /* driver itself handles scan_timeout status. */
 	u32 scan_start_time; /* used to evaluate the time spent in scanning */
 
 #ifdef CONFIG_SET_SCAN_DENY_TIMER
-	struct timer_list set_scan_deny_timer;
+	_timer set_scan_deny_timer;
 	ATOMIC_T set_scan_deny; /* 0: allowed, 1: deny */
 #endif
 
 	struct qos_priv qospriv;
+
+#ifdef CONFIG_80211N_HT
 
 	/* Number of non-HT AP/stations */
 	int num_sta_no_ht;
@@ -644,6 +662,11 @@ struct mlme_priv {
 
 	struct ht_priv	htpriv;
 
+#endif
+
+#ifdef CONFIG_80211AC_VHT
+	struct vht_priv	vhtpriv;
+#endif
 #ifdef CONFIG_BEAMFORMING
 #ifndef RTW_BEAMFORMING_VERSION_2
 #if (BEAMFORMING_SUPPORT == 0)/*for driver beamforming*/
@@ -657,7 +680,7 @@ struct mlme_priv {
 #endif
 #ifdef CONFIG_DFS_MASTER
 	/* TODO: move to rfctl */
-	struct timer_list dfs_master_timer;
+	_timer dfs_master_timer;
 #endif
 #ifdef CONFIG_RTW_80211R
 	ft_priv ftpriv;
@@ -704,10 +727,12 @@ struct mlme_priv {
 	/* Overlapping BSS information */
 	ATOMIC_T olbc_ht;
 
+#ifdef CONFIG_80211N_HT
 	int ht_20mhz_width_req;
 	int ht_intolerant_ch_reported;
 	u16 ht_op_mode;
 	u8 sw_to_20mhz; /*switch to 20Mhz BW*/
+#endif /* CONFIG_80211N_HT */
 
 #ifdef CONFIG_RTW_80211R
 	u8 *auth_rsp;
@@ -786,7 +811,7 @@ struct mlme_priv {
 #ifdef CONFIG_INTEL_WIDI
 	int	widi_state;
 	int	listen_state;
-	struct timer_list listen_timer;
+	_timer	listen_timer;
 	ATOMIC_T	rx_probe_rsp; /* 1:receive probe respone from RDS source. */
 	u8	*l2sdTaBuffer;
 	u8	channel_idx;
@@ -814,6 +839,11 @@ struct mlme_priv {
 	u8	scanning_via_buddy_intf;
 #endif
 
+#if 0
+	u8	NumOfBcnInfoChkFail;
+	u32	timeBcnInfoChkStart;
+#endif
+
 #ifdef CONFIG_APPEND_VENDOR_IE_ENABLE
 	u32 vendor_ie_mask[WLAN_MAX_VENDOR_IE_NUM];
 	u8 vendor_ie[WLAN_MAX_VENDOR_IE_NUM][WLAN_MAX_VENDOR_IE_LEN];
@@ -823,7 +853,7 @@ struct mlme_priv {
 
 #define mlme_set_scan_to_timer(mlme, ms) \
 	do { \
-		/* RTW_INFO("%s set_scan_to_timer(%p, %d)\n", __func__, (mlme), (ms)); */ \
+		/* RTW_INFO("%s set_scan_to_timer(%p, %d)\n", __FUNCTION__, (mlme), (ms)); */ \
 		_set_timer(&(mlme)->scan_to_timer, (ms)); \
 	} while (0)
 
@@ -873,13 +903,8 @@ void rtw_sta_timeout_event_callback(_adapter *adapter, u8 *pbuf);
 void rtw_update_ft_stainfo(_adapter *padapter, WLAN_BSSID_EX *pnetwork);
 void rtw_ft_reassoc_event_callback(_adapter *padapter, u8 *pbuf);
 #endif
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
 extern void rtw_join_timeout_handler(RTW_TIMER_HDL_ARGS);
 extern void _rtw_scan_timeout_handler(RTW_TIMER_HDL_ARGS);
-#else
-void rtw_join_timeout_handler(struct timer_list *t);
-void _rtw_scan_timeout_handler(struct timer_list *t);
-#endif
 
 thread_return event_thread(thread_context context);
 
@@ -904,12 +929,12 @@ __inline static sint check_fwstate(struct mlme_priv *pmlmepriv, sint state)
 {
 	if ((state == WIFI_NULL_STATE) &&
 		(pmlmepriv->fw_state == WIFI_NULL_STATE))
-		return true;
+		return _TRUE;
 
 	if (pmlmepriv->fw_state & state)
-		return true;
+		return _TRUE;
 
-	return false;
+	return _FALSE;
 }
 
 __inline static sint get_fwstate(struct mlme_priv *pmlmepriv)
@@ -932,7 +957,7 @@ static inline void set_fwstate(struct mlme_priv *pmlmepriv, sint state)
 
 	/*bScanInProcess hook in phydm*/
 	if (_FW_UNDER_SURVEY == state)
-		pmlmepriv->bScanInProcess = true;
+		pmlmepriv->bScanInProcess = _TRUE;
 
 	rtw_mi_update_iface_status(pmlmepriv, state);
 }
@@ -942,7 +967,7 @@ static inline void init_fwstate(struct mlme_priv *pmlmepriv, sint state)
 
 	/*bScanInProcess hook in phydm*/
 	if (_FW_UNDER_SURVEY == state)
-		pmlmepriv->bScanInProcess = true;
+		pmlmepriv->bScanInProcess = _TRUE;
 
 	rtw_mi_update_iface_status(pmlmepriv, state);
 }
@@ -953,7 +978,7 @@ static inline void _clr_fwstate_(struct mlme_priv *pmlmepriv, sint state)
 
 	/*bScanInProcess hook in phydm*/
 	if (_FW_UNDER_SURVEY == state)
-		pmlmepriv->bScanInProcess = false;
+		pmlmepriv->bScanInProcess = _FALSE;
 
 	rtw_mi_update_iface_status(pmlmepriv, state);
 }
@@ -964,31 +989,39 @@ static inline void _clr_fwstate_(struct mlme_priv *pmlmepriv, sint state)
  */
 static inline void clr_fwstate(struct mlme_priv *pmlmepriv, sint state)
 {
-	spin_lock_bh(&pmlmepriv->lock);
+	_irqL irqL;
+
+	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 	_clr_fwstate_(pmlmepriv, state);
-	spin_unlock_bh(&pmlmepriv->lock);
+	_exit_critical_bh(&pmlmepriv->lock, &irqL);
 }
 
 static inline void up_scanned_network(struct mlme_priv *pmlmepriv)
 {
-	spin_lock_bh(&pmlmepriv->lock);
+	_irqL irqL;
+
+	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 	pmlmepriv->num_of_scanned++;
-	spin_unlock_bh(&pmlmepriv->lock);
+	_exit_critical_bh(&pmlmepriv->lock, &irqL);
 }
 u8 rtw_is_adapter_up(_adapter *padapter);
 
 __inline static void down_scanned_network(struct mlme_priv *pmlmepriv)
 {
-	spin_lock_bh(&pmlmepriv->lock);
+	_irqL irqL;
+
+	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 	pmlmepriv->num_of_scanned--;
-	spin_unlock_bh(&pmlmepriv->lock);
+	_exit_critical_bh(&pmlmepriv->lock, &irqL);
 }
 
 __inline static void set_scanned_network_val(struct mlme_priv *pmlmepriv, sint val)
 {
-	spin_lock_bh(&pmlmepriv->lock);
+	_irqL irqL;
+
+	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 	pmlmepriv->num_of_scanned = val;
-	spin_unlock_bh(&pmlmepriv->lock);
+	_exit_critical_bh(&pmlmepriv->lock, &irqL);
 }
 
 extern u16 rtw_get_capability(WLAN_BSSID_EX *bss);
@@ -1022,13 +1055,9 @@ extern void rtw_get_encrypt_decrypt_from_registrypriv(_adapter *adapter);
 extern void _rtw_join_timeout_handler(_adapter *adapter);
 extern void rtw_scan_timeout_handler(_adapter *adapter);
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0)
-void _dynamic_check_timer_handler (void *FunctionContext);
-#else
-void _dynamic_check_timer_handler(struct timer_list *t);
-#endif
-extern void rtw_dynamic_check_timer_handler(_adapter *adapter);
-extern void rtw_iface_dynamic_check_timer_handler(_adapter *adapter);
+extern void _dynamic_check_timer_handlder(void *FunctionContext);
+extern void rtw_dynamic_check_timer_handlder(_adapter *adapter);
+extern void rtw_iface_dynamic_check_timer_handlder(_adapter *adapter);
 
 #ifdef CONFIG_SET_SCAN_DENY_TIMER
 bool rtw_is_scan_deny(_adapter *adapter);
@@ -1036,7 +1065,7 @@ void rtw_clear_scan_deny(_adapter *adapter);
 void rtw_set_scan_deny_timer_hdl(_adapter *adapter);
 void rtw_set_scan_deny(_adapter *adapter, u32 ms);
 #else
-#define rtw_is_scan_deny(adapter) false
+#define rtw_is_scan_deny(adapter) _FALSE
 #define rtw_clear_scan_deny(adapter) do {} while (0)
 #define rtw_set_scan_deny_timer_hdl(adapter) do {} while (0)
 #define rtw_set_scan_deny(adapter, ms) do {} while (0)
@@ -1077,14 +1106,17 @@ u8 *rtw_get_capability_from_ie(u8 *ie);
 u8 *rtw_get_timestampe_from_ie(u8 *ie);
 u8 *rtw_get_beacon_interval_from_ie(u8 *ie);
 
+
 void rtw_joinbss_reset(_adapter *padapter);
 
+#ifdef CONFIG_80211N_HT
 void	rtw_ht_use_default_setting(_adapter *padapter);
 void rtw_build_wmm_ie_ht(_adapter *padapter, u8 *out_ie, uint *pout_len);
 unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, uint in_len, uint *pout_len, u8 channel);
 void rtw_update_ht_cap(_adapter *padapter, u8 *pie, uint ie_len, u8 channel);
 void rtw_issue_addbareq_cmd(_adapter *padapter, struct xmit_frame *pxmitframe);
 void rtw_append_exented_cap(_adapter *padapter, u8 *out_ie, uint *pout_len);
+#endif
 
 int rtw_is_same_ibss(_adapter *adapter, struct wlan_network *pnetwork);
 int is_same_network(WLAN_BSSID_EX *src, WLAN_BSSID_EX *dst, u8 feature);
@@ -1137,9 +1169,6 @@ struct sta_media_status_rpt_cmd_parm {
 void rtw_sta_media_status_rpt(_adapter *adapter, struct sta_info *sta, bool connected);
 u8 rtw_sta_media_status_rpt_cmd(_adapter *adapter, struct sta_info *sta, bool connected);
 void rtw_sta_media_status_rpt_cmd_hdl(_adapter *adapter, struct sta_media_status_rpt_cmd_parm *parm);
-void rtw_indicate_wx_assoc_event(_adapter *padapter);
-void rtw_indicate_wx_disassoc_event(_adapter *padapter);
-void indicate_wx_scan_complete_event(_adapter *padapter);
 
 #ifdef CONFIG_INTEL_PROXIM
 void rtw_proxim_enable(_adapter *padapter);

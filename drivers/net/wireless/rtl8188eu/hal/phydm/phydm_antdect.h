@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef	__PHYDMANTDECT_H__
 #define    __PHYDMANTDECT_H__
@@ -8,6 +24,7 @@
 #define ANTDECT_VERSION	"2.1"	/*2015.07.29 by YuChen*/
 
 #if (defined(CONFIG_ANT_DETECTION))
+/* #if( DM_ODM_SUPPORT_TYPE & (ODM_WIN |ODM_CE)) */
 /* ANT Test */
 #define		ANTTESTALL		0x00	/*ant A or B will be Testing*/
 #define		ANTTESTA		0x01	/*ant A will be Testing*/

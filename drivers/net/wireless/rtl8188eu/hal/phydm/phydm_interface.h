@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 
 #ifndef	__ODM_INTERFACE_H__
@@ -23,14 +39,20 @@
 #define _bit_all(_name)			BIT_##_name
 #define _bit_ic(_name, _ic)		BIT_##_name##_ic
 
-/* _cat: implemented by Token-Passing Operator. */
+/* _cat: implemented by Token-Pasting Operator. */
+#if 0
+#define _cat(_name, _ic_type, _func)								\
+	(\
+	 _func##_all(_name)										\
+	)
+#endif
 
 /*===================================
 
 #define ODM_REG_DIG_11N		0xC50
 #define ODM_REG_DIG_11AC	0xDDD
 
-ODM_REG(DIG, _pdm_odm)
+ODM_REG(DIG,_pdm_odm)
 =====================================*/
 
 #define _reg_11N(_name)			ODM_REG_##_name##_11N
@@ -253,6 +275,45 @@ odm_release_spin_lock(
 	enum rt_spinlock_type	type
 );
 
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+/*
+ * ODM MISC-workitem relative API.
+ *   */
+void
+odm_initialize_work_item(
+	struct PHY_DM_STRUCT					*p_dm_odm,
+	PRT_WORK_ITEM				p_rt_work_item,
+	RT_WORKITEM_CALL_BACK		rt_work_item_callback,
+	void						*p_context,
+	const char					*sz_id
+);
+
+void
+odm_start_work_item(
+	PRT_WORK_ITEM	p_rt_work_item
+);
+
+void
+odm_stop_work_item(
+	PRT_WORK_ITEM	p_rt_work_item
+);
+
+void
+odm_free_work_item(
+	PRT_WORK_ITEM	p_rt_work_item
+);
+
+void
+odm_schedule_work_item(
+	PRT_WORK_ITEM	p_rt_work_item
+);
+
+bool
+odm_is_work_item_scheduled(
+	PRT_WORK_ITEM	p_rt_work_item
+);
+#endif
+
 /*
  * ODM Timer relative API.
  *   */
@@ -326,12 +387,13 @@ u64
 odm_get_current_time(
 	struct PHY_DM_STRUCT		*p_dm_odm
 );
-
 u64
 odm_get_progressing_time(
 	struct PHY_DM_STRUCT		*p_dm_odm,
 	u64			start_time
 );
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))
 
 void
 phydm_set_hw_reg_handler_interface (
@@ -345,7 +407,10 @@ phydm_get_hal_def_var_handler_interface (
 	struct PHY_DM_STRUCT		*p_dm_odm,
 	enum _HAL_DEF_VARIABLE		e_variable,
 	void						*p_value
-);
+	);
+
+#endif
+
 
 #endif /* __ODM_INTERFACE_H__ */
 

@@ -1,9 +1,26 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef _RTW_BR_EXT_H_
 #define _RTW_BR_EXT_H_
 
+#if 1	/* rtw_wifi_driver */
 #define CL_IPV6_PASS	1
 #define MACADDRLEN		6
 #define _DEBUG_ERR		RTW_INFO
@@ -13,6 +30,7 @@
 #define DEBUG_ERR		RTW_INFO
 /* #define GET_MY_HWADDR		((GET_MIB(priv))->dot11OperationEntry.hwaddr) */
 #define GET_MY_HWADDR(padapter)		(adapter_mac_addr(padapter))
+#endif /* rtw_wifi_driver */
 
 #define NAT25_HASH_BITS		4
 #define NAT25_HASH_SIZE		(1 << NAT25_HASH_BITS)

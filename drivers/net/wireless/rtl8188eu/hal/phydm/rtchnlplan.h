@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2012 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 
 #ifndef	__RT_CHANNELPLAN_H__
@@ -27,6 +43,57 @@ enum rt_channel_domain_new {
 
 };
 
+
+#if 0
+#define DOMAIN_CODE_2G_WORLD \
+	{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 13
+#define DOMAIN_CODE_2G_ETSI1 \
+	{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}, 13
+#define DOMAIN_CODE_2G_ETSI2 \
+	{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, 11
+#define DOMAIN_CODE_2G_FCC1 \
+	{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}, 14
+#define DOMAIN_CODE_2G_MKK1 \
+	{10, 11, 12, 13}, 4
+
+#define DOMAIN_CODE_5G_ETSI1 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140}, 19
+#define DOMAIN_CODE_5G_ETSI2 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165}, 24
+#define DOMAIN_CODE_5G_ETSI3 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 149, 153, 157, 161, 165}, 22
+#define DOMAIN_CODE_5G_FCC1 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 149, 153, 157, 161, 165}, 24
+#define DOMAIN_CODE_5G_FCC2 \
+	{36, 40, 44, 48, 149, 153, 157, 161, 165}, 9
+#define DOMAIN_CODE_5G_FCC3 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161, 165}, 13
+#define DOMAIN_CODE_5G_FCC4 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 149, 153, 157, 161}, 12
+#define DOMAIN_CODE_5G_FCC5 \
+	{149, 153, 157, 161, 165}, 5
+#define DOMAIN_CODE_5G_FCC6 \
+	{36, 40, 44, 48, 52, 56, 60, 64}, 8
+#define DOMAIN_CODE_5G_FCC7 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 136, 140, 149, 153, 157, 161, 165}, 20
+#define DOMAIN_CODE_5G_IC1 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 136, 140, 149, 153, 157, 161, 165}, 20
+#define DOMAIN_CODE_5G_KCC1 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 149, 153, 157, 161, 165}, 20
+#define DOMAIN_CODE_5G_MKK1 \
+	{36, 40, 44, 48, 52, 56, 60, 64, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140}, 19
+#define DOMAIN_CODE_5G_MKK2 \
+	{36, 40, 44, 48, 52, 56, 60, 64}, 8
+#define DOMAIN_CODE_5G_MKK3 \
+	{100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140}, 11
+#define DOMAIN_CODE_5G_NCC1 \
+	{56, 60, 64, 100, 104, 108, 112, 116, 136, 140, 149, 153, 157, 161, 165}, 24
+#define DOMAIN_CODE_5G_NCC2 \
+	{56, 60, 64, 149, 153, 157, 161, 165}, 8
+#define UNDEFINED \
+	{0}, 0
+#endif
+
 /*
  *
  *
@@ -34,157 +101,157 @@ enum rt_channel_domain_new {
 
 Countries							"Country Abbreviation"	Domain Code					SKU's	Ch# of 20MHz
 															2G			5G						Ch# of 40MHz
-"Albaniaï¿½ï¿½ï¿½ï¿½ï¿½Ú¥ï¿½ï¿½ï¿½"					AL													Local Test
+"Albaniaªüº¸¤Ú¥§¨È"					AL													Local Test
 
-"Algeriaï¿½ï¿½ï¿½ï¿½ï¿½Î§Qï¿½ï¿½"					DZ									CE TCF
+"Algeriaªüº¸¤Î§Q¨È"					DZ									CE TCF
 
-"Antigua & Barbudaï¿½wï¿½ï¿½ï¿½Ê®q&ï¿½Ú¥ï¿½ï¿½F"	AG						2G_WORLD					FCC TCF
+"Antigua & Barbuda¦w´£¥Ê®q&¤Ú¥¬¹F"	AG						2G_WORLD					FCC TCF
 
-"Argentinaï¿½ï¿½ï¿½Ú§ï¿½"					AR						2G_WORLD					Local Test
+"Argentinaªü®Ú§Ê"					AR						2G_WORLD					Local Test
 
-"Armeniaï¿½È¬ï¿½ï¿½ï¿½ï¿½ï¿½"					AM						2G_WORLD					ETSI
+"Armenia¨È¬ü¥§¨È"					AM						2G_WORLD					ETSI
 
-"Arubaï¿½ï¿½ï¿½|ï¿½Ú®q"						AW						2G_WORLD					FCC TCF
+"Arubaªü¾|¤Ú®q"						AW						2G_WORLD					FCC TCF
 
-"Australiaï¿½Dï¿½w"						AU						2G_WORLD		5G_ETSI2
+"Australia¿D¬w"						AU						2G_WORLD		5G_ETSI2
 
-"Austriaï¿½ï¿½ï¿½aï¿½Q"						AT						2G_WORLD		5G_ETSI1	CE
+"Austria¶ø¦a§Q"						AT						2G_WORLD		5G_ETSI1	CE
 
-"Azerbaijanï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"				AZ						2G_WORLD					CE TCF
+"Azerbaijanªü¶ë«ô¾Ê"				AZ						2G_WORLD					CE TCF
 
-"Bahamasï¿½Ú«ï¿½ï¿½ï¿½"						BS						2G_WORLD
+"Bahamas¤Ú«¢°¨"						BS						2G_WORLD
 
-"Barbadosï¿½Ú¤Ú¦hï¿½ï¿½"					BB						2G_WORLD					FCC TCF
+"Barbados¤Ú¤Ú¦h´µ"					BB						2G_WORLD					FCC TCF
 
-"Belgiumï¿½ï¿½Qï¿½ï¿½"						BE						2G_WORLD		5G_ETSI1	CE
+"Belgium¤ñ§Q®É"						BE						2G_WORLD		5G_ETSI1	CE
 
-"Bermudaï¿½Ê¼}ï¿½F"						BM						2G_WORLD					FCC TCF
+"Bermuda¦Ê¼}¹F"						BM						2G_WORLD					FCC TCF
 
-"Brazilï¿½Ú¦ï¿½"						BR						2G_WORLD					Local Test
+"Brazil¤Ú¦è"						BR						2G_WORLD					Local Test
 
-"Bulgariaï¿½Oï¿½[ï¿½Qï¿½ï¿½"					BG						2G_WORLD		5G_ETSI1	CE
+"Bulgaria«O¥[§Q¨È"					BG						2G_WORLD		5G_ETSI1	CE
 
-"Canadaï¿½[ï¿½ï¿½ï¿½j"						CA						2G_FCC1			5G_FCC7		IC / FCC	IC / FCC
+"Canada¥[®³¤j"						CA						2G_FCC1			5G_FCC7		IC / FCC	IC / FCC
 
-"Cayman Islandsï¿½}ï¿½Ò¸sï¿½q"			KY						2G_WORLD		5G_ETSI1	CE
+"Cayman Islands¶}°Ò¸s®q"			KY						2G_WORLD		5G_ETSI1	CE
 
-"Chileï¿½ï¿½ï¿½Q"							CL						2G_WORLD					FCC TCF
+"Chile´¼§Q"							CL						2G_WORLD					FCC TCF
 
-"Chinaï¿½ï¿½ï¿½ï¿½"							CN						2G_WORLD		5G_FCC5		ï¿½Hï¿½ï¿½?ï¿½i2002ï¿½j353?
+"China¤¤°ê"							CN						2G_WORLD		5G_FCC5		«H³¡?¡i2002¡j353?
 
-"Columbiaï¿½ï¿½ï¿½Û¤ï¿½ï¿½"					CO						2G_WORLD					Voluntary
+"Columbia­ô­Û¤ñ¨È"					CO						2G_WORLD					Voluntary
 
-"Costa Ricaï¿½ï¿½ï¿½ï¿½ï¿½Fï¿½ï¿½ï¿½["				CR						2G_WORLD					FCC TCF
+"Costa Rica­ô´µ¹F¾¤¥["				CR						2G_WORLD					FCC TCF
 
-"Cyprusï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"					CY						2G_WORLD		5G_ETSI1	CE
+"Cyprus¶ë®ú¸ô´µ"					CY						2G_WORLD		5G_ETSI1	CE
 
-"Czech ï¿½ï¿½ï¿½J"						CZ						2G_WORLD		5G_ETSI1	CE
+"Czech ±¶§J"						CZ						2G_WORLD		5G_ETSI1	CE
 
-"Denmarkï¿½ï¿½ï¿½ï¿½"						DK						2G_WORLD		5G_ETSI1	CE
+"Denmark¤¦³Á"						DK						2G_WORLD		5G_ETSI1	CE
 
-"Dominican Republicï¿½hï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½@ï¿½Mï¿½ï¿½"	DO						2G_WORLD					FCC TCF
+"Dominican Republic¦h©ú¥§¥[¦@©M°ê"	DO						2G_WORLD					FCC TCF
 
-"Egyptï¿½Jï¿½ï¿½"	EG	2G_WORLD			CE T												CF
+"Egypt®J¤Î"	EG	2G_WORLD			CE T												CF
 
-"El Salvadorï¿½Äºï¿½ï¿½Ë¦h"				SV						2G_WORLD					Voluntary
+"El SalvadorÂÄº¸¥Ë¦h"				SV						2G_WORLD					Voluntary
 
-"Estoniaï¿½Rï¿½Fï¿½ï¿½ï¿½ï¿½"					EE						2G_WORLD		5G_ETSI1	CE
+"Estonia·R¨F¥§¨È"					EE						2G_WORLD		5G_ETSI1	CE
 
-"Finlandï¿½ï¿½ï¿½ï¿½"						FI						2G_WORLD		5G_ETSI1	CE
+"FinlandªâÄõ"						FI						2G_WORLD		5G_ETSI1	CE
 
-"Franceï¿½kï¿½ï¿½"						FR										5G_E		TSI1	CE
+"Franceªk°ê"						FR										5G_E		TSI1	CE
 
-"Germanyï¿½wï¿½ï¿½"						DE						2G_WORLD		5G_ETSI1	CE
+"Germany¼w°ê"						DE						2G_WORLD		5G_ETSI1	CE
 
-"Greece ï¿½ï¿½Ã¾"						GR						2G_WORLD		5G_ETSI1	CE
+"Greece §ÆÃ¾"						GR						2G_WORLD		5G_ETSI1	CE
 
-"Guamï¿½ï¿½ï¿½q"							GU						2G_WORLD
+"GuamÃö®q"							GU						2G_WORLD
 
-"Guatemalaï¿½Ê¦aï¿½ï¿½ï¿½ï¿½"					GT						2G_WORLD
+"Guatemala¥Ê¦a°¨©Ô"					GT						2G_WORLD
 
-"Haitiï¿½ï¿½ï¿½a"							HT						2G_WORLD					FCC TCF
+"Haiti®ü¦a"							HT						2G_WORLD					FCC TCF
 
-"Hondurasï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½"					HN						2G_WORLD					FCC TCF
+"Honduras§»³£©Ô´µ"					HN						2G_WORLD					FCC TCF
 
-"Hungaryï¿½Iï¿½ï¿½ï¿½Q"						HU						2G_WORLD		5G_ETSI1	CE
+"Hungary¦I¤ú§Q"						HU						2G_WORLD		5G_ETSI1	CE
 
-"Icelandï¿½Bï¿½q"						IS						2G_WORLD		5G_ETSI1	CE
+"Iceland¦B®q"						IS						2G_WORLD		5G_ETSI1	CE
 
-"Indiaï¿½Lï¿½ï¿½"												2G_WORLD		5G_FCC3		FCC/CE TCF
+"India¦L«×"												2G_WORLD		5G_FCC3		FCC/CE TCF
 
-"Irelandï¿½Rï¿½ï¿½ï¿½ï¿½"						IE						2G_WORLD		5G_ETSI1	CE
+"Ireland·Rº¸Äõ"						IE						2G_WORLD		5G_ETSI1	CE
 
-"Israelï¿½Hï¿½ï¿½C"						IL										5G_F		CC6	CE TCF
+"Israel¥H¦â¦C"						IL										5G_F		CC6	CE TCF
 
-"Italyï¿½qï¿½jï¿½Q"						IT						2G_WORLD		5G_ETSI1	CE
+"Italy¸q¤j§Q"						IT						2G_WORLD		5G_ETSI1	CE
 
-"Japanï¿½é¥»"							JP						2G_MKK1			5G_MKK1		MKK	MKK
+"Japan¤é¥»"							JP						2G_MKK1			5G_MKK1		MKK	MKK
 
-"Koreaï¿½ï¿½ï¿½ï¿½"							KR						2G_WORLD		5G_KCC1		KCC	KCC
+"KoreaÁú°ê"							KR						2G_WORLD		5G_KCC1		KCC	KCC
 
-"Latviaï¿½Ô²ï¿½ï¿½ï¿½ï¿½"					LV						2G_WORLD		5G_ETSI1	CE
+"Latvia©Ô²æºû¨È"					LV						2G_WORLD		5G_ETSI1	CE
 
-"Lithuaniaï¿½ß³ï¿½ï¿½{"					LT						2G_WORLD		5G_ETSI1	CE
+"Lithuania¥ß³³©{"					LT						2G_WORLD		5G_ETSI1	CE
 
-"Luxembourgï¿½cï¿½Ë³ï¿½"					LU						2G_WORLD		5G_ETSI1	CE
+"Luxembourg¿c´Ë³ù"					LU						2G_WORLD		5G_ETSI1	CE
 
-"Malaysiaï¿½ï¿½ï¿½Ó¦ï¿½ï¿½"					MY						2G_WORLD					Local Test
+"Malaysia°¨¨Ó¦è¨È"					MY						2G_WORLD					Local Test
 
-"Maltaï¿½ï¿½ï¿½ï¿½ï¿½L"						MT						2G_WORLD		5G_ETSI1	CE
+"Malta°¨º¸¥L"						MT						2G_WORLD		5G_ETSI1	CE
 
-"Mexicoï¿½ï¿½ï¿½ï¿½ï¿½"						MX						2G_WORLD		5G_FCC3		Local Test
+"Mexico¾¥¦è­ô"						MX						2G_WORLD		5G_FCC3		Local Test
 
-"Moroccoï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"						MA													CE TCF
+"Morocco¼¯¬¥­ô"						MA													CE TCF
 
-"Netherlandsï¿½ï¿½ï¿½ï¿½"					NL						2G_WORLD		5G_ETSI1	CE
+"Netherlands²üÄõ"					NL						2G_WORLD		5G_ETSI1	CE
 
-"New Zealandï¿½Ã¦ï¿½ï¿½ï¿½"					NZ						2G_WORLD		5G_ETSI2
+"New Zealand¯Ã¦èÄõ"					NZ						2G_WORLD		5G_ETSI2
 
-"Norwayï¿½ï¿½ï¿½ï¿½"						NO						2G_WORLD		5G_ETSI1	CE
+"Norway®¿«Â"						NO						2G_WORLD		5G_ETSI1	CE
 
-"Panamaï¿½Ú®ï¿½ï¿½ï¿½ "						PA						2G_FCC1						Voluntary
+"Panama¤Ú®³°¨ "						PA						2G_FCC1						Voluntary
 
-"Philippinesï¿½ï¿½ß»ï¿½"					PH						2G_WORLD					FCC TCF
+"Philippinesµá«ß»«"					PH						2G_WORLD					FCC TCF
 
-"Polandï¿½iï¿½ï¿½"						PL						2G_WORLD		5G_ETSI1	CE
+"PolandªiÄõ"						PL						2G_WORLD		5G_ETSI1	CE
 
-"Portugalï¿½ï¿½ï¿½ï¿½ï¿½"					PT						2G_WORLD		5G_ETSI1	CE
+"Portugal¸²µå¤ú"					PT						2G_WORLD		5G_ETSI1	CE
 
-"RomaniaÃ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"					RO						2G_WORLD		5G_ETSI1	CE
+"RomaniaÃ¹°¨¥§¨È"					RO						2G_WORLD		5G_ETSI1	CE
 
-"Russiaï¿½XÃ¹ï¿½ï¿½"						RU						2G_WORLD		5G_ETSI3	CE TCF
+"Russia«XÃ¹´µ"						RU						2G_WORLD		5G_ETSI3	CE TCF
 
-"Saudi Arabiaï¿½Fï¿½aï¿½ï¿½ï¿½Ô§B"			SA						2G_WORLD					CE TCF
+"Saudi Arabia¨F¦aªü©Ô§B"			SA						2G_WORLD					CE TCF
 
-"Singaporeï¿½sï¿½[ï¿½Y"					SG						2G_WORLD
+"Singapore·s¥[©Y"					SG						2G_WORLD
 
-"Slovakiaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½J"					SK						2G_WORLD		5G_ETSI1	CE
+"Slovakia´µ¬¥¥ï§J"					SK						2G_WORLD		5G_ETSI1	CE
 
-"Sloveniaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"				SI						2G_WORLD		5G_ETSI1	CE
+"Slovenia´µ¬¥ºû¥§¨È"				SI						2G_WORLD		5G_ETSI1	CE
 
-"South Africaï¿½nï¿½D"					ZA						2G_WORLD					CE TCF
+"South Africa«n«D"					ZA						2G_WORLD					CE TCF
 
-"Spainï¿½ï¿½Zï¿½ï¿½"						ES										5G_ETSI1	CE
+"Spain¦è¯Z¤ú"						ES										5G_ETSI1	CE
 
-"Swedenï¿½ï¿½ï¿½"						SE						2G_WORLD		5G_ETSI1	CE
+"Sweden·ç¨å"						SE						2G_WORLD		5G_ETSI1	CE
 
-"Switzerlandï¿½ï¿½h"					CH						2G_WORLD		5G_ETSI1	CE
+"Switzerland·ç¤h"					CH						2G_WORLD		5G_ETSI1	CE
 
-"Taiwanï¿½Oï¿½W"						TW						2G_FCC1			5G_NCC1	NCC
+"Taiwan»OÆW"						TW						2G_FCC1			5G_NCC1	NCC
 
-"Thailandï¿½ï¿½ï¿½ï¿½"						TH						2G_WORLD					FCC/CE TCF
+"Thailand®õ°ê"						TH						2G_WORLD					FCC/CE TCF
 
-"Turkeyï¿½gï¿½Õ¨ï¿½"						TR						2G_WORLD
+"Turkey¤g¦Õ¨ä"						TR						2G_WORLD
 
-"Ukraineï¿½Qï¿½Jï¿½ï¿½"						UA						2G_WORLD					Local Test
+"Ukraine¯Q§JÄõ"						UA						2G_WORLD					Local Test
 
-"United Kingdomï¿½^ï¿½ï¿½"				GB						2G_WORLD		5G_ETSI1	CE	ETSI
+"United Kingdom­^°ê"				GB						2G_WORLD		5G_ETSI1	CE	ETSI
 
-"United Statesï¿½ï¿½ï¿½ï¿½"					US						2G_FCC1			5G_FCC7		FCC	FCC
+"United States¬ü°ê"					US						2G_FCC1			5G_FCC7		FCC	FCC
 
-"Venezuelaï¿½eï¿½ï¿½ï¿½ï¿½ï¿½"					VE						2G_WORLD		5G_FCC4		FCC TCF
+"Venezuela©e¤º·ç©Ô"					VE						2G_WORLD		5G_FCC4		FCC TCF
 
-"Vietnamï¿½Vï¿½n"						VN						2G_WORLD					FCC/CE TCF
+"Vietnam¶V«n"						VN						2G_WORLD					FCC/CE TCF
 
 
 
@@ -192,82 +259,82 @@ Countries							"Country Abbreviation"	Domain Code					SKU's	Ch# of 20MHz
 
 /* counter abbervation. */
 enum rt_country_name {
-	RT_CTRY_AL,				/*	"Albaniaï¿½ï¿½ï¿½ï¿½ï¿½Ú¥ï¿½ï¿½ï¿½" */
-	RT_CTRY_DZ,             /* "Algeriaï¿½ï¿½ï¿½ï¿½ï¿½Î§Qï¿½ï¿½" */
-	RT_CTRY_AG,             /* "Antigua & Barbudaï¿½wï¿½ï¿½ï¿½Ê®q&ï¿½Ú¥ï¿½ï¿½F" */
-	RT_CTRY_AR,             /* "Argentinaï¿½ï¿½ï¿½Ú§ï¿½" */
-	RT_CTRY_AM,             /* "Armeniaï¿½È¬ï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_AW,             /* "Arubaï¿½ï¿½ï¿½|ï¿½Ú®q" */
-	RT_CTRY_AU,             /* "Australiaï¿½Dï¿½w" */
-	RT_CTRY_AT,             /* "Austriaï¿½ï¿½ï¿½aï¿½Q" */
-	RT_CTRY_AZ,             /* "Azerbaijanï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_BS,             /* "Bahamasï¿½Ú«ï¿½ï¿½ï¿½" */
-	RT_CTRY_BB,             /* "Barbadosï¿½Ú¤Ú¦hï¿½ï¿½" */
-	RT_CTRY_BE,             /* "Belgiumï¿½ï¿½Qï¿½ï¿½" */
-	RT_CTRY_BM,             /* "Bermudaï¿½Ê¼}ï¿½F" */
-	RT_CTRY_BR,             /* "Brazilï¿½Ú¦ï¿½" */
-	RT_CTRY_BG,             /* "Bulgariaï¿½Oï¿½[ï¿½Qï¿½ï¿½" */
-	RT_CTRY_CA,             /* "Canadaï¿½[ï¿½ï¿½ï¿½j" */
-	RT_CTRY_KY,             /* "Cayman Islandsï¿½}ï¿½Ò¸sï¿½q" */
-	RT_CTRY_CL,             /* "Chileï¿½ï¿½ï¿½Q" */
-	RT_CTRY_CN,             /* "Chinaï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_CO,             /* "Columbiaï¿½ï¿½ï¿½Û¤ï¿½ï¿½" */
-	RT_CTRY_CR,             /* "Costa Ricaï¿½ï¿½ï¿½ï¿½ï¿½Fï¿½ï¿½ï¿½[" */
-	RT_CTRY_CY,             /* "Cyprusï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_CZ,             /* "Czech ï¿½ï¿½ï¿½J" */
-	RT_CTRY_DK,             /* "Denmarkï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_DO,             /* "Dominican Republicï¿½hï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½@ï¿½Mï¿½ï¿½" */
-	RT_CTRY_CE,             /* "Egyptï¿½Jï¿½ï¿½"	EG	2G_WORLD */
-	RT_CTRY_SV,             /* "El Salvadorï¿½Äºï¿½ï¿½Ë¦h" */
-	RT_CTRY_EE,             /* "Estoniaï¿½Rï¿½Fï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_FI,             /* "Finlandï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_FR,             /* "Franceï¿½kï¿½ï¿½" */
-	RT_CTRY_DE,             /* "Germanyï¿½wï¿½ï¿½" */
-	RT_CTRY_GR,             /* "Greece ï¿½ï¿½Ã¾" */
-	RT_CTRY_GU,             /* "Guamï¿½ï¿½ï¿½q" */
-	RT_CTRY_GT,             /* "Guatemalaï¿½Ê¦aï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_HT,             /* "Haitiï¿½ï¿½ï¿½a" */
-	RT_CTRY_HN,             /* "Hondurasï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½" */
-	RT_CTRY_HU,             /* "Hungaryï¿½Iï¿½ï¿½ï¿½Q" */
-	RT_CTRY_IS,             /* "Icelandï¿½Bï¿½q" */
-	RT_CTRY_IN,             /* "Indiaï¿½Lï¿½ï¿½" */
-	RT_CTRY_IE,             /* "Irelandï¿½Rï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_IL,             /* "Israelï¿½Hï¿½ï¿½C" */
-	RT_CTRY_IT,             /* "Italyï¿½qï¿½jï¿½Q" */
-	RT_CTRY_JP,             /* "Japanï¿½é¥»" */
-	RT_CTRY_KR,             /* "Koreaï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_LV,             /* "Latviaï¿½Ô²ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_LT,             /* "Lithuaniaï¿½ß³ï¿½ï¿½{" */
-	RT_CTRY_LU,             /* "Luxembourgï¿½cï¿½Ë³ï¿½" */
-	RT_CTRY_MY,             /* "Malaysiaï¿½ï¿½ï¿½Ó¦ï¿½ï¿½" */
-	RT_CTRY_MT,             /* "Maltaï¿½ï¿½ï¿½ï¿½ï¿½L" */
-	RT_CTRY_MX,             /* "Mexicoï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_MA,             /* "Moroccoï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_NL,             /* "Netherlandsï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_NZ,             /* "New Zealandï¿½Ã¦ï¿½ï¿½ï¿½" */
-	RT_CTRY_NO,             /* "Norwayï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_PA,             /* "Panamaï¿½Ú®ï¿½ï¿½ï¿½ " */
-	RT_CTRY_PH,             /* "Philippinesï¿½ï¿½ß»ï¿½" */
-	RT_CTRY_PL,             /* "Polandï¿½iï¿½ï¿½" */
-	RT_CTRY_PT,             /* "Portugalï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_RO,             /* "RomaniaÃ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_RU,             /* "Russiaï¿½XÃ¹ï¿½ï¿½" */
-	RT_CTRY_SA,             /* "Saudi Arabiaï¿½Fï¿½aï¿½ï¿½ï¿½Ô§B" */
-	RT_CTRY_SG,             /* "Singaporeï¿½sï¿½[ï¿½Y" */
-	RT_CTRY_SK,             /* "Slovakiaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½J" */
-	RT_CTRY_SI,             /* "Sloveniaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_ZA,             /* "South Africaï¿½nï¿½D" */
-	RT_CTRY_ES,             /* "Spainï¿½ï¿½Zï¿½ï¿½" */
-	RT_CTRY_SE,             /* "Swedenï¿½ï¿½ï¿½" */
-	RT_CTRY_CH,             /* "Switzerlandï¿½ï¿½h" */
-	RT_CTRY_TW,             /* "Taiwanï¿½Oï¿½W" */
-	RT_CTRY_TH,             /* "Thailandï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_TR,             /* "Turkeyï¿½gï¿½Õ¨ï¿½" */
-	RT_CTRY_UA,             /* "Ukraineï¿½Qï¿½Jï¿½ï¿½" */
-	RT_CTRY_GB,             /* "United Kingdomï¿½^ï¿½ï¿½" */
-	RT_CTRY_US,             /* "United Statesï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_VE,             /* "Venezuelaï¿½eï¿½ï¿½ï¿½ï¿½ï¿½" */
-	RT_CTRY_VN,             /* "Vietnamï¿½Vï¿½n" */
+	RT_CTRY_AL,				/*	"Albaniaªüº¸¤Ú¥§¨È" */
+	RT_CTRY_DZ,             /* "Algeriaªüº¸¤Î§Q¨È" */
+	RT_CTRY_AG,             /* "Antigua & Barbuda¦w´£¥Ê®q&¤Ú¥¬¹F" */
+	RT_CTRY_AR,             /* "Argentinaªü®Ú§Ê" */
+	RT_CTRY_AM,             /* "Armenia¨È¬ü¥§¨È" */
+	RT_CTRY_AW,             /* "Arubaªü¾|¤Ú®q" */
+	RT_CTRY_AU,             /* "Australia¿D¬w" */
+	RT_CTRY_AT,             /* "Austria¶ø¦a§Q" */
+	RT_CTRY_AZ,             /* "Azerbaijanªü¶ë«ô¾Ê" */
+	RT_CTRY_BS,             /* "Bahamas¤Ú«¢°¨" */
+	RT_CTRY_BB,             /* "Barbados¤Ú¤Ú¦h´µ" */
+	RT_CTRY_BE,             /* "Belgium¤ñ§Q®É" */
+	RT_CTRY_BM,             /* "Bermuda¦Ê¼}¹F" */
+	RT_CTRY_BR,             /* "Brazil¤Ú¦è" */
+	RT_CTRY_BG,             /* "Bulgaria«O¥[§Q¨È" */
+	RT_CTRY_CA,             /* "Canada¥[®³¤j" */
+	RT_CTRY_KY,             /* "Cayman Islands¶}°Ò¸s®q" */
+	RT_CTRY_CL,             /* "Chile´¼§Q" */
+	RT_CTRY_CN,             /* "China¤¤°ê" */
+	RT_CTRY_CO,             /* "Columbia­ô­Û¤ñ¨È" */
+	RT_CTRY_CR,             /* "Costa Rica­ô´µ¹F¾¤¥[" */
+	RT_CTRY_CY,             /* "Cyprus¶ë®ú¸ô´µ" */
+	RT_CTRY_CZ,             /* "Czech ±¶§J" */
+	RT_CTRY_DK,             /* "Denmark¤¦³Á" */
+	RT_CTRY_DO,             /* "Dominican Republic¦h©ú¥§¥[¦@©M°ê" */
+	RT_CTRY_CE,             /* "Egypt®J¤Î"	EG	2G_WORLD */
+	RT_CTRY_SV,             /* "El SalvadorÂÄº¸¥Ë¦h" */
+	RT_CTRY_EE,             /* "Estonia·R¨F¥§¨È" */
+	RT_CTRY_FI,             /* "FinlandªâÄõ" */
+	RT_CTRY_FR,             /* "Franceªk°ê" */
+	RT_CTRY_DE,             /* "Germany¼w°ê" */
+	RT_CTRY_GR,             /* "Greece §ÆÃ¾" */
+	RT_CTRY_GU,             /* "GuamÃö®q" */
+	RT_CTRY_GT,             /* "Guatemala¥Ê¦a°¨©Ô" */
+	RT_CTRY_HT,             /* "Haiti®ü¦a" */
+	RT_CTRY_HN,             /* "Honduras§»³£©Ô´µ" */
+	RT_CTRY_HU,             /* "Hungary¦I¤ú§Q" */
+	RT_CTRY_IS,             /* "Iceland¦B®q" */
+	RT_CTRY_IN,             /* "India¦L«×" */
+	RT_CTRY_IE,             /* "Ireland·Rº¸Äõ" */
+	RT_CTRY_IL,             /* "Israel¥H¦â¦C" */
+	RT_CTRY_IT,             /* "Italy¸q¤j§Q" */
+	RT_CTRY_JP,             /* "Japan¤é¥»" */
+	RT_CTRY_KR,             /* "KoreaÁú°ê" */
+	RT_CTRY_LV,             /* "Latvia©Ô²æºû¨È" */
+	RT_CTRY_LT,             /* "Lithuania¥ß³³©{" */
+	RT_CTRY_LU,             /* "Luxembourg¿c´Ë³ù" */
+	RT_CTRY_MY,             /* "Malaysia°¨¨Ó¦è¨È" */
+	RT_CTRY_MT,             /* "Malta°¨º¸¥L" */
+	RT_CTRY_MX,             /* "Mexico¾¥¦è­ô" */
+	RT_CTRY_MA,             /* "Morocco¼¯¬¥­ô" */
+	RT_CTRY_NL,             /* "Netherlands²üÄõ" */
+	RT_CTRY_NZ,             /* "New Zealand¯Ã¦èÄõ" */
+	RT_CTRY_NO,             /* "Norway®¿«Â" */
+	RT_CTRY_PA,             /* "Panama¤Ú®³°¨ " */
+	RT_CTRY_PH,             /* "Philippinesµá«ß»«" */
+	RT_CTRY_PL,             /* "PolandªiÄõ" */
+	RT_CTRY_PT,             /* "Portugal¸²µå¤ú" */
+	RT_CTRY_RO,             /* "RomaniaÃ¹°¨¥§¨È" */
+	RT_CTRY_RU,             /* "Russia«XÃ¹´µ" */
+	RT_CTRY_SA,             /* "Saudi Arabia¨F¦aªü©Ô§B" */
+	RT_CTRY_SG,             /* "Singapore·s¥[©Y" */
+	RT_CTRY_SK,             /* "Slovakia´µ¬¥¥ï§J" */
+	RT_CTRY_SI,             /* "Slovenia´µ¬¥ºû¥§¨È" */
+	RT_CTRY_ZA,             /* "South Africa«n«D" */
+	RT_CTRY_ES,             /* "Spain¦è¯Z¤ú" */
+	RT_CTRY_SE,             /* "Sweden·ç¨å" */
+	RT_CTRY_CH,             /* "Switzerland·ç¤h" */
+	RT_CTRY_TW,             /* "Taiwan»OÆW" */
+	RT_CTRY_TH,             /* "Thailand®õ°ê" */
+	RT_CTRY_TR,             /* "Turkey¤g¦Õ¨ä" */
+	RT_CTRY_UA,             /* "Ukraine¯Q§JÄõ" */
+	RT_CTRY_GB,             /* "United Kingdom­^°ê" */
+	RT_CTRY_US,             /* "United States¬ü°ê" */
+	RT_CTRY_VE,             /* "Venezuela©e¤º·ç©Ô" */
+	RT_CTRY_VN,             /* "Vietnam¶V«n" */
 	RT_CTRY_MAX,
 
 };

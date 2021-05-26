@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __USB_OPS_LINUX_H__
 #define __USB_OPS_LINUX_H__
 
@@ -50,8 +66,8 @@
 
 #ifdef CONFIG_USB_SUPPORT_ASYNC_VDN_REQ
 int usb_async_write8(struct intf_hdl *pintfhdl, u32 addr, u8 val);
-int usb_async_write16(struct intf_hdl *pintfhdl, u32 addr, __le16 val);
-int usb_async_write32(struct intf_hdl *pintfhdl, u32 addr, __le32 val);
+int usb_async_write16(struct intf_hdl *pintfhdl, u32 addr, u16 val);
+int usb_async_write32(struct intf_hdl *pintfhdl, u32 addr, u32 val);
 #endif /* CONFIG_USB_SUPPORT_ASYNC_VDN_REQ */
 
 unsigned int ffaddr2pipehdl(struct dvobj_priv *pdvobj, u32 addr);
@@ -74,8 +90,8 @@ u8 usb_read8(struct intf_hdl *pintfhdl, u32 addr);
 u16 usb_read16(struct intf_hdl *pintfhdl, u32 addr);
 u32 usb_read32(struct intf_hdl *pintfhdl, u32 addr);
 int usb_write8(struct intf_hdl *pintfhdl, u32 addr, u8 val);
-int usb_write16(struct intf_hdl *pintfhdl, u32 addr, __le16 val);
-int usb_write32(struct intf_hdl *pintfhdl, u32 addr, __le32 val);
+int usb_write16(struct intf_hdl *pintfhdl, u32 addr, u16 val);
+int usb_write32(struct intf_hdl *pintfhdl, u32 addr, u32 val);
 int usb_writeN(struct intf_hdl *pintfhdl, u32 addr, u32 length, u8 *pdata);
 u32 usb_read_port(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *rmem);
 void usb_recv_tasklet(void *priv);

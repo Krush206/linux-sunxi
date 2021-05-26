@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RECV_OSDEP_H_
 #define __RECV_OSDEP_H_
 
@@ -11,7 +27,7 @@ extern void _rtw_free_recv_priv(struct recv_priv *precvpriv);
 
 extern s32  rtw_recv_entry(union recv_frame *precv_frame);
 extern int rtw_recv_indicatepkt(_adapter *adapter, union recv_frame *precv_frame);
-extern void rtw_recv_returnpacket(_nic_hdl cnxt, _pkt *preturnedpkt);
+extern void rtw_recv_returnpacket(IN _nic_hdl cnxt, IN _pkt *preturnedpkt);
 
 extern int rtw_recv_monitor(_adapter *padapter, union recv_frame *precv_frame);
 
@@ -41,10 +57,12 @@ void rtw_os_read_port(_adapter *padapter, struct recv_buf *precvbuf);
 
 void rtw_init_recv_timer(struct recv_reorder_ctrl *preorder_ctrl);
 
+#ifdef PLATFORM_LINUX
 #ifdef CONFIG_RTW_NAPI
 #include <linux/netdevice.h>	/* struct napi_struct */
 
 int rtw_recv_napi_poll(struct napi_struct *, int budget);
 #endif /* CONFIG_RTW_NAPI */
+#endif /* PLATFORM_LINUX */
 
 #endif /*  */

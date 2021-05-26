@@ -1,10 +1,32 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __DRV_CONF_H__
 #define __DRV_CONF_H__
 #include "autoconf.h"
 #include "hal_ic_cfg.h"
+
+#if defined(PLATFORM_LINUX) && defined (PLATFORM_WINDOWS)
+
+	#error "Shall be Linux or Windows, but not both!\n"
+
+#endif
 
 #if defined(CONFIG_MCC_MODE) && (!defined(CONFIG_CONCURRENT_MODE))
 
@@ -255,6 +277,27 @@
 
 #define MACID_NUM_SW_LIMIT 32
 #define SEC_CAM_ENT_NUM_SW_LIMIT 32
+
+#if defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) || defined(CONFIG_RTL8814A)
+	#define CONFIG_IEEE80211_BAND_5GHZ
+#endif
+
+#if defined(CONFIG_WOWLAN) && (defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C))
+	#define CONFIG_WOW_PATTERN_HW_CAM
+#endif
+
+/*
+	Mark CONFIG_DEAUTH_BEFORE_CONNECT by Arvin 2015/07/20
+	If the failure of Wi-Fi connection is due to some irregular disconnection behavior (like unplug dongle,
+	power down etc.) in last time, we can unmark this flag to avoid some unpredictable response from AP.
+*/
+/*#define CONFIG_DEAUTH_BEFORE_CONNECT */
+
+/*#define CONFIG_WEXT_DONT_JOIN_BYSSID	*/
+/* #include <rtl871x_byteorder.h> */
+
+
+/*#define CONFIG_DOSCAN_IN_BUSYTRAFFIC	*/
 
 /*Don't release SDIO irq in suspend/resume procedure*/
 #define CONFIG_RTW_SDIO_KEEP_IRQ	0

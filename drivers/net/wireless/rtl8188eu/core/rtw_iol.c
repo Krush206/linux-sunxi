@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #include <drv_types.h>
 
@@ -12,15 +28,16 @@ struct xmit_frame	*rtw_IOL_accquire_xmit_frame(ADAPTER *adapter)
 	struct pkt_attrib	*pattrib;
 	struct xmit_priv	*pxmitpriv = &(adapter->xmitpriv);
 
+#if 1
 	xmit_frame = rtw_alloc_xmitframe(pxmitpriv);
 	if (xmit_frame == NULL) {
-		RTW_INFO("%s rtw_alloc_xmitframe return null\n", __func__);
+		RTW_INFO("%s rtw_alloc_xmitframe return null\n", __FUNCTION__);
 		goto exit;
 	}
 
 	xmitbuf = rtw_alloc_xmitbuf(pxmitpriv);
 	if (xmitbuf == NULL) {
-		RTW_INFO("%s rtw_alloc_xmitbuf return null\n", __func__);
+		RTW_INFO("%s rtw_alloc_xmitbuf return null\n", __FUNCTION__);
 		rtw_free_xmitframe(pxmitpriv, xmit_frame);
 		xmit_frame = NULL;
 		goto exit;
@@ -37,9 +54,22 @@ struct xmit_frame	*rtw_IOL_accquire_xmit_frame(ADAPTER *adapter)
 	pattrib->subtype = WIFI_BEACON;
 	pattrib->pktlen = pattrib->last_txcmdsz = 0;
 
+#else
+	xmit_frame = alloc_mgtxmitframe(pxmitpriv);
+	if (xmit_frame == NULL)
+		RTW_INFO("%s alloc_mgtxmitframe return null\n", __FUNCTION__);
+	else {
+		pattrib = &xmit_frame->attrib;
+		update_mgntframe_attrib(adapter, pattrib);
+		pattrib->qsel = QSLT_BEACON;
+		pattrib->pktlen = pattrib->last_txcmdsz = 0;
+	}
+#endif
+
 exit:
 	return xmit_frame;
 }
+
 
 int rtw_IOL_append_cmds(struct xmit_frame *xmit_frame, u8 *IOL_cmds, u32 cmd_len)
 {
@@ -52,16 +82,16 @@ int rtw_IOL_append_cmds(struct xmit_frame *xmit_frame, u8 *IOL_cmds, u32 cmd_len
 
 	/* check if the io_buf can accommodate new cmds */
 	if (ori_len + cmd_len + 8 > MAX_XMITBUF_SZ) {
-		RTW_INFO("%s %u is large than MAX_XMITBUF_SZ:%u, can't accommodate new cmds\n", __func__
+		RTW_INFO("%s %u is large than MAX_XMITBUF_SZ:%u, can't accommodate new cmds\n", __FUNCTION__
 			 , ori_len + cmd_len + 8, MAX_XMITBUF_SZ);
 		return _FAIL;
 	}
 
-	memcpy(xmit_frame->buf_addr + buf_offset + pattrib->pktlen, IOL_cmds, cmd_len);
+	_rtw_memcpy(xmit_frame->buf_addr + buf_offset + pattrib->pktlen, IOL_cmds, cmd_len);
 	pattrib->pktlen += cmd_len;
 	pattrib->last_txcmdsz += cmd_len;
 
-	/* RTW_INFO("%s ori:%u + cmd_len:%u = %u\n", __func__, ori_len, cmd_len, buf_offset+pattrib->pktlen); */
+	/* RTW_INFO("%s ori:%u + cmd_len:%u = %u\n", __FUNCTION__, ori_len, cmd_len, buf_offset+pattrib->pktlen); */
 
 	return _SUCCESS;
 }
@@ -69,12 +99,14 @@ int rtw_IOL_append_cmds(struct xmit_frame *xmit_frame, u8 *IOL_cmds, u32 cmd_len
 bool rtw_IOL_applied(ADAPTER *adapter)
 {
 	if (1 == adapter->registrypriv.fw_iol)
-		return true;
+		return _TRUE;
 
+#ifdef CONFIG_USB_HCI
 	if ((2 == adapter->registrypriv.fw_iol) && (IS_FULL_SPEED_USB(adapter)))
-		return true;
+		return _TRUE;
+#endif
 
-	return false;
+	return _FALSE;
 }
 
 int rtw_IOL_exec_cmds_sync(ADAPTER *adapter, struct xmit_frame *xmit_frame, u32 max_wating_ms, u32 bndy_cnt)
@@ -102,7 +134,7 @@ int _rtw_IOL_append_WB_cmd(struct xmit_frame *xmit_frame, u16 addr, u8 value, u8
 		cmd.mask = cpu_to_le32(mask);
 	}
 
-	/* RTW_INFO("%s addr:0x%04x,value:0x%08x,mask:0x%08x\n", __func__, addr,value,mask); */
+	/* RTW_INFO("%s addr:0x%04x,value:0x%08x,mask:0x%08x\n", __FUNCTION__, addr,value,mask); */
 
 	return rtw_IOL_append_cmds(xmit_frame, (u8 *)&cmd, cmd.length);
 
@@ -122,7 +154,7 @@ int _rtw_IOL_append_WW_cmd(struct xmit_frame *xmit_frame, u16 addr, u16 value, u
 		cmd.mask =  cpu_to_le32(mask);
 	}
 
-	/* RTW_INFO("%s addr:0x%04x,value:0x%08x,mask:0x%08x\n", __func__, addr,value,mask); */
+	/* RTW_INFO("%s addr:0x%04x,value:0x%08x,mask:0x%08x\n", __FUNCTION__, addr,value,mask); */
 
 	return rtw_IOL_append_cmds(xmit_frame, (u8 *)&cmd, cmd.length);
 
@@ -154,7 +186,7 @@ int _rtw_IOL_append_WRF_cmd(struct xmit_frame *xmit_frame, u8 rf_path, u16 addr,
 
 	/* RTW_PUT_LE16((u8*)&cmd.address, addr);	 */
 	/* RTW_PUT_LE32((u8*)&cmd.value, (u32)value);	 */
-	cmd.address = cpu_to_le16((rf_path << 8) | ((addr) & 0xFF));
+	cmd.address = (rf_path << 8) | ((addr) & 0xFF);
 	cmd.data = cpu_to_le32(value);
 
 	if (mask != 0x000FFFFF) {
@@ -177,7 +209,7 @@ int rtw_IOL_append_DELAY_US_cmd(struct xmit_frame *xmit_frame, u16 us)
 	/* RTW_PUT_LE16((u8*)&cmd.address, us);	 */
 	cmd.address = cpu_to_le16(us);
 
-	/* RTW_INFO("%s %u\n", __func__, us); */
+	/* RTW_INFO("%s %u\n", __FUNCTION__, us); */
 	return rtw_IOL_append_cmds(xmit_frame, (u8 *)&cmd, 4);
 }
 
@@ -188,26 +220,26 @@ int rtw_IOL_append_DELAY_MS_cmd(struct xmit_frame *xmit_frame, u16 ms)
 	/* RTW_PUT_LE16((u8*)&cmd.address, ms);	 */
 	cmd.address = cpu_to_le16(ms);
 
-	/* RTW_INFO("%s %u\n", __func__, ms); */
+	/* RTW_INFO("%s %u\n", __FUNCTION__, ms); */
 	return rtw_IOL_append_cmds(xmit_frame, (u8 *)&cmd, 4);
 }
 int rtw_IOL_append_END_cmd(struct xmit_frame *xmit_frame)
 {
-	struct ioreg_cfg cmd = {4, IOREG_CMD_END, cpu_to_le16(0xFFFF), cpu_to_le32(0xFF), 0x0};
+	struct ioreg_cfg cmd = {4, IOREG_CMD_END, 0xFFFF, 0xFF, 0x0};
 	return rtw_IOL_append_cmds(xmit_frame, (u8 *)&cmd, 4);
 
 }
 
 u8 rtw_IOL_cmd_boundary_handle(struct xmit_frame *pxmit_frame)
 {
-	u8 is_cmd_bndy = false;
+	u8 is_cmd_bndy = _FALSE;
 	if (((pxmit_frame->attrib.pktlen + 32) % 256) + 8 >= 256) {
 		rtw_IOL_append_END_cmd(pxmit_frame);
 		pxmit_frame->attrib.pktlen = ((((pxmit_frame->attrib.pktlen + 32) / 256) + 1) * 256);
 
-		/* RTW_INFO("==> %s, pktlen(%d)\n",__func__,pxmit_frame->attrib.pktlen); */
+		/* printk("==> %s, pktlen(%d)\n",__FUNCTION__,pxmit_frame->attrib.pktlen); */
 		pxmit_frame->attrib.last_txcmdsz = pxmit_frame->attrib.pktlen;
-		is_cmd_bndy = true;
+		is_cmd_bndy = _TRUE;
 	}
 	return is_cmd_bndy;
 }
@@ -217,16 +249,16 @@ void rtw_IOL_cmd_buf_dump(ADAPTER *Adapter, int buf_len, u8 *pbuf)
 	int i;
 	int j = 1;
 
-	RTW_INFO("###### %s ######\n", __func__);
+	printk("###### %s ######\n", __FUNCTION__);
 	for (i = 0; i < buf_len; i++) {
-		RTW_INFO("%02x-", *(pbuf + i));
+		printk("%02x-", *(pbuf + i));
 
 		if (j % 32 == 0)
-			RTW_INFO("\n");
+			printk("\n");
 		j++;
 	}
-	RTW_INFO("\n");
-	RTW_INFO("============= ioreg_cmd len = %d ===============\n", buf_len);
+	printk("\n");
+	printk("============= ioreg_cmd len = %d ===============\n", buf_len);
 }
 
 
@@ -303,7 +335,7 @@ int rtw_IOL_append_DELAY_US_cmd(struct xmit_frame *xmit_frame, u16 us)
 
 	RTW_PUT_BE32((u8 *)&cmd.value, (u32)us);
 
-	/* RTW_INFO("%s %u\n", __func__, us); */
+	/* RTW_INFO("%s %u\n", __FUNCTION__, us); */
 
 	return rtw_IOL_append_cmds(xmit_frame, (u8 *)&cmd, 8);
 }
@@ -314,7 +346,7 @@ int rtw_IOL_append_DELAY_MS_cmd(struct xmit_frame *xmit_frame, u16 ms)
 
 	RTW_PUT_BE32((u8 *)&cmd.value, (u32)ms);
 
-	/* RTW_INFO("%s %u\n", __func__, ms); */
+	/* RTW_INFO("%s %u\n", __FUNCTION__, ms); */
 
 	return rtw_IOL_append_cmds(xmit_frame, (u8 *)&cmd, 8);
 }

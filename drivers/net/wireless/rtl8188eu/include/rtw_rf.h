@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef	__RTW_RF_H_
 #define __RTW_RF_H_
 
@@ -228,12 +244,19 @@ bool rtw_chbw_to_freq_range(u8 ch, u8 bw, u8 offset, u32 *hi, u32 *lo);
 struct country_chplan {
 	char alpha2[2];
 	u8 chplan;
+#ifdef CONFIG_80211AC_VHT
+	u8 en_11ac;
+#endif
 #if RTW_DEF_MODULE_REGULATORY_CERT
 	u8 def_module_flags; /* RTW_MODULE_RTLXXX */
 #endif
 };
 
+#ifdef CONFIG_80211AC_VHT
+#define COUNTRY_CHPLAN_EN_11AC(_ent) ((_ent)->en_11ac)
+#else
 #define COUNTRY_CHPLAN_EN_11AC(_ent) 0
+#endif
 
 #if RTW_DEF_MODULE_REGULATORY_CERT
 #define COUNTRY_CHPLAN_DEF_MODULE_FALGS(_ent) ((_ent)->def_module_flags)

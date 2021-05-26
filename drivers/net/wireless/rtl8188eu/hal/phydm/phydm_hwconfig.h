@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 
 #ifndef	__HALHWOUTSRC_H__
@@ -178,6 +194,17 @@ void
 odm_init_rssi_for_dm(
 	struct PHY_DM_STRUCT	*p_dm_odm
 );
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+void
+phydm_normal_driver_rx_sniffer(
+	struct PHY_DM_STRUCT			*p_dm_odm,
+	u8				*p_desc,
+	PRT_RFD_STATUS		p_rt_rfd_status,
+	u8				*p_drv_info,
+	u8				phy_status
+);
+#endif
 
 void
 odm_phy_status_query(

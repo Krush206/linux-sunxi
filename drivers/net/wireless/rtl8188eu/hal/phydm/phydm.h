@@ -1,5 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 
 #ifndef	__HALDMOUTSRC_H__
@@ -30,10 +47,24 @@
 #include "phydm_adc_sampling.h"
 #include "phydm_dynamic_rx_path.h"
 
-#include "phydm_beamforming.h"
 
-#include "phydm_noisemonitor.h"
-#include "halphyrf_ce.h"
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_WIN))
+	#include "phydm_beamforming.h"
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
+	#include "halphyrf_ap.h"
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
+	#include "phydm_noisemonitor.h"
+	#include "halphyrf_ce.h"
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
+	#include "halphyrf_win.h"
+	#include "phydm_noisemonitor.h"
+#endif
 
 /*============================================================*/
 /*Definition */
@@ -76,7 +107,12 @@
 #define	FREQ_POSITIVE	1
 #define	FREQ_NEGATIVE	2
 
-#define PHYDM_WATCH_DOG_PERIOD	2
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
+	#define PHYDM_WATCH_DOG_PERIOD	1
+#else
+	#define PHYDM_WATCH_DOG_PERIOD	2
+#endif
 
 /*============================================================*/
 /*structure and define*/
@@ -85,9 +121,31 @@
 /*2011/09/20 MH Add for AP/ADSLpseudo DM structuer requirement.*/
 /*We need to remove to other position???*/
 
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_WIN))
 struct rtl8192cd_priv {
+		u8		temp;
+
+	};
+#endif
+
+
+#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
+struct _ADAPTER {
+	u8		temp;
+#ifdef AP_BUILD_WORKAROUND
+	HAL_DATA_TYPE		*temp2;
+	struct rtl8192cd_priv		*priv;
+#endif
+};
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
+
+struct _WLAN_STA {
 	u8		temp;
 };
+
+#endif
 
 struct _dynamic_primary_cca {
 	u8	pri_cca_flag;
@@ -99,6 +157,14 @@ struct _dynamic_primary_cca {
 	u8	MF_state;
 };
 
+
+#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
+	#ifdef ADSL_AP_BUILD_WORKAROUND
+		#define MAX_TOLERANCE			5
+		#define IQK_DELAY_TIME			1		/*ms*/
+	#endif
+#endif	/*#if(DM_ODM_SUPPORT_TYPE & (ODM_AP))*/
+
 #define		dm_type_by_fw			0
 #define		dm_type_by_driver		1
 
@@ -107,12 +173,45 @@ struct _dynamic_primary_cca {
 #define IQK_THRESHOLD			8
 #define DPK_THRESHOLD			4
 
+
+#if (DM_ODM_SUPPORT_TYPE &  (ODM_AP))
+__PACK struct _odm_phy_status_info_ {
+	u8		rx_pwdb_all;
+	u8		signal_quality;					/* in 0-100 index. */
+	u8		rx_mimo_signal_strength[4];		/* in 0~100 index */
+	s8		rx_mimo_signal_quality[4];		/* EVM */
+	s8		rx_snr[4];					/* per-path's SNR */
+#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
+	u8		rx_count:2;					/* RX path counter---*/
+	u8		band_width:2;
+	u8		rxsc:4;						/* sub-channel---*/
+#else
+	u8		band_width;
+#endif
+#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
+	u8		channel;						/* channel number---*/
+	bool		is_mu_packet;					/* is MU packet or not---*/
+	bool		is_beamformed;				/* BF packet---*/
+#endif
+};
+
+struct _odm_phy_status_info_append_ {
+	u8		MAC_CRC32;
+
+};
+
+#else
+
 struct _odm_phy_status_info_ {
 	/*  */
 	/* Be care, if you want to add any element please insert between */
 	/* rx_pwdb_all & signal_strength. */
 	/*  */
+#if (DM_ODM_SUPPORT_TYPE &  (ODM_WIN))
+	u32		rx_pwdb_all;
+#else
 	u8		rx_pwdb_all;
+#endif
 	u8		signal_quality;				/* in 0-100 index. */
 	s8		rx_mimo_signal_quality[4];		/* per-path's EVM translate to 0~100% */
 	u8		rx_mimo_evm_dbm[4];			/* per-path's original EVM (dbm) */
@@ -133,13 +232,16 @@ struct _odm_phy_status_info_ {
 #else
 	u8		band_width;
 #endif
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 	u8		bt_coex_pwr_adjust;
+#endif
 #if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
 	u8		channel;						/* channel number---*/
 	bool		is_mu_packet;					/* is MU packet or not---*/
 	bool		is_beamformed;				/* BF packet---*/
 #endif
 };
+#endif
 
 struct _odm_per_pkt_info_ {
 	u8		data_rate;
@@ -150,6 +252,7 @@ struct _odm_per_pkt_info_ {
 	bool		is_to_self;
 	u8		ppdu_cnt;
 };
+
 
 struct _odm_phy_dbg_info_ {
 	/*ODM Write,debug info*/
@@ -173,9 +276,11 @@ struct _odm_phy_dbg_info_ {
 
 };
 
+
 /*2011/20/20 MH For MP driver RT_WLAN_STA =  struct sta_info*/
 /*Please declare below ODM relative info in your STA info structure.*/
 
+#if 1
 struct _ODM_STA_INFO {
 	/*Driver Write*/
 	bool		is_used;			/*record the sta status link or not?*/
@@ -189,6 +294,7 @@ struct _ODM_STA_INFO {
 	u8		RXSNR[4];
 
 };
+#endif
 
 enum odm_cmninfo_e {
 	/*Fixed value*/
@@ -293,6 +399,11 @@ enum odm_cmninfo_e {
 	ODM_CMNINFO_BT_DIG,
 	ODM_CMNINFO_BT_BUSY,
 	ODM_CMNINFO_BT_DISABLE_EDCA,
+#if (DM_ODM_SUPPORT_TYPE & ODM_AP)		/*for repeater mode add by YuChen 2014.06.23*/
+#ifdef UNIVERSAL_REPEATER
+	ODM_CMNINFO_VXD_LINK,
+#endif
+#endif
 	ODM_CMNINFO_AP_TOTAL_NUM,
 	ODM_CMNINFO_POWER_TRAINING,
 	ODM_CMNINFO_DFS_REGION_DOMAIN,
@@ -303,6 +414,7 @@ enum odm_cmninfo_e {
 	ODM_CMNINFO_MAX,
 
 };
+
 
 enum phydm_info_query_e {
 	PHYDM_INFO_FA_OFDM,
@@ -331,6 +443,7 @@ enum phydm_api_e {
 	PHYDM_API_CSI_MASK,
 
 };
+
 
 /*2011/10/20 MH Define ODM support ability.  ODM_CMNINFO_ABILITY*/
 enum odm_ability_e {
@@ -363,6 +476,7 @@ enum odm_ability_e {
 
 };
 
+
 /*ODM_CMNINFO_ONE_PATH_CCA*/
 enum odm_cca_path_e {
 	ODM_CCA_2R		= 0,
@@ -376,6 +490,7 @@ enum cca_pathdiv_en_e {
 
 };
 
+
 enum phy_reg_pg_type {
 	PHY_REG_PG_RELATIVE_VALUE = 0,
 	PHY_REG_PG_EXACT_VALUE = 1
@@ -383,14 +498,30 @@ enum phy_reg_pg_type {
 
 /*2011/09/22 MH Copy from SD4 defined structure. We use to support PHY DM integration.*/
 
-struct PHY_DM_STRUCT {
+#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
+	#if (RT_PLATFORM != PLATFORM_LINUX)
+		typedef
+	#endif
+
+	struct PHY_DM_STRUCT
+#else/*for AP,ADSL,CE Team*/
+	struct PHY_DM_STRUCT
+#endif
+{
 	/*Add for different team use temporarily*/
 	struct _ADAPTER		*adapter;		/*For CE/NIC team*/
 	struct rtl8192cd_priv	*priv;			/*For AP/ADSL team*/
 	/*WHen you use adapter or priv pointer, you must make sure the pointer is ready.*/
 	bool			odm_ready;
 
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_WIN))
 	struct rtl8192cd_priv		fake_priv;
+#endif
+#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
+	/* ADSL_AP_BUILD_WORKAROUND */
+	struct _ADAPTER			fake_adapter;
+#endif
+
 	enum phy_reg_pg_type		phy_reg_pg_value_type;
 	u8				phy_reg_pg_version;
 
@@ -411,6 +542,7 @@ struct PHY_DM_STRUCT {
 	u8			control_channel;
 	/*------ ODM HANDLE, DRIVER NEEDS NOT TO HOOK------*/
 
+
 	/* 1  COMMON INFORMATION */
 
 	/*Init value*/
@@ -419,7 +551,7 @@ struct PHY_DM_STRUCT {
 	u8			support_platform;
 	/* ODM Platform info WIN/AP/CE = 1/2/3 */
 	u8			normal_rx_path;
-	/*ODM Support Ability DIG/RATR/TX_PWR_TRACK/ ï¿½Kï¿½K = 1/2/3/ï¿½K*/
+	/*ODM Support Ability DIG/RATR/TX_PWR_TRACK/ ¡K¡K = 1/2/3/¡K*/
 	u32			support_ability;
 	/*ODM PCIE/USB/SDIO = 1/2/3*/
 	u8			support_interface;
@@ -531,6 +663,11 @@ struct PHY_DM_STRUCT {
 	bool			is_wifi_display;
 	bool			is_linked;
 	bool			bsta_state;
+#if (DM_ODM_SUPPORT_TYPE & ODM_AP)		/*for repeater mode add by YuChen 2014.06.23*/
+#ifdef UNIVERSAL_REPEATER
+	bool			vxd_linked;
+#endif
+#endif
 	u8			rssi_min;
 	u8			interface_index;		/*Add for 92D  dual MAC: 0--Mac0 1--Mac1*/
 	bool			is_mp_chip;
@@ -648,7 +785,10 @@ struct PHY_DM_STRUCT {
 	bool			pre_b_noisy;
 	u32			noisy_decision_smooth;
 	bool			is_disable_dym_ecs;
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_WIN))
 	struct _ODM_NOISE_MONITOR_ noise_level;
+#endif
 	/*Define STA info.*/
 	/*_ODM_STA_INFO*/
 	/*2012/01/12 MH For MP, we need to reduce one array pointer for default port.??*/
@@ -674,6 +814,9 @@ struct PHY_DM_STRUCT {
 
 	/*ODM Structure*/
 #if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
+#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
+	struct _BF_DIV_COEX_					dm_bdc_table;
+#endif
 
 #ifdef CONFIG_HL_SMART_ANTENNA_TYPE1
 	struct _SMART_ANTENNA_TRAINNING_						dm_sat_table;
@@ -687,8 +830,8 @@ struct PHY_DM_STRUCT {
 #endif
 	struct _dynamic_primary_cca					dm_pri_cca;
 	struct _rate_adaptive_table_						dm_ra_table;
-	struct false_ALARM_STATISTICS		false_alm_cnt;
-	struct false_ALARM_STATISTICS		flase_alm_cnt_buddy_adapter;
+	struct _FALSE_ALARM_STATISTICS		false_alm_cnt;
+	struct _FALSE_ALARM_STATISTICS		flase_alm_cnt_buddy_adapter;
 	struct _sw_antenna_switch_						dm_swat_table;
 	struct _CFO_TRACKING_				dm_cfo_track;
 	struct _ACS_							dm_acs;
@@ -700,6 +843,14 @@ struct PHY_DM_STRUCT {
 	struct _DYNAMIC_RX_PATH_						dm_drp_table;
 #endif
 
+#if (RTL8814A_SUPPORT == 1 || RTL8822B_SUPPORT == 1 || RTL8821C_SUPPORT == 1)
+	struct _IQK_INFORMATION	IQK_info;
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
+	/*path Div Struct*/
+	struct _path_div_parameter_define_	path_iqk;
+#endif
 #if (defined(CONFIG_PATH_DIVERSITY))
 	struct _ODM_PATH_DIVERSITY_	dm_path_div;
 #endif
@@ -735,12 +886,14 @@ struct PHY_DM_STRUCT {
 	u32			n_iqk_ok_cnt;
 	u32			n_iqk_fail_cnt;
 
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 	/*Power Training*/
 	u8			force_power_training_state;
 	bool			is_change_state;
 	u32			PT_score;
 	u64			ofdm_rx_cnt;
 	u64			cck_rx_cnt;
+#endif
 	bool			is_disable_power_training;
 	u8			dynamic_tx_high_power_lvl;
 	u8			last_dtp_lvl;
@@ -758,8 +911,21 @@ struct PHY_DM_STRUCT {
 	struct timer_list		sbdcnt_timer;
 
 	/*ODM relative workitem.*/
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+#if USE_WORKITEM
+	RT_WORK_ITEM			path_div_switch_workitem;
+	RT_WORK_ITEM			cck_path_diversity_workitem;
+	RT_WORK_ITEM			fast_ant_training_workitem;
+	RT_WORK_ITEM			mpt_dig_workitem;
+	RT_WORK_ITEM			ra_rpt_workitem;
+	RT_WORK_ITEM			sbdcnt_workitem;
+#endif
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 #if (BEAMFORMING_SUPPORT == 1)
 	struct _RT_BEAMFORMING_INFO beamforming_info;
+#endif
 #endif
 
 #ifdef CONFIG_PHYDM_DFS_MASTER
@@ -774,15 +940,29 @@ struct PHY_DM_STRUCT {
 	u32 radar_detect_reg_924;
 	/*====== phydm_radar_detect_with_dbg_parm end ======*/
 #endif
+
+#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
+
+#if (RT_PLATFORM != PLATFORM_LINUX)
+};		/*DM_Dynamic_Mechanism_Structure*/
+#else
 };
+#endif
+
+#else	/*for AP,ADSL,CE Team*/
+};
+#endif
+
 
 enum phydm_structure_type {
-	PHYDMfalseALMCNT,
+	PHYDM_FALSEALMCNT,
 	PHYDM_CFOTRACK,
 	PHYDM_ADAPTIVITY,
 	PHYDM_ROMINFO,
 
 };
+
+
 
 enum odm_rf_content {
 	odm_radioa_txt = 0x1000,
@@ -819,6 +999,7 @@ enum odm_fw_config_type {
 };
 
 /*status code*/
+#if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
 enum rt_status {
 	RT_STATUS_SUCCESS,
 	RT_STATUS_FAILURE,
@@ -829,6 +1010,7 @@ enum rt_status {
 	RT_STATUS_NOT_SUPPORT,
 	RT_STATUS_OS_API_FAILED,
 };
+#endif	/*end of enum rt_status definition*/
 
 #ifdef REMOVE_PACK
 	#pragma pack()
@@ -861,17 +1043,44 @@ enum dm_rf_e {
 
 /*check Sta pointer valid or not*/
 
-#define IS_STA_VALID(p_sta)		(p_sta)
+#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
+	#define IS_STA_VALID(p_sta)		(p_sta && p_sta->expire_to)
+#elif (DM_ODM_SUPPORT_TYPE & ODM_WIN)
+	#define IS_STA_VALID(p_sta)		(p_sta && p_sta->bUsed)
+#else
+	#define IS_STA_VALID(p_sta)		(p_sta)
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_AP))
+
+bool
+odm_check_power_status(
+	struct _ADAPTER		*adapter
+);
+
+#endif
 
 u32 odm_convert_to_db(u32 value);
 
 u32 odm_convert_to_linear(u32 value);
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 
 u32
 get_psd_data(
 	struct PHY_DM_STRUCT	*p_dm_odm,
 	unsigned int	point,
 	u8 initial_gain_psd);
+
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
+void
+odm_dm_watchdog_lps(
+	struct PHY_DM_STRUCT		*p_dm_odm
+);
+#endif
+
 
 s32
 odm_pwdb_conversion(
@@ -895,6 +1104,7 @@ void
 phydm_txcurrentcalibration(
 	struct PHY_DM_STRUCT	*p_dm_odm
 );	
+
 
 void
 phydm_seq_sorting(
@@ -984,6 +1194,18 @@ phydm_cmn_info_query(
 	enum phydm_info_query_e			info_type
 );
 
+#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
+void
+odm_init_all_threads(
+	struct PHY_DM_STRUCT	*p_dm_odm
+);
+
+void
+odm_stop_all_threads(
+	struct PHY_DM_STRUCT	*p_dm_odm
+);
+#endif
+
 void
 odm_init_all_timers(
 	struct PHY_DM_STRUCT	*p_dm_odm
@@ -999,10 +1221,44 @@ odm_release_all_timers(
 	struct PHY_DM_STRUCT	*p_dm_odm
 );
 
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+void odm_init_all_work_items(struct PHY_DM_STRUCT	*p_dm_odm);
+void odm_free_all_work_items(struct PHY_DM_STRUCT	*p_dm_odm);
+
+u64
+platform_division64(
+	u64	x,
+	u64	y
+);
+
+#define dm_change_dynamic_init_gain_thresh		odm_change_dynamic_init_gain_thresh
+
+enum dm_dig_connect_e {
+	DIG_STA_DISCONNECT = 0,
+	DIG_STA_CONNECT = 1,
+	DIG_STA_BEFORE_CONNECT = 2,
+	DIG_MULTI_STA_DISCONNECT = 3,
+	DIG_MULTI_STA_CONNECT = 4,
+	DIG_CONNECT_MAX
+};
+
+/*2012/01/12 MH Check afapter status. Temp fix BSOD.*/
+
+#define	HAL_ADAPTER_STS_CHK(p_dm_odm) do {\
+		if (p_dm_odm->adapter == NULL) { \
+			\
+			return;\
+		} \
+	} while (0)
+
+#endif	/*#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)*/
+
 void
 odm_asoc_entry_init(
 	struct PHY_DM_STRUCT		*p_dm_odm
 );
+
 
 void *
 phydm_get_structure(
@@ -1010,6 +1266,7 @@ phydm_get_structure(
 	u8			structure_type
 );
 
+#if (DM_ODM_SUPPORT_TYPE == ODM_WIN) || (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	/*===========================================================*/
 	/* The following is for compile only*/
 	/*===========================================================*/
@@ -1020,17 +1277,27 @@ phydm_get_structure(
 	#define	IS_HARDWARE_TYPE_8192D(_adapter)			false
 	#define	RF_T_METER_92D	0x42
 
+
 	#define	GET_RX_STATUS_DESC_RX_MCS(__prx_status_desc)	LE_BITS_TO_1BYTE(__prx_status_desc+12, 0, 6)
 
 	#define	REG_CONFIG_RAM64X16				0xb2c
 
 	#define TARGET_CHNL_NUM_2G_5G	59
 
-	/* *********************************************************** */
+	#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
+		u8 get_right_chnl_place_for_iqk(u8 chnl);
+	#endif
 
+	/* *********************************************************** */
+#endif
+
+#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	void odm_dtc(struct PHY_DM_STRUCT *p_dm_odm);
+#endif /* #if (DM_ODM_SUPPORT_TYPE == ODM_CE) */
+
 
 void phydm_noisy_detection(struct PHY_DM_STRUCT	*p_dm_odm);
+
 
 #endif
 

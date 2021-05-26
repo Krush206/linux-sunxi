@@ -1,12 +1,41 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef __HAL_PHY_RF_H__
 #define __HAL_PHY_RF_H__
 
 #include "phydm_kfree.h"
+#if (RTL8814A_SUPPORT == 1)
+	#include "rtl8814a/phydm_iqk_8814a.h"
+#endif
+
+#if (RTL8822B_SUPPORT == 1)
+	#include "rtl8822b/phydm_iqk_8822b.h"
+#endif
+
+#if (RTL8821C_SUPPORT == 1)
+	#include "rtl8821c/phydm_iqk_8821c.h"
+#endif
+
 #include "phydm_powertracking_ce.h"
+
 
 enum spur_cal_method {
 	PLL_RESET,
@@ -61,10 +90,17 @@ odm_clear_txpowertracking_state(
 
 void
 odm_txpowertracking_callback_thermal_meter(
+#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
+	void					*p_dm_void
+#else
 	struct _ADAPTER	*adapter
+#endif
 );
 
+
+
 #define ODM_TARGET_CHNL_NUM_2G_5G	59
+
 
 void
 odm_reset_iqk_result(

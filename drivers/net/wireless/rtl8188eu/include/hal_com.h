@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __HAL_COMMON_H__
 #define __HAL_COMMON_H__
 
@@ -332,21 +348,21 @@ u8 hal_largest_bw(_adapter *adapter, u8 in_bw);
 bool hal_chk_wl_func(_adapter *adapter, u8 func);
 
 u8 hal_com_config_channel_plan(
-	PADAPTER padapter,
-	char *hw_alpha2,
-	u8 hw_chplan,
-	char *sw_alpha2,
-	u8 sw_chplan,
-	u8 def_chplan,
-	bool AutoLoadFail
+	IN	PADAPTER padapter,
+	IN	char *hw_alpha2,
+	IN	u8 hw_chplan,
+	IN	char *sw_alpha2,
+	IN	u8 sw_chplan,
+	IN	u8 def_chplan,
+	IN	BOOLEAN AutoLoadFail
 );
 
 int hal_config_macaddr(_adapter *adapter, bool autoload_fail);
 
-bool
+BOOLEAN
 HAL_IsLegalChannel(
-	PADAPTER	Adapter,
-	u32			Channel
+	IN	PADAPTER	Adapter,
+	IN	u32			Channel
 );
 
 u8	MRateToHwRate(u8 rate);
@@ -354,14 +370,14 @@ u8	MRateToHwRate(u8 rate);
 u8	hw_rate_to_m_rate(u8 rate);
 
 void	HalSetBrateCfg(
-	PADAPTER		Adapter,
-	u8			*mBratesOS,
-	u16			*pBrateCfg);
+	IN PADAPTER		Adapter,
+	IN u8			*mBratesOS,
+	OUT u16			*pBrateCfg);
 
-bool
+BOOLEAN
 Hal_MappingOutPipe(
-	PADAPTER	pAdapter,
-	u8		NumOutPipe
+	IN	PADAPTER	pAdapter,
+	IN	u8		NumOutPipe
 );
 
 void rtw_dump_fw_info(void *sel, _adapter *adapter);
@@ -408,7 +424,7 @@ void rtw_hal_reqtxrpt(_adapter *padapter, u8 macid);
 u8 SetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value);
 u8 GetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value);
 
-bool
+BOOLEAN
 eqNByte(
 	u8	*str1,
 	u8	*str2,
@@ -417,45 +433,45 @@ eqNByte(
 
 u32
 MapCharToHexDigit(
-	char	chTmp
+	IN	char	chTmp
 );
 
-bool
+BOOLEAN
 GetHexValueFromString(
-		char			*szStr,
-	u32			*pu4bVal,
-	u32			*pu4bMove
+	IN		char			*szStr,
+	IN OUT	u32			*pu4bVal,
+	IN OUT	u32			*pu4bMove
 );
 
-bool
+BOOLEAN
 GetFractionValueFromString(
-		char		*szStr,
-	u8			*pInteger,
-	u8			*pFraction,
-	u32		*pu4bMove
+	IN		char		*szStr,
+	IN OUT	u8			*pInteger,
+	IN OUT	u8			*pFraction,
+	IN OUT	u32		*pu4bMove
 );
 
-bool
+BOOLEAN
 IsCommentString(
-		char		*szStr
+	IN		char		*szStr
 );
 
-bool
+BOOLEAN
 ParseQualifiedString(
-	char *In,
-	u32 *Start,
-	char *Out,
-	char  LeftQualifier,
-	char  RightQualifier
+	IN	char *In,
+	IN OUT  u32 *Start,
+	OUT	char *Out,
+	IN	char  LeftQualifier,
+	IN	char  RightQualifier
 );
 
-bool
+BOOLEAN
 GetU1ByteIntegerFromStringInDecimal(
-		char *Str,
-	u8 *pInt
+	IN		char *Str,
+	IN OUT	u8 *pInt
 );
 
-bool
+BOOLEAN
 isAllSpaceOrTab(
 	u8	*data,
 	u8	size
@@ -492,13 +508,13 @@ u8 rtw_hal_busagg_qsel_check(_adapter *padapter, u8 pre_qsel, u8 next_qsel);
 void GetHalODMVar(
 	PADAPTER				Adapter,
 	HAL_ODM_VARIABLE		eVariable,
-	void *					pValue1,
-	void *					pValue2);
+	PVOID					pValue1,
+	PVOID					pValue2);
 void SetHalODMVar(
 	PADAPTER				Adapter,
 	HAL_ODM_VARIABLE		eVariable,
-	void *					pValue1,
-	bool					bSet);
+	PVOID					pValue1,
+	BOOLEAN					bSet);
 
 #ifdef CONFIG_BACKGROUND_NOISE_MONITOR
 struct noise_info {

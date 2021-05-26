@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2012 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_PWRCTRL_H_
 #define __RTW_PWRCTRL_H_
 
@@ -137,11 +153,12 @@ typedef _sema _pwrlock;
 
 __inline static void _init_pwrlock(_pwrlock *plock)
 {
-	sema_init(plock, 1);
+	_rtw_init_sema(plock, 1);
 }
 
 __inline static void _free_pwrlock(_pwrlock *plock)
 {
+	_rtw_free_sema(plock);
 }
 
 
@@ -153,7 +170,7 @@ __inline static void _enter_pwrlock(_pwrlock *plock)
 
 __inline static void _exit_pwrlock(_pwrlock *plock)
 {
-	up(plock);
+	_rtw_up_sema(plock);
 }
 
 #define LPS_DELAY_TIME	1*HZ /* 1 sec */
@@ -182,7 +199,7 @@ typedef enum _rt_rf_power_state {
 #define	RT_RF_LPS_DISALBE_2R			BIT(30)	/* When LPS is on, disable 2R if no packet is received or transmittd. */
 #define	RT_RF_LPS_LEVEL_ASPM			BIT(31)	/* LPS with ASPM */
 
-#define	RT_IN_PS_LEVEL(ppsc, _PS_FLAG)		((ppsc->cur_ps_level & _PS_FLAG) ? true : false)
+#define	RT_IN_PS_LEVEL(ppsc, _PS_FLAG)		((ppsc->cur_ps_level & _PS_FLAG) ? _TRUE : _FALSE)
 #define	RT_CLEAR_PS_LEVEL(ppsc, _PS_FLAG)	(ppsc->cur_ps_level &= (~(_PS_FLAG)))
 #define	RT_SET_PS_LEVEL(ppsc, _PS_FLAG)		(ppsc->cur_ps_level |= _PS_FLAG)
 
@@ -291,7 +308,6 @@ struct aoac_report {
 };
 
 struct pwrctrl_priv {
-	_adapter *padapter;
 	_pwrlock	lock;
 	_pwrlock	check_32k_lock;
 	volatile u8 rpwm; /* requested power state for fw */
@@ -310,7 +326,7 @@ struct pwrctrl_priv {
 #ifdef CONFIG_LPS_RPWM_TIMER
 	u8 brpwmtimeout;
 	_workitem rpwmtimeoutwi;
-	struct timer_list pwr_rpwm_timer;
+	_timer pwr_rpwm_timer;
 #endif /* CONFIG_LPS_RPWM_TIMER */
 	u8	bpower_saving; /* for LPS/IPS */
 
@@ -388,7 +404,7 @@ struct pwrctrl_priv {
 	u8		wowlan_aoac_rpt_loc;
 	struct aoac_report wowlan_aoac_rpt;
 #endif /* CONFIG_WOWLAN */
-	struct timer_list pwr_state_check_timer;
+	_timer	pwr_state_check_timer;
 	int		pwr_state_check_interval;
 	u8		pwr_state_check_cnts;
 
@@ -444,7 +460,7 @@ struct pwrctrl_priv {
 
 #define _rtw_set_pwr_state_check_timer(pwrctl, ms) \
 	do { \
-		/*RTW_INFO("%s _rtw_set_pwr_state_check_timer(%p, %d)\n", __func__, (pwrctl), (ms));*/ \
+		/*RTW_INFO("%s _rtw_set_pwr_state_check_timer(%p, %d)\n", __FUNCTION__, (pwrctl), (ms));*/ \
 		_set_timer(&(pwrctl)->pwr_state_check_timer, (ms)); \
 	} while (0)
 
@@ -484,7 +500,7 @@ void rtw_ps_processor(_adapter *padapter);
 int autoresume_enter(_adapter *padapter);
 #endif
 #ifdef SUPPORT_HW_RFOFF_DETECTED
-rt_rf_power_state RfOnOffDetect(PADAPTER pAdapter);
+rt_rf_power_state RfOnOffDetect(IN	PADAPTER pAdapter);
 #endif
 
 
@@ -511,8 +527,8 @@ void rtw_set_do_late_resume(struct pwrctrl_priv *pwrpriv, bool enable);
 void rtw_register_early_suspend(struct pwrctrl_priv *pwrpriv);
 void rtw_unregister_early_suspend(struct pwrctrl_priv *pwrpriv);
 #else
-#define rtw_is_earlysuspend_registered(pwrpriv) false
-#define rtw_is_do_late_resume(pwrpriv) false
+#define rtw_is_earlysuspend_registered(pwrpriv) _FALSE
+#define rtw_is_do_late_resume(pwrpriv) _FALSE
 #define rtw_set_do_late_resume(pwrpriv, enable) do {} while (0)
 #define rtw_register_early_suspend(pwrpriv) do {} while (0)
 #define rtw_unregister_early_suspend(pwrpriv) do {} while (0)
@@ -521,8 +537,8 @@ void rtw_unregister_early_suspend(struct pwrctrl_priv *pwrpriv);
 u8 rtw_interface_ps_func(_adapter *padapter, HAL_INTF_PS_FUNC efunc_id, u8 *val);
 void rtw_set_ips_deny(_adapter *padapter, u32 ms);
 int _rtw_pwr_wakeup(_adapter *padapter, u32 ips_deffer_ms, const char *caller);
-#define rtw_pwr_wakeup(adapter) _rtw_pwr_wakeup(adapter, RTW_PWR_STATE_CHK_INTERVAL, __func__)
-#define rtw_pwr_wakeup_ex(adapter, ips_deffer_ms) _rtw_pwr_wakeup(adapter, ips_deffer_ms, __func__)
+#define rtw_pwr_wakeup(adapter) _rtw_pwr_wakeup(adapter, RTW_PWR_STATE_CHK_INTERVAL, __FUNCTION__)
+#define rtw_pwr_wakeup_ex(adapter, ips_deffer_ms) _rtw_pwr_wakeup(adapter, ips_deffer_ms, __FUNCTION__)
 int rtw_pm_set_ips(_adapter *padapter, u8 mode);
 int rtw_pm_set_lps(_adapter *padapter, u8 mode);
 

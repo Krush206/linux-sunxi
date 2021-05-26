@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2012 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 /*-------------------------------------------------------------------------------
 
 	For type defines and data structure defines
@@ -14,6 +30,7 @@
 #include <drv_conf.h>
 #include <basic_types.h>
 #include <osdep_service.h>
+#include <rtw_byteorder.h>
 #include <wlan_bssdef.h>
 #include <wifi.h>
 #include <ieee80211.h>
@@ -22,7 +39,17 @@
 	#include <net/arp.h>
 #endif
 
-#include <drv_types_linux.h>
+#ifdef PLATFORM_OS_XP
+	#include <drv_types_xp.h>
+#endif
+
+#ifdef PLATFORM_OS_CE
+	#include <drv_types_ce.h>
+#endif
+
+#ifdef PLATFORM_LINUX
+	#include <drv_types_linux.h>
+#endif
 
 enum _NIC_VERSION {
 
@@ -38,7 +65,13 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <rtw_debug.h>
 #include <rtw_rf.h>
 
+#ifdef CONFIG_80211N_HT
 	#include <rtw_ht.h>
+#endif
+
+#ifdef CONFIG_80211AC_VHT
+	#include <rtw_vht.h>
+#endif
 
 #ifdef CONFIG_INTEL_WIDI
 	#include <rtw_intel_widi.h>
@@ -190,9 +223,12 @@ struct registry_priv {
 	u8	uapsd_acbe_en;
 	u8	uapsd_acvi_en;
 	u8	uapsd_acvo_en;
+
 	WLAN_BSSID_EX    dev_network;
-	u8	tx_bw_mode;
-	u8	led_enable;
+
+	u8 tx_bw_mode;
+
+#ifdef CONFIG_80211N_HT
 	u8	ht_enable;
 	/* 0: 20 MHz, 1: 40 MHz, 2: 80 MHz, 3: 160MHz */
 	/* 2.4G use bit 0 ~ 3, 5G use bit 4 ~ 7 */
@@ -222,6 +258,13 @@ struct registry_priv {
 	u8	beamform_cap;
 	u8	beamformer_rf_num;
 	u8	beamformee_rf_num;
+#endif /* CONFIG_80211N_HT */
+
+#ifdef CONFIG_80211AC_VHT
+	u8	vht_enable; /* 0:disable, 1:enable, 2:auto */
+	u8	ampdu_factor;
+	u8 vht_rx_mcs_map[2];
+#endif /* CONFIG_80211AC_VHT */
 
 	u8	lowrate_two_xmit;
 
@@ -242,7 +285,7 @@ struct registry_priv {
 	u8	bt_ampdu;
 	u8	ant_num;
 #endif
-	bool	bAcceptAddbaReq;
+	BOOLEAN	bAcceptAddbaReq;
 
 	u8	antdiv_cfg;
 	u8	antdiv_type;
@@ -328,7 +371,7 @@ struct registry_priv {
 	s8 adaptivity_th_edcca_hl_diff;
 
 	u8 boffefusemask;
-	bool bFileMaskEfuse;
+	BOOLEAN bFileMaskEfuse;
 #ifdef CONFIG_AUTO_CHNL_SEL_NHM
 	u8 acs_mode;
 	u8 acs_auto_scan;
@@ -375,7 +418,7 @@ struct registry_priv {
 };
 
 /* For registry parameters */
-#define RGTRY_OFT(field) ((u32)FIELD_OFFSET(struct registry_priv, field))
+#define RGTRY_OFT(field) ((ULONG)FIELD_OFFSET(struct registry_priv, field))
 #define RGTRY_SZ(field)   sizeof(((struct registry_priv *) 0)->field)
 
 #define GetRegAmplifierType2G(_Adapter)	(_Adapter->registrypriv.AmplifierType_2G)
@@ -389,7 +432,7 @@ struct registry_priv {
 #define GetRegGLNAType(_Adapter)	(_Adapter->registrypriv.GLNA_Type)
 #define GetRegPowerTrackingType(_Adapter)	(_Adapter->registrypriv.PowerTracking_Type)
 
-#define BSSID_OFT(field) ((u32)FIELD_OFFSET(WLAN_BSSID_EX, field))
+#define BSSID_OFT(field) ((ULONG)FIELD_OFFSET(WLAN_BSSID_EX, field))
 #define BSSID_SZ(field)   sizeof(((PWLAN_BSSID_EX) 0)->field)
 
 #define BW_MODE_2G(bw_mode) ((bw_mode) & 0x0F)
@@ -408,6 +451,17 @@ typedef struct rtw_if_operations {
 	int __must_check(*write)(struct dvobj_priv *d, int addr, void *buf,
 				 size_t len, bool fixed);
 } RTW_IF_OPS, *PRTW_IF_OPS;
+
+#ifdef CONFIG_SDIO_HCI
+	#include <drv_types_sdio.h>
+	#define INTF_DATA	SDIO_DATA
+	#define INTF_OPS	PRTW_IF_OPS
+#elif defined(CONFIG_GSPI_HCI)
+	#include <drv_types_gspi.h>
+	#define INTF_DATA GSPI_DATA
+#elif defined(CONFIG_PCI_HCI)
+	#include <drv_types_pci.h>
+#endif
 
 #ifdef CONFIG_CONCURRENT_MODE
 	#define is_primary_adapter(adapter) (adapter->adapter_type == PRIMARY_ADAPTER)
@@ -756,8 +810,8 @@ struct rf_ctl_t {
 
 #define RTW_CAC_STOPPED 0
 #define IS_CAC_STOPPED(rfctl) ((rfctl)->cac_end_time == RTW_CAC_STOPPED)
-#define IS_CH_WAITING(rfctl) (!IS_CAC_STOPPED(rfctl) && time_after((unsigned long)(rfctl)->cac_end_time, (unsigned long)jiffies))
-#define IS_UNDER_CAC(rfctl) (IS_CH_WAITING(rfctl) && time_after((unsigned long)jiffies, (unsigned long)(rfctl)->cac_start_time))
+#define IS_CH_WAITING(rfctl) (!IS_CAC_STOPPED(rfctl) && time_after((unsigned long)(rfctl)->cac_end_time, (unsigned long)rtw_get_current_time()))
+#define IS_UNDER_CAC(rfctl) (IS_CH_WAITING(rfctl) && time_after((unsigned long)rtw_get_current_time(), (unsigned long)(rfctl)->cac_start_time))
 
 #ifdef CONFIG_MBSSID_CAM
 #define TOTAL_MBID_CAM_NUM	8
@@ -788,6 +842,11 @@ struct halmacpriv {
 
 	/* For asynchronous functions */
 	struct halmac_indicator *indicator;
+
+#ifdef CONFIG_SDIO_HCI
+	/* Store hardware tx queue page number setting */
+	u16 txpage[HW_QUEUE_ENTRY];
+#endif /* CONFIG_SDIO_HCI */
 };
 #endif /* RTW_HALMAC */
 
@@ -865,16 +924,18 @@ struct dvobj_priv {
 
 	struct rtw_traffic_statistics	traffic_stat;
 
+#ifdef PLATFORM_LINUX
 	_thread_hdl_ rtnl_lock_holder;
 
 	#if defined(CONFIG_IOCTL_CFG80211) && defined(RTW_SINGLE_WIPHY)
 	struct wiphy *wiphy;
 	#endif
+#endif /* PLATFORM_LINUX */
 
 #ifdef CONFIG_SWTIMER_BASED_TXBCN
-	struct timer_list txbcn_timer;
+	_timer txbcn_timer;
 #endif
-	struct timer_list dynamic_chk_timer; /* dynamic/periodic check timer */
+	_timer dynamic_chk_timer; /* dynamic/periodic check timer */
 
 #ifdef RTW_HALMAC
 	void *halmac;
@@ -895,6 +956,8 @@ struct dvobj_priv {
 
 	/*-------- below is for USB INTERFACE --------*/
 
+#ifdef CONFIG_USB_HCI
+
 	u8	usb_speed; /* 1.1, 2.0 or 3.0 */
 	u8	nr_endpoint;
 	u8	RtNumInPipes;
@@ -914,10 +977,92 @@ struct dvobj_priv {
 	u8 *usb_vendor_req_buf;
 #endif
 
+#ifdef PLATFORM_WINDOWS
+	/* related device objects */
+	PDEVICE_OBJECT	pphysdevobj;/* pPhysDevObj; */
+	PDEVICE_OBJECT	pfuncdevobj;/* pFuncDevObj; */
+	PDEVICE_OBJECT	pnextdevobj;/* pNextDevObj; */
+
+	u8	nextdevstacksz;/* unsigned char NextDeviceStackSize;	 */ /* = (CHAR)CEdevice->pUsbDevObj->StackSize + 1; */
+
+	/* urb for control diescriptor request */
+
+#ifdef PLATFORM_OS_XP
+	struct _URB_CONTROL_DESCRIPTOR_REQUEST descriptor_urb;
+	PUSB_CONFIGURATION_DESCRIPTOR	pconfig_descriptor;/* UsbConfigurationDescriptor; */
+#endif
+
+#ifdef PLATFORM_OS_CE
+	WCHAR			active_path[MAX_ACTIVE_REG_PATH];	/* adapter regpath */
+	USB_EXTENSION	usb_extension;
+
+	_nic_hdl		pipehdls_r8192c[0x10];
+#endif
+
+	u32	config_descriptor_len;/* ULONG UsbConfigurationDescriptorLength; */
+#endif/* PLATFORM_WINDOWS */
+
+#ifdef PLATFORM_LINUX
 	struct usb_interface *pusbintf;
 	struct usb_device *pusbdev;
+#endif/* PLATFORM_LINUX */
+
+#ifdef PLATFORM_FREEBSD
+	struct usb_interface *pusbintf;
+	struct usb_device *pusbdev;
+#endif/* PLATFORM_FREEBSD */
+
+#endif/* CONFIG_USB_HCI */
 
 	/*-------- below is for PCIE INTERFACE --------*/
+
+#ifdef CONFIG_PCI_HCI
+
+#ifdef PLATFORM_LINUX
+	struct pci_dev *ppcidev;
+
+	/* PCI MEM map */
+	unsigned long	pci_mem_end;	/* shared mem end	*/
+	unsigned long	pci_mem_start;	/* shared mem start	*/
+
+	/* PCI IO map */
+	unsigned long	pci_base_addr;	/* device I/O address	*/
+
+#ifdef RTK_129X_PLATFORM
+	unsigned long	ctrl_start;
+	/* PCI MASK addr */
+	unsigned long	mask_addr;
+
+	/* PCI TRANSLATE addr */
+	unsigned long	tran_addr;
+
+	_lock   io_reg_lock;
+#endif
+
+	/* PciBridge */
+	struct pci_priv	pcipriv;
+
+	unsigned int irq; /* get from pci_dev.irq, store to net_device.irq */
+	u16	irqline;
+	u8	irq_enabled;
+	RT_ISR_CONTENT	isr_content;
+	_lock	irq_th_lock;
+
+	/* ASPM */
+	u8	const_pci_aspm;
+	u8	const_amdpci_aspm;
+	u8	const_hwsw_rfoff_d3;
+	u8	const_support_pciaspm;
+	/* pci-e bridge */
+	u8	const_hostpci_aspm_setting;
+	/* pci-e device */
+	u8	const_devicepci_aspm_setting;
+	u8	b_support_aspm; /* If it supports ASPM, Offset[560h] = 0x40, otherwise Offset[560h] = 0x00. */
+	u8	b_support_backdoor;
+	u8	bdma64;
+#endif/* PLATFORM_LINUX */
+
+#endif/* CONFIG_PCI_HCI */
 
 #ifdef CONFIG_MCC_MODE
 	struct mcc_obj_priv mcc_objpriv;
@@ -951,28 +1096,44 @@ struct dvobj_priv {
 
 static inline void dev_set_surprise_removed(struct dvobj_priv *dvobj)
 {
-	ATOMIC_SET(&dvobj->bSurpriseRemoved, true);
+	ATOMIC_SET(&dvobj->bSurpriseRemoved, _TRUE);
 }
 static inline void dev_clr_surprise_removed(struct dvobj_priv *dvobj)
 {
-	ATOMIC_SET(&dvobj->bSurpriseRemoved, false);
+	ATOMIC_SET(&dvobj->bSurpriseRemoved, _FALSE);
 }
 static inline void dev_set_drv_stopped(struct dvobj_priv *dvobj)
 {
-	ATOMIC_SET(&dvobj->bDriverStopped, true);
+	ATOMIC_SET(&dvobj->bDriverStopped, _TRUE);
 }
 static inline void dev_clr_drv_stopped(struct dvobj_priv *dvobj)
 {
-	ATOMIC_SET(&dvobj->bDriverStopped, false);
+	ATOMIC_SET(&dvobj->bDriverStopped, _FALSE);
 }
-#define dev_is_surprise_removed(dvobj)	(ATOMIC_READ(&dvobj->bSurpriseRemoved) == true)
-#define dev_is_drv_stopped(dvobj)		(ATOMIC_READ(&dvobj->bDriverStopped) == true)
+#define dev_is_surprise_removed(dvobj)	(ATOMIC_READ(&dvobj->bSurpriseRemoved) == _TRUE)
+#define dev_is_drv_stopped(dvobj)		(ATOMIC_READ(&dvobj->bDriverStopped) == _TRUE)
 
+#ifdef PLATFORM_LINUX
 static struct device *dvobj_to_dev(struct dvobj_priv *dvobj)
 {
 	/* todo: get interface type from dvobj and the return the dev accordingly */
+#ifdef RTW_DVOBJ_CHIP_HW_TYPE
+#endif
+
+#ifdef CONFIG_USB_HCI
 	return &dvobj->pusbintf->dev;
+#endif
+#ifdef CONFIG_SDIO_HCI
+	return &dvobj->intf_data.func->dev;
+#endif
+#ifdef CONFIG_GSPI_HCI
+	return &dvobj->intf_data.func->dev;
+#endif
+#ifdef CONFIG_PCI_HCI
+	return &dvobj->ppcidev->dev;
+#endif
 }
+#endif
 
 _adapter *dvobj_get_port0_adapter(struct dvobj_priv *dvobj);
 _adapter *dvobj_get_unregisterd_adapter(struct dvobj_priv *dvobj);
@@ -1061,7 +1222,7 @@ struct _ADAPTER {
 	struct	recv_priv	recvpriv;
 	struct	sta_priv	stapriv;
 	struct	security_priv	securitypriv;
-	spinlock_t security_key_mutex; /* add for CONFIG_IEEE80211W, non 11w also can use */
+	_lock   security_key_mutex; /* add for CONFIG_IEEE80211W, none 11w also can use */
 	struct	registry_priv	registrypriv;
 
 	struct	led_priv	ledpriv;
@@ -1115,7 +1276,7 @@ struct _ADAPTER {
 
 	ERROR_CODE		LastError; /* <20130613, Kordan> Only the functions associated with MP records the error code by now. */
 
-	void *			HalData;
+	PVOID			HalData;
 	u32 hal_data_sz;
 	struct hal_ops	hal_func;
 
@@ -1140,6 +1301,10 @@ struct _ADAPTER {
 	_thread_hdl_ recvThread;
 
 	u8 registered;
+#ifndef PLATFORM_LINUX
+	NDIS_STATUS(*dvobj_init)(struct dvobj_priv *dvobj);
+	void (*dvobj_deinit)(struct dvobj_priv *dvobj);
+#endif
 
 	u32(*intf_init)(struct dvobj_priv *dvobj);
 	void (*intf_deinit)(struct dvobj_priv *dvobj);
@@ -1150,6 +1315,18 @@ struct _ADAPTER {
 	void (*intf_start)(_adapter *adapter);
 	void (*intf_stop)(_adapter *adapter);
 
+#ifdef PLATFORM_WINDOWS
+	_nic_hdl		hndis_adapter;/* hNdisAdapter(NDISMiniportAdapterHandle); */
+	_nic_hdl		hndis_config;/* hNdisConfiguration; */
+	NDIS_STRING fw_img;
+
+	u32	NdisPacketFilter;
+	u8	MCList[MAX_MCAST_LIST_NUM][6];
+	u32	MCAddrCount;
+#endif /* end of PLATFORM_WINDOWS */
+
+
+#ifdef PLATFORM_LINUX
 	_nic_hdl pnetdev;
 	char old_ifname[IFNAMSIZ];
 
@@ -1182,6 +1359,13 @@ struct _ADAPTER {
 
 #endif /* CONFIG_IOCTL_CFG80211 */
 
+#endif /* PLATFORM_LINUX */
+
+#ifdef PLATFORM_FREEBSD
+	_nic_hdl pifp;
+	int bup;
+	_lock glock;
+#endif /* PLATFORM_FREEBSD */
 	u8 mac_addr[ETH_ALEN];
 	int net_closed;
 
@@ -1375,21 +1559,35 @@ int rtw_dev_pno_set(struct net_device *net, pno_ssid_t *ssid, int num,
 #endif /* CONFIG_PNO_SET_DEBUG */
 #endif /* CONFIG_PNO_SUPPORT */
 
-void *scdb_findEntry(_adapter *priv, unsigned char *macAddr,
-		     unsigned char *ipAddr);
-void dhcp_flag_bcast(_adapter *priv, struct sk_buff *skb);
 int rtw_suspend_free_assoc_resource(_adapter *padapter);
-int recvbuf2recvframe(PADAPTER padapter, void *ptr);
-int rtw_change_ifname(_adapter *padapter, const char *ifname);
-
 #ifdef CONFIG_WOWLAN
 	int rtw_suspend_wow(_adapter *padapter);
 	int rtw_resume_process_wow(_adapter *padapter);
 #endif
 
 /* HCI Related header file */
+#ifdef CONFIG_USB_HCI
 	#include <usb_osintf.h>
 	#include <usb_ops.h>
 	#include <usb_hal.h>
+#endif
+
+#ifdef CONFIG_SDIO_HCI
+	#include <sdio_osintf.h>
+	#include <sdio_ops.h>
+	#include <sdio_hal.h>
+#endif
+
+#ifdef CONFIG_GSPI_HCI
+	#include <gspi_osintf.h>
+	#include <gspi_ops.h>
+	#include <gspi_hal.h>
+#endif
+
+#ifdef CONFIG_PCI_HCI
+	#include <pci_osintf.h>
+	#include <pci_ops.h>
+	#include <pci_hal.h>
+#endif
 
 #endif /* __DRV_TYPES_H__ */

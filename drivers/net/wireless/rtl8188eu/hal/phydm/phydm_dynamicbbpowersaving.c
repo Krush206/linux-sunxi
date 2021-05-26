@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 /* ************************************************************
  * include files
@@ -33,14 +49,18 @@ odm_rf_saving(
 )
 {
 	struct PHY_DM_STRUCT		*p_dm_odm = (struct PHY_DM_STRUCT *)p_dm_void;
+#if (DM_ODM_SUPPORT_TYPE != ODM_AP)
 	struct _dynamic_power_saving	*p_dm_ps_table = &p_dm_odm->dm_ps_table;
 	u8	rssi_up_bound = 30 ;
 	u8	rssi_low_bound = 25;
+#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	if (p_dm_odm->patch_id == 40) { /* RT_CID_819x_FUNAI_TV */
 		rssi_up_bound = 50 ;
 		rssi_low_bound = 45;
 	}
+#endif
 	if (p_dm_ps_table->initialize == 0) {
+
 		p_dm_ps_table->reg874 = (odm_get_bb_reg(p_dm_odm, 0x874, MASKDWORD) & 0x1CC000) >> 14;
 		p_dm_ps_table->regc70 = (odm_get_bb_reg(p_dm_odm, 0xc70, MASKDWORD) & BIT(3)) >> 3;
 		p_dm_ps_table->reg85c = (odm_get_bb_reg(p_dm_odm, 0x85c, MASKDWORD) & 0xFF000000) >> 24;
@@ -85,6 +105,7 @@ odm_rf_saving(
 		}
 		p_dm_ps_table->pre_rf_state = p_dm_ps_table->cur_rf_state;
 	}
+#endif
 }
 
 #endif

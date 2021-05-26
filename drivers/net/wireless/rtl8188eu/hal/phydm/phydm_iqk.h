@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef	__PHYDMIQK_H__
 #define __PHYDMIQK_H__
@@ -21,8 +37,8 @@
 /*---------------------------End Define Parameters-------------------------------*/
 
 struct _IQK_INFORMATION {
-	bool		LOK_fail[NUM];
-	bool		IQK_fail[2][NUM];
+	boolean		LOK_fail[NUM];
+	boolean		IQK_fail[2][NUM];
 	u32		iqc_matrix[2][NUM];
 	u8      iqk_times;
 	u32		rf_reg18;
@@ -32,7 +48,7 @@ struct _IQK_INFORMATION {
 	u8		kcount;
 
 	u32		iqk_channel[2];
-	bool		IQK_fail_report[2][4][2]; /*channel/path/TRX(TX:0, RX:1) */
+	boolean		IQK_fail_report[2][4][2]; /*channel/path/TRX(TX:0, RX:1) */
 	u32		IQK_CFIR_real[2][4][2][8]; /*channel / path / TRX(TX:0, RX:1) / CFIR_real*/
 	u32		IQK_CFIR_imag[2][4][2][8]; /*channel / path / TRX(TX:0, RX:1) / CFIR_imag*/
 	u8		retry_count[2][4][3]; /* channel / path / (TXK:0, RXK1:1, RXK2:2) */
@@ -42,8 +58,8 @@ struct _IQK_INFORMATION {
 	u16		RXIQK_AGC[2][4];	 /*channel / path*/
 	u32		bypass_iqk[2][4];	/*channel / 0xc94/0xe94*/
 	u32		tmp_GNTWL;
-	bool		is_BTG;
-	bool		isbnd;
+	boolean		is_BTG;
+	boolean		isbnd;
 };
 
 #endif

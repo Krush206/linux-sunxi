@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __STA_INFO_H_
 #define __STA_INFO_H_
 
@@ -143,9 +159,9 @@ struct	stainfo_stats	{
 struct session_tracker {
 	_list list; /* session_tracker_queue */
 	u32 local_naddr;
-	__be16 local_port;
+	u16 local_port;
 	u32 remote_naddr;
-	__be16 remote_port;
+	u16 remote_port;
 	u32 set_time;
 	u8 status;
 };
@@ -246,7 +262,7 @@ struct sta_info {
 #endif /* CONFIG_GTK_OL */
 #ifdef CONFIG_IEEE80211W
 	union pn48		dot11wtxpn;			/* PN48 used for Unicast mgmt xmit. */
-	struct timer_list dot11w_expire_timer;
+	_timer dot11w_expire_timer;
 #endif /* CONFIG_IEEE80211W */
 	union pn48		dot11rxpn;			/* PN48 used for Unicast recv. */
 
@@ -292,14 +308,14 @@ struct sta_info {
 	_timer	stay_on_base_chnl_timer;
 	_timer	ch_sw_monitor_timer;
 #endif
-	struct timer_list handshake_timer;
+	_timer handshake_timer;
 	u8 alive_count;
 	_timer	pti_timer;
 	u8	TDLS_RSNIE[20];	/* Save peer's RSNIE, used for sending TDLS_SETUP_RSP */
 #endif /* CONFIG_TDLS */
 
 	/* for A-MPDU TX, ADDBA timeout check	 */
-	struct timer_list addba_retry_timer;
+	_timer addba_retry_timer;
 
 	/* for A-MPDU Rx reordering buffer control */
 	struct recv_reorder_ctrl recvreorder_ctrl[TID_NUM];
@@ -307,7 +323,15 @@ struct sta_info {
 	/* for A-MPDU Tx */
 	/* unsigned char		ampdu_txen_bitmap; */
 	u16	BA_starting_seqctrl[16];
+
+
+#ifdef CONFIG_80211N_HT
 	struct ht_priv	htpriv;
+#endif
+
+#ifdef CONFIG_80211AC_VHT
+	struct vht_priv	vhtpriv;
+#endif
 
 	/* Notes:	 */
 	/* STA_Mode: */

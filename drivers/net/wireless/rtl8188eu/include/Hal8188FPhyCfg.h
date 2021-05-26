@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __INC_HAL8188FPHYCFG_H__
 #define __INC_HAL8188FPHYCFG_H__
 
@@ -33,7 +49,7 @@ PHY_QueryBBReg_8188F(
 	IN	u32		BitMask
 );
 
-void
+VOID
 PHY_SetBBReg_8188F(
 	IN	PADAPTER	Adapter,
 	IN	u32		RegAddr,
@@ -49,7 +65,7 @@ PHY_QueryRFReg_8188F(
 	IN	u32				BitMask
 );
 
-void
+VOID
 PHY_SetRFReg_8188F(
 	IN	PADAPTER			Adapter,
 	IN	u8				eRFPath,
@@ -72,7 +88,7 @@ PHY_ConfigRFWithParaFile_8188F(
 	RF_PATH				eRFPath
 );
 
-void
+VOID
 PHY_SetTxPowerIndex_8188F(
 	IN	PADAPTER			Adapter,
 	IN	u32					PowerIndex,
@@ -90,19 +106,19 @@ PHY_GetTxPowerIndex_8188F(
 	struct txpwr_idx_comp *tic
 );
 
-void
+VOID
 PHY_GetTxPowerLevel8188F(
 	IN	PADAPTER		Adapter,
 	OUT s32				*powerlevel
 );
 
-void
+VOID
 PHY_SetTxPowerLevel8188F(
 	IN	PADAPTER		Adapter,
 	IN	u8			channel
 );
 
-void
+VOID
 PHY_SetSwChnlBWMode8188F(
 	IN	PADAPTER			Adapter,
 	IN	u8					channel,
@@ -111,7 +127,7 @@ PHY_SetSwChnlBWMode8188F(
 	IN	u8					Offset80
 );
 
-void phy_set_rf_path_switch_8188f(
+VOID phy_set_rf_path_switch_8188f(
 	IN	PADAPTER	pAdapter,
 	IN	bool		bMain
 );

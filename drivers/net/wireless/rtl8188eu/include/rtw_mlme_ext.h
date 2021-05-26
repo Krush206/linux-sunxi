@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #ifndef __RTW_MLME_EXT_H_
 #define __RTW_MLME_EXT_H_
 
@@ -454,7 +470,7 @@ struct mlme_ext_info {
 	u8	candidate_tid_bitmap;
 	u8	dialogToken;
 	/* Accept ADDBA Request */
-	bool bAcceptAddbaReq;
+	BOOLEAN bAcceptAddbaReq;
 	u8	bwmode_updated;
 	u8	hidden_ssid_mode;
 	u8	VHT_enable;
@@ -490,7 +506,7 @@ void rtw_rfctl_init(_adapter *adapter);
 
 #ifdef CONFIG_DFS_MASTER
 struct rf_ctl_t;
-#define CH_IS_NON_OCP(rt_ch_info) (time_after((unsigned long)(rt_ch_info)->non_ocp_end_time, (unsigned long)jiffies))
+#define CH_IS_NON_OCP(rt_ch_info) (time_after((unsigned long)(rt_ch_info)->non_ocp_end_time, (unsigned long)rtw_get_current_time()))
 bool rtw_is_cac_reset_needed(_adapter *adapter, u8 ch, u8 bw, u8 offset);
 bool _rtw_rfctl_overlap_radar_detect_ch(struct rf_ctl_t *rfctl, u8 ch, u8 bw, u8 offset);
 bool rtw_rfctl_overlap_radar_detect_ch(struct rf_ctl_t *rfctl);
@@ -502,8 +518,8 @@ u32 rtw_get_ch_waiting_ms(_adapter *adapter, u8 ch, u8 bw, u8 offset, u32 *r_non
 void rtw_reset_cac(_adapter *adapter, u8 ch, u8 bw, u8 offset);
 #else
 #define CH_IS_NON_OCP(rt_ch_info) 0
-#define rtw_chset_is_ch_non_ocp(ch_set, ch, bw, offset) false
-#define rtw_rfctl_is_tx_blocked_by_ch_waiting(rfctl) false
+#define rtw_chset_is_ch_non_ocp(ch_set, ch, bw, offset) _FALSE
+#define rtw_rfctl_is_tx_blocked_by_ch_waiting(rfctl) _FALSE
 #endif
 
 enum {
@@ -596,18 +612,21 @@ struct mlme_ext_priv {
 	struct p2p_channels channel_list;
 	unsigned char	basicrate[NumRates];
 	unsigned char	datarate[NumRates];
+#ifdef CONFIG_80211N_HT
 	unsigned char default_supported_mcs_set[16];
+#endif
+
 	struct ss_res		sitesurvey_res;
 	struct mlme_ext_info	mlmext_info;/* for sta/adhoc mode, including current scanning/connecting/connected related info.
                                                       * for ap mode, network includes ap's cap_info */
-	struct timer_list 	survey_timer;
-	struct timer_list 	link_timer;
+	_timer		survey_timer;
+	_timer		link_timer;
 #ifdef CONFIG_RTW_80211R
-	struct timer_list 	ft_link_timer;
-	struct timer_list 	ft_roam_timer;
+	_timer		ft_link_timer;
+	_timer		ft_roam_timer;
 #endif
 
-	/* struct timer_list 	ADDBA_timer; */
+	/* _timer		ADDBA_timer; */
 	u32 last_scan_time;
 	u8	scan_abort;
 	u8	tx_rate; /* TXRATE when USERATE is set. */
@@ -648,9 +667,9 @@ struct mlme_ext_priv {
 static inline u8 check_mlmeinfo_state(struct mlme_ext_priv *plmeext, sint state)
 {
 	if ((plmeext->mlmext_info.state & 0x03) == state)
-		return true;
+		return _TRUE;
 
-	return false;
+	return _FALSE;
 }
 
 #define mlmeext_msr(mlmeext) ((mlmeext)->mlmext_info.state & 0x03)
@@ -766,7 +785,7 @@ void CAM_empty_entry(PADAPTER Adapter, u8 ucIndex);
 
 void flush_all_cam_entry(_adapter *padapter);
 
-bool IsLegal5GChannel(PADAPTER Adapter, u8 channel);
+BOOLEAN IsLegal5GChannel(PADAPTER Adapter, u8 channel);
 
 void site_survey(_adapter *padapter, u8 survey_channel, RT_SCAN_TYPE ScanType);
 u8 collect_bss_info(_adapter *padapter, union recv_frame *precv_frame, WLAN_BSSID_EX *bssid);
@@ -1004,16 +1023,20 @@ void addba_timer_hdl(struct sta_info *psta);
 #ifdef CONFIG_IEEE80211W
 void sa_query_timer_hdl(struct sta_info *psta);
 #endif /* CONFIG_IEEE80211W */
+#if 0
+void reauth_timer_hdl(_adapter *padapter);
+void reassoc_timer_hdl(_adapter *padapter);
+#endif
 
 #define set_survey_timer(mlmeext, ms) \
 	do { \
-		/*RTW_INFO("%s set_survey_timer(%p, %d)\n", __func__, (mlmeext), (ms));*/ \
+		/*RTW_INFO("%s set_survey_timer(%p, %d)\n", __FUNCTION__, (mlmeext), (ms));*/ \
 		_set_timer(&(mlmeext)->survey_timer, (ms)); \
 	} while (0)
 
 #define set_link_timer(mlmeext, ms) \
 	do { \
-		/*RTW_INFO("%s set_link_timer(%p, %d)\n", __func__, (mlmeext), (ms));*/ \
+		/*RTW_INFO("%s set_link_timer(%p, %d)\n", __FUNCTION__, (mlmeext), (ms));*/ \
 		_set_timer(&(mlmeext)->link_timer, (ms)); \
 	} while (0)
 
@@ -1085,7 +1108,7 @@ u8 rtw_getmacreg_hdl(_adapter *padapter, u8 *pbuf);
 
 #ifdef _RTW_CMD_C_
 
-static struct cmd_hdl wlancmds[] = {
+struct cmd_hdl wlancmds[] = {
 	GEN_DRV_CMD_HANDLER(sizeof(struct readMAC_parm), rtw_getmacreg) /*0*/
 	GEN_DRV_CMD_HANDLER(0, NULL)
 	GEN_DRV_CMD_HANDLER(0, NULL)
@@ -1160,17 +1183,27 @@ static struct cmd_hdl wlancmds[] = {
 #endif
 
 struct C2HEvent_Header {
-#ifdef __LITTLE_ENDIAN
+
+#ifdef CONFIG_LITTLE_ENDIAN
+
 	unsigned int len:16;
 	unsigned int ID:8;
 	unsigned int seq:8;
-#else
+
+#elif defined(CONFIG_BIG_ENDIAN)
+
 	unsigned int seq:8;
 	unsigned int ID:8;
 	unsigned int len:16;
 
+#else
+
+#  error "Must be LITTLE or BIG Endian"
+
 #endif
+
 	unsigned int rsvd;
+
 };
 
 void rtw_dummy_event_callback(_adapter *adapter , u8 *pbuf);

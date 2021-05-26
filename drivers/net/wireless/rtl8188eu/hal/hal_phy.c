@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #define _HAL_PHY_C_
 
 #include <drv_types.h>
@@ -17,10 +33,10 @@ static RF_SHADOW_T RF_Shadow[RF6052_MAX_PATH][RF6052_MAX_REG];
 * OverView:	Get shifted position of the BitMask
 *
 * Input:
-*			u32		BitMask,
+*			u4Byte		BitMask,
 *
 * Output:	none
-* Return:		u32		Return the shift bit bit position of the mask
+* Return:		u4Byte		Return the shift bit bit position of the mask
 */
 u32
 PHY_CalculateBitShift(
@@ -68,59 +84,59 @@ PHY_CalculateBitShift(
  *---------------------------------------------------------------------------*/
 u32
 PHY_RFShadowRead(
-	PADAPTER		Adapter,
-	u8				eRFPath,
-	u32				Offset)
+	IN	PADAPTER		Adapter,
+	IN	u8				eRFPath,
+	IN	u32				Offset)
 {
 	return	RF_Shadow[eRFPath][Offset].Value;
 
 }	/* PHY_RFShadowRead */
 
 
-void
+VOID
 PHY_RFShadowWrite(
-	PADAPTER		Adapter,
-	u8				eRFPath,
-	u32				Offset,
-	u32				Data)
+	IN	PADAPTER		Adapter,
+	IN	u8				eRFPath,
+	IN	u32				Offset,
+	IN	u32				Data)
 {
 	RF_Shadow[eRFPath][Offset].Value = (Data & bRFRegOffsetMask);
-	RF_Shadow[eRFPath][Offset].Driver_Write = true;
+	RF_Shadow[eRFPath][Offset].Driver_Write = _TRUE;
 
 }	/* PHY_RFShadowWrite */
 
 
-bool
+BOOLEAN
 PHY_RFShadowCompare(
-	PADAPTER		Adapter,
-	u8				eRFPath,
-	u32				Offset)
+	IN	PADAPTER		Adapter,
+	IN	u8				eRFPath,
+	IN	u32				Offset)
 {
 	u32	reg;
 	/* Check if we need to check the register */
-	if (RF_Shadow[eRFPath][Offset].Compare == true) {
+	if (RF_Shadow[eRFPath][Offset].Compare == _TRUE) {
 		reg = rtw_hal_read_rfreg(Adapter, eRFPath, Offset, bRFRegOffsetMask);
 		/* Compare shadow and real rf register for 20bits!! */
 		if (RF_Shadow[eRFPath][Offset].Value != reg) {
 			/* Locate error position. */
-			RF_Shadow[eRFPath][Offset].ErrorOrNot = true;
+			RF_Shadow[eRFPath][Offset].ErrorOrNot = _TRUE;
 		}
 		return RF_Shadow[eRFPath][Offset].ErrorOrNot ;
 	}
-	return false;
+	return _FALSE;
 }	/* PHY_RFShadowCompare */
 
 
-void
+VOID
 PHY_RFShadowRecorver(
-	PADAPTER		Adapter,
-	u8				eRFPath,
-	u32				Offset)
+	IN	PADAPTER		Adapter,
+	IN	u8				eRFPath,
+	IN	u32				Offset)
 {
 	/* Check if the address is error */
-	if (RF_Shadow[eRFPath][Offset].ErrorOrNot == true) {
+	if (RF_Shadow[eRFPath][Offset].ErrorOrNot == _TRUE) {
 		/* Check if we need to recorver the register. */
-		if (RF_Shadow[eRFPath][Offset].Recorver == true) {
+		if (RF_Shadow[eRFPath][Offset].Recorver == _TRUE) {
 			rtw_hal_write_rfreg(Adapter, eRFPath, Offset, bRFRegOffsetMask,
 					    RF_Shadow[eRFPath][Offset].Value);
 		}
@@ -129,9 +145,9 @@ PHY_RFShadowRecorver(
 }	/* PHY_RFShadowRecorver */
 
 
-void
+VOID
 PHY_RFShadowCompareAll(
-	PADAPTER			Adapter)
+	IN	PADAPTER			Adapter)
 {
 	u8		eRFPath = 0 ;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -144,9 +160,9 @@ PHY_RFShadowCompareAll(
 }	/* PHY_RFShadowCompareAll */
 
 
-void
+VOID
 PHY_RFShadowRecorverAll(
-	PADAPTER			Adapter)
+	IN	PADAPTER			Adapter)
 {
 	u8		eRFPath = 0;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -159,12 +175,12 @@ PHY_RFShadowRecorverAll(
 }	/* PHY_RFShadowRecorverAll */
 
 
-void
+VOID
 PHY_RFShadowCompareFlagSet(
-	PADAPTER		Adapter,
-	u8				eRFPath,
-	u32				Offset,
-	u8				Type)
+	IN	PADAPTER		Adapter,
+	IN	u8				eRFPath,
+	IN	u32				Offset,
+	IN	u8				Type)
 {
 	/* Set True or False!!! */
 	RF_Shadow[eRFPath][Offset].Compare = Type;
@@ -172,12 +188,12 @@ PHY_RFShadowCompareFlagSet(
 }	/* PHY_RFShadowCompareFlagSet */
 
 
-void
+VOID
 PHY_RFShadowRecorverFlagSet(
-	PADAPTER		Adapter,
-	u8				eRFPath,
-	u32				Offset,
-	u8				Type)
+	IN	PADAPTER		Adapter,
+	IN	u8				eRFPath,
+	IN	u32				Offset,
+	IN	u8				Type)
 {
 	/* Set True or False!!! */
 	RF_Shadow[eRFPath][Offset].Recorver = Type;
@@ -185,9 +201,9 @@ PHY_RFShadowRecorverFlagSet(
 }	/* PHY_RFShadowRecorverFlagSet */
 
 
-void
+VOID
 PHY_RFShadowCompareFlagSetAll(
-	PADAPTER			Adapter)
+	IN	PADAPTER			Adapter)
 {
 	u8		eRFPath = 0;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -196,18 +212,18 @@ PHY_RFShadowCompareFlagSetAll(
 		for (Offset = 0; Offset < maxReg; Offset++) {
 			/* 2008/11/20 MH For S3S4 test, we only check reg 26/27 now!!!! */
 			if (Offset != 0x26 && Offset != 0x27)
-				PHY_RFShadowCompareFlagSet(Adapter, eRFPath, Offset, false);
+				PHY_RFShadowCompareFlagSet(Adapter, eRFPath, Offset, _FALSE);
 			else
-				PHY_RFShadowCompareFlagSet(Adapter, eRFPath, Offset, true);
+				PHY_RFShadowCompareFlagSet(Adapter, eRFPath, Offset, _TRUE);
 		}
 	}
 
 }	/* PHY_RFShadowCompareFlagSetAll */
 
 
-void
+VOID
 PHY_RFShadowRecorverFlagSetAll(
-	PADAPTER			Adapter)
+	IN	PADAPTER			Adapter)
 {
 	u8		eRFPath = 0;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -216,17 +232,17 @@ PHY_RFShadowRecorverFlagSetAll(
 		for (Offset = 0; Offset < maxReg; Offset++) {
 			/* 2008/11/20 MH For S3S4 test, we only check reg 26/27 now!!!! */
 			if (Offset != 0x26 && Offset != 0x27)
-				PHY_RFShadowRecorverFlagSet(Adapter, eRFPath, Offset, false);
+				PHY_RFShadowRecorverFlagSet(Adapter, eRFPath, Offset, _FALSE);
 			else
-				PHY_RFShadowRecorverFlagSet(Adapter, eRFPath, Offset, true);
+				PHY_RFShadowRecorverFlagSet(Adapter, eRFPath, Offset, _TRUE);
 		}
 	}
 
 }	/* PHY_RFShadowCompareFlagSetAll */
 
-void
+VOID
 PHY_RFShadowRefresh(
-	PADAPTER			Adapter)
+	IN	PADAPTER			Adapter)
 {
 	u8		eRFPath = 0;
 	u32		Offset = 0, maxReg = GET_RF6052_REAL_MAX_REG(Adapter);
@@ -234,10 +250,10 @@ PHY_RFShadowRefresh(
 	for (eRFPath = 0; eRFPath < RF6052_MAX_PATH; eRFPath++) {
 		for (Offset = 0; Offset < maxReg; Offset++) {
 			RF_Shadow[eRFPath][Offset].Value = 0;
-			RF_Shadow[eRFPath][Offset].Compare = false;
-			RF_Shadow[eRFPath][Offset].Recorver  = false;
-			RF_Shadow[eRFPath][Offset].ErrorOrNot = false;
-			RF_Shadow[eRFPath][Offset].Driver_Write = false;
+			RF_Shadow[eRFPath][Offset].Compare = _FALSE;
+			RF_Shadow[eRFPath][Offset].Recorver  = _FALSE;
+			RF_Shadow[eRFPath][Offset].ErrorOrNot = _FALSE;
+			RF_Shadow[eRFPath][Offset].Driver_Write = _FALSE;
 		}
 	}
 

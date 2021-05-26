@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 #define _RTW_RF_C_
 
 #include <drv_types.h>
@@ -27,7 +43,7 @@ u8 center_ch_2g_40m[CENTER_CH_2G_40M_NUM] = {
 	11,
 };
 
-static u8 op_chs_of_cch_2g_40m[CENTER_CH_2G_40M_NUM][2] = {
+u8 op_chs_of_cch_2g_40m[CENTER_CH_2G_40M_NUM][2] = {
 	{1, 5}, /* 3 */
 	{2, 6}, /* 4 */
 	{3, 7}, /* 5 */
@@ -117,7 +133,7 @@ u8 center_ch_5g_20m_40m[CENTER_CH_5G_20M_NUM + CENTER_CH_5G_40M_NUM] = {
 /* G13 */173, 175, 177
 };
 
-static u8 op_chs_of_cch_5g_40m[CENTER_CH_5G_40M_NUM][2] = {
+u8 op_chs_of_cch_5g_40m[CENTER_CH_5G_40M_NUM][2] = {
 	{36, 40}, /* 38 */
 	{44, 48}, /* 46 */
 	{52, 56}, /* 54 */
@@ -144,7 +160,7 @@ u8 center_ch_5g_80m[CENTER_CH_5G_80M_NUM] = {
 /* G12 ~ G13*/171
 };
 
-static u8 op_chs_of_cch_5g_80m[CENTER_CH_5G_80M_NUM][4] = {
+u8 op_chs_of_cch_5g_80m[CENTER_CH_5G_80M_NUM][4] = {
 	{36, 40, 44, 48}, /* 42 */
 	{52, 56, 60, 64}, /* 58 */
 	{100, 104, 108, 112}, /* 106 */
@@ -154,13 +170,13 @@ static u8 op_chs_of_cch_5g_80m[CENTER_CH_5G_80M_NUM][4] = {
 	{165, 169, 173, 177}, /* 171 */
 };
 
-static u8 center_ch_5g_160m[CENTER_CH_5G_160M_NUM] = {
+u8 center_ch_5g_160m[CENTER_CH_5G_160M_NUM] = {
 /* G00 ~ G03*/50,
 /* G04 ~ G07*/114,
 /* G10 ~ G13*/163
 };
 
-static u8 op_chs_of_cch_5g_160m[CENTER_CH_5G_160M_NUM][8] = {
+u8 op_chs_of_cch_5g_160m[CENTER_CH_5G_160M_NUM][8] = {
 	{36, 40, 44, 48, 52, 56, 60, 64}, /* 50 */
 	{100, 104, 108, 112, 116, 120, 124, 128}, /* 114 */
 	{149, 153, 157, 161, 165, 169, 173, 177}, /* 163 */
@@ -171,12 +187,12 @@ struct center_chs_ent_t {
 	u8 *chs;
 };
 
-static struct center_chs_ent_t center_chs_2g_by_bw[] = {
+struct center_chs_ent_t center_chs_2g_by_bw[] = {
 	{CENTER_CH_2G_NUM, center_ch_2g},
 	{CENTER_CH_2G_40M_NUM, center_ch_2g_40m},
 };
 
-static struct center_chs_ent_t center_chs_5g_by_bw[] = {
+struct center_chs_ent_t center_chs_5g_by_bw[] = {
 	{CENTER_CH_5G_20M_NUM, center_ch_5g_20m},
 	{CENTER_CH_5G_40M_NUM, center_ch_5g_40m},
 	{CENTER_CH_5G_80M_NUM, center_ch_5g_80m},
@@ -241,12 +257,12 @@ struct op_chs_ent_t {
 	u8 *chs;
 };
 
-static struct op_chs_ent_t op_chs_of_cch_2g_by_bw[] = {
+struct op_chs_ent_t op_chs_of_cch_2g_by_bw[] = {
 	{1, center_ch_2g},
 	{2, (u8 *)op_chs_of_cch_2g_40m},
 };
 
-static struct op_chs_ent_t op_chs_of_cch_5g_by_bw[] = {
+struct op_chs_ent_t op_chs_of_cch_5g_by_bw[] = {
 	{1, center_ch_5g_20m},
 	{2, (u8 *)op_chs_of_cch_5g_40m},
 	{4, (u8 *)op_chs_of_cch_5g_80m},
@@ -460,7 +476,7 @@ bool rtw_chbw_to_freq_range(u8 ch, u8 bw, u8 offset, u32 *hi, u32 *lo)
 	u32 freq;
 	u32 hi_ret = 0, lo_ret = 0;
 	int i;
-	bool valid = false;
+	bool valid = _FALSE;
 
 	if (hi)
 		*hi = 0;
@@ -492,7 +508,7 @@ bool rtw_chbw_to_freq_range(u8 ch, u8 bw, u8 offset, u32 *hi, u32 *lo)
 	if (lo)
 		*lo = lo_ret;
 
-	valid = true;
+	valid = _TRUE;
 
 exit:
 	return valid;
@@ -554,7 +570,11 @@ const u8 _rf_type_to_rf_rx_cnt[] = {
 	4,
 };
 
+#ifdef CONFIG_80211AC_VHT
+#define COUNTRY_CHPLAN_ASSIGN_EN_11AC(_val) , .en_11ac = (_val)
+#else
 #define COUNTRY_CHPLAN_ASSIGN_EN_11AC(_val)
+#endif
 
 #if RTW_DEF_MODULE_REGULATORY_CERT
 #define COUNTRY_CHPLAN_ASSIGN_DEF_MODULE_FLAGS(_val) , .def_module_flags = (_val)
@@ -915,7 +935,7 @@ static const struct country_chplan country_chplan_map[] = {
 	COUNTRY_CHPLAN_ENT("ZW", 0x26, 1, 0xF1), /* Zimbabwe */
 };
 
-static u16 const country_chplan_map_sz = sizeof(country_chplan_map) / sizeof(struct country_chplan);
+u16 const country_chplan_map_sz = sizeof(country_chplan_map) / sizeof(struct country_chplan);
 
 /*
 * rtw_get_chplan_from_country -
@@ -986,7 +1006,7 @@ int rtw_ch_to_bb_gain_sel(int ch)
 	return sel;
 }
 
-static s8 rtw_rf_get_kfree_tx_gain_offset(_adapter *padapter, u8 path, u8 ch)
+s8 rtw_rf_get_kfree_tx_gain_offset(_adapter *padapter, u8 path, u8 ch)
 {
 	s8 kfree_offset = 0;
 
@@ -1002,8 +1022,13 @@ static s8 rtw_rf_get_kfree_tx_gain_offset(_adapter *padapter, u8 path, u8 ch)
 
 	if (kfree_data->flag & KFREE_FLAG_ON) {
 		kfree_offset = kfree_data->bb_gain[bb_gain_sel][path];
-		RTW_INFO("%s path:%u, ch:%u, bb_gain_sel:%d, kfree_offset:%d\n",
-			 __func__, path, ch, bb_gain_sel, kfree_offset);
+		if (IS_HARDWARE_TYPE_8723D(padapter))
+			RTW_INFO("%s path:%s, ch:%u, bb_gain_sel:%d, kfree_offset:%d\n"
+				, __func__, (path == 0)?"S1":"S0", 
+				ch, bb_gain_sel, kfree_offset);
+		else
+			RTW_INFO("%s path:%u, ch:%u, bb_gain_sel:%d, kfree_offset:%d\n"
+				, __func__, path, ch, bb_gain_sel, kfree_offset);
 	}
 exit:
 #endif /* CONFIG_RF_POWER_TRIM */
@@ -1016,16 +1041,75 @@ void rtw_rf_set_tx_gain_offset(_adapter *adapter, u8 path, s8 offset)
 	u8 target_path = 0;
 	u32 val32 = 0;
 
-	target_path = path;
-	RTW_INFO("kfree gain_offset 0x55:0x%x ", rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff));
+	if (IS_HARDWARE_TYPE_8723D(adapter)) {
+		target_path = RF_PATH_A; /*in 8723D case path means S0/S1*/
+		if (path == PPG_8723D_S1)
+			RTW_INFO("kfree gain_offset 0x55:0x%x ",
+			rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff));
+		else if (path == PPG_8723D_S0)
+			RTW_INFO("kfree gain_offset 0x65:0x%x ",
+			rtw_hal_read_rfreg(adapter, target_path, 0x65, 0xffffffff));
+	} else {
+		target_path = path;
+		RTW_INFO("kfree gain_offset 0x55:0x%x ", rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff));
+	}
 	
 	switch (rtw_get_chip_type(adapter)) {
+#ifdef CONFIG_RTL8723D
+	case RTL8723D:
+		write_value = RF_TX_GAIN_OFFSET_8723D(offset);
+		if (path == PPG_8723D_S1)
+			rtw_hal_write_rfreg(adapter, target_path, 0x55, 0x0f8000, write_value);
+		else if (path == PPG_8723D_S0)
+			rtw_hal_write_rfreg(adapter, target_path, 0x65, 0x0f8000, write_value);
+		break;
+#endif /* CONFIG_RTL8723D */
+#ifdef CONFIG_RTL8703B
+	case RTL8703B:
+		write_value = RF_TX_GAIN_OFFSET_8703B(offset);
+		rtw_hal_write_rfreg(adapter, target_path, 0x55, 0x0fc000, write_value);
+		break;
+#endif /* CONFIG_RTL8703B */
+#ifdef CONFIG_RTL8188F
+	case RTL8188F:
+		write_value = RF_TX_GAIN_OFFSET_8188F(offset);
+		rtw_hal_write_rfreg(adapter, target_path, 0x55, 0x0fc000, write_value);
+		break;
+#endif /* CONFIG_RTL8188F */
+#ifdef CONFIG_RTL8192E
+	case RTL8192E:
+		write_value = RF_TX_GAIN_OFFSET_8192E(offset);
+		rtw_hal_write_rfreg(adapter, target_path, 0x55, 0x0f8000, write_value);
+		break;
+#endif /* CONFIG_RTL8188F */
+
+#ifdef CONFIG_RTL8821A
+	case RTL8821:
+		write_value = RF_TX_GAIN_OFFSET_8821A(offset);
+		rtw_hal_write_rfreg(adapter, target_path, 0x55, 0x0f8000, write_value);
+		break;
+#endif /* CONFIG_RTL8821A */
+#if defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)
+	case RTL8814A:
+	case RTL8822B:
+	case RTL8821C:
+		RTW_INFO("\nkfree by PhyDM on the sw CH. path %d\n", path);
+		break;
+#endif /* CONFIG_RTL8814A || CONFIG_RTL8822B || CONFIG_RTL8821C */
+
 	default:
 		rtw_warn_on(1);
 		break;
 	}
 	
-	val32 = rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff);
+	if (IS_HARDWARE_TYPE_8723D(adapter)) {
+		if (path == PPG_8723D_S1)
+			val32 = rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff);
+		else if (path == PPG_8723D_S0)
+			val32 = rtw_hal_read_rfreg(adapter, target_path, 0x65, 0xffffffff);
+	} else {
+		val32 = rtw_hal_read_rfreg(adapter, target_path, 0x55, 0xffffffff);
+	}
 	RTW_INFO(" after :0x%x\n", val32);
 }
 
@@ -1037,7 +1121,10 @@ void rtw_rf_apply_tx_gain_offset(_adapter *adapter, u8 ch)
 	s8 total_offset;
 	int i, total = 0;
 
-	total = hal_data->NumTotalRFPath;
+	if (IS_HARDWARE_TYPE_8723D(adapter))
+		total = 2; /* S1 and S0 */
+	else
+		total = hal_data->NumTotalRFPath;
 
 	for (i = 0; i < total; i++) {
 		kfree_offset = rtw_rf_get_kfree_tx_gain_offset(adapter, i, ch);
@@ -1048,30 +1135,30 @@ void rtw_rf_apply_tx_gain_offset(_adapter *adapter, u8 ch)
 
 bool rtw_is_dfs_range(u32 hi, u32 lo)
 {
-	return rtw_is_range_overlap(hi, lo, 5720 + 10, 5260 - 10) ? true : false;
+	return rtw_is_range_overlap(hi, lo, 5720 + 10, 5260 - 10) ? _TRUE : _FALSE;
 }
 
 bool rtw_is_dfs_ch(u8 ch, u8 bw, u8 offset)
 {
 	u32 hi, lo;
 
-	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == false)
-		return false;
+	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == _FALSE)
+		return _FALSE;
 
-	return rtw_is_dfs_range(hi, lo) ? true : false;
+	return rtw_is_dfs_range(hi, lo) ? _TRUE : _FALSE;
 }
 
 bool rtw_is_long_cac_range(u32 hi, u32 lo, u8 dfs_region)
 {
-	return (dfs_region == PHYDM_DFS_DOMAIN_ETSI && rtw_is_range_overlap(hi, lo, 5660 + 10, 5600 - 10)) ? true : false;
+	return (dfs_region == PHYDM_DFS_DOMAIN_ETSI && rtw_is_range_overlap(hi, lo, 5660 + 10, 5600 - 10)) ? _TRUE : _FALSE;
 }
 
 bool rtw_is_long_cac_ch(u8 ch, u8 bw, u8 offset, u8 dfs_region)
 {
 	u32 hi, lo;
 
-	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == false)
-		return false;
+	if (rtw_chbw_to_freq_range(ch, bw, offset, &hi, &lo) == _FALSE)
+		return _FALSE;
 
-	return rtw_is_long_cac_range(hi, lo, dfs_region) ? true : false;
+	return rtw_is_long_cac_range(hi, lo, dfs_region) ? _TRUE : _FALSE;
 }

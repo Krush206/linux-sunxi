@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef	__PHYDMPOWERTRACKING_H__
 #define    __PHYDMPOWERTRACKING_H__
@@ -153,7 +169,11 @@ struct odm_rf_calibration_structure {
 
 	u8			bb_swing_idx_ofdm[MAX_RF_PATH];
 	u8			bb_swing_idx_ofdm_current;
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
 	u8			bb_swing_idx_ofdm_base[MAX_RF_PATH];
+#else
+	u8			bb_swing_idx_ofdm_base;
+#endif
 	bool		default_bb_swing_index_flag;
 	bool			bb_swing_flag_ofdm;
 	u8			bb_swing_idx_cck;
@@ -281,5 +301,34 @@ void
 odm_txpowertracking_check_ce(
 	void		*p_dm_void
 );
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
+
+void
+odm_txpowertracking_callback_thermal_meter92c(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_txpowertracking_callback_rx_gain_thermal_meter92d(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_txpowertracking_callback_thermal_meter92d(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_txpowertracking_direct_call92c(
+	struct _ADAPTER		*adapter
+);
+
+void
+odm_txpowertracking_thermal_meter_check(
+	struct _ADAPTER		*adapter
+);
+
+#endif
 
 #endif

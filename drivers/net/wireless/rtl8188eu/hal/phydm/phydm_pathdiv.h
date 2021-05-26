@@ -1,6 +1,22 @@
-/* SPDX-License-Identifier: GPL-2.0 */
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #ifndef	__PHYDMPATHDIV_H__
 #define    __PHYDMPATHDIV_H__
@@ -132,5 +148,172 @@ odm_pathdiv_debug(
 	char		*output,
 	u32		*_out_len
 );
+
+
+
+/* 1 [OLD IC]-------------------------------------------------------------------------------- */
+
+
+
+
+
+
+#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
+
+/* #define   PATHDIV_ENABLE	 1 */
+#define dm_path_div_rssi_check	odm_path_div_chk_per_pkt_rssi
+#define path_div_check_before_link8192c	odm_path_diversity_before_link92c
+
+
+
+
+struct _path_div_parameter_define_ {
+	u32 org_5g_rege30;
+	u32 org_5g_regc14;
+	u32 org_5g_regca0;
+	u32 swt_5g_rege30;
+	u32 swt_5g_regc14;
+	u32 swt_5g_regca0;
+	/* for 2G IQK information */
+	u32 org_2g_regc80;
+	u32 org_2g_regc4c;
+	u32 org_2g_regc94;
+	u32 org_2g_regc14;
+	u32 org_2g_regca0;
+
+	u32 swt_2g_regc80;
+	u32 swt_2g_regc4c;
+	u32 swt_2g_regc94;
+	u32 swt_2g_regc14;
+	u32 swt_2g_regca0;
+};
+
+void
+odm_path_diversity_init_92c(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_2t_path_diversity_init_92c(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_1t_path_diversity_init_92c(
+	struct _ADAPTER	*adapter
+);
+
+bool
+odm_is_connected_92c(
+	struct _ADAPTER	*adapter
+);
+
+bool
+odm_path_diversity_before_link92c(
+	/* struct _ADAPTER*	adapter */
+	struct PHY_DM_STRUCT		*p_dm_odm
+);
+
+void
+odm_path_diversity_after_link_92c(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_set_resp_path_92c(
+	struct _ADAPTER	*adapter,
+	u8	default_resp_path
+);
+
+void
+odm_ofdm_tx_path_diversity_92c(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_cck_tx_path_diversity_92c(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_reset_path_diversity_92c(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_cck_tx_path_diversity_callback(
+	struct timer_list		*p_timer
+);
+
+void
+odm_cck_tx_path_diversity_work_item_callback(
+	void            *p_context
+);
+
+void
+odm_path_div_chk_ant_switch_callback(
+	struct timer_list		*p_timer
+);
+
+void
+odm_path_div_chk_ant_switch_workitem_callback(
+	void            *p_context
+);
+
+
+void
+odm_path_div_chk_ant_switch(
+	struct PHY_DM_STRUCT    *p_dm_odm
+);
+
+void
+odm_cck_path_diversity_chk_per_pkt_rssi(
+	struct _ADAPTER		*adapter,
+	bool			is_def_port,
+	bool			is_match_bssid,
+	struct _WLAN_STA	*p_entry,
+	PRT_RFD			p_rfd,
+	u8			*p_desc
+);
+
+void
+odm_path_div_chk_per_pkt_rssi(
+	struct _ADAPTER		*adapter,
+	bool			is_def_port,
+	bool			is_match_bssid,
+	struct _WLAN_STA	*p_entry,
+	PRT_RFD			p_rfd
+);
+
+void
+odm_path_div_rest_after_link(
+	struct PHY_DM_STRUCT		*p_dm_odm
+);
+
+void
+odm_fill_tx_path_in_txdesc(
+	struct _ADAPTER	*adapter,
+	PRT_TCB		p_tcb,
+	u8		*p_desc
+);
+
+void
+odm_path_div_init_92d(
+	struct PHY_DM_STRUCT	*p_dm_odm
+);
+
+u8
+odm_sw_ant_div_select_scan_chnl(
+	struct _ADAPTER	*adapter
+);
+
+void
+odm_sw_ant_div_construct_scan_chnl(
+	struct _ADAPTER	*adapter,
+	u8		scan_chnl
+);
+
+#endif       /* #if(DM_ODM_SUPPORT_TYPE & (ODM_WIN)) */
+
 
 #endif		 /* #ifndef  __ODMPATHDIV_H__ */

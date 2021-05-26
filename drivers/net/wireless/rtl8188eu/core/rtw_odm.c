@@ -1,6 +1,22 @@
-// SPDX-License-Identifier: GPL-2.0
-/* Copyright(c) 2007 - 2016 Realtek Corporation. All rights reserved. */
-
+/******************************************************************************
+ *
+ * Copyright(c) 2013 Realtek Corporation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of version 2 of the GNU General Public License as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
+ *
+ *
+ ******************************************************************************/
 
 #include <rtw_odm.h>
 #include <hal_data.h>
@@ -12,7 +28,7 @@ void rtw_odm_init_ic_type(_adapter *adapter)
 {
 	HAL_DATA_TYPE *hal_data = GET_HAL_DATA(adapter);
 	struct PHY_DM_STRUCT *odm = &hal_data->odmpriv;
-	u32 ic_type = chip_type_to_odm_ic_type(rtw_get_chip_type(adapter));
+	u4Byte ic_type = chip_type_to_odm_ic_type(rtw_get_chip_type(adapter));
 
 	rtw_warn_on(!ic_type);
 
@@ -33,7 +49,7 @@ inline u8 rtw_odm_get_force_igi_lb(_adapter *adapter)
 	return hal_data->u1ForcedIgiLb;
 }
 
-static void rtw_odm_adaptivity_ver_msg(void *sel, _adapter *adapter)
+void rtw_odm_adaptivity_ver_msg(void *sel, _adapter *adapter)
 {
 	RTW_PRINT_SEL(sel, "ADAPTIVITY_VERSION "ADAPTIVITY_VERSION"\n");
 }
@@ -41,7 +57,7 @@ static void rtw_odm_adaptivity_ver_msg(void *sel, _adapter *adapter)
 #define RTW_ADAPTIVITY_EN_DISABLE 0
 #define RTW_ADAPTIVITY_EN_ENABLE 1
 
-static void rtw_odm_adaptivity_en_msg(void *sel, _adapter *adapter)
+void rtw_odm_adaptivity_en_msg(void *sel, _adapter *adapter)
 {
 	struct registry_priv *regsty = &adapter->registrypriv;
 	struct mlme_priv *mlme = &adapter->mlmepriv;
@@ -61,7 +77,7 @@ static void rtw_odm_adaptivity_en_msg(void *sel, _adapter *adapter)
 #define RTW_ADAPTIVITY_MODE_NORMAL 0
 #define RTW_ADAPTIVITY_MODE_CARRIER_SENSE 1
 
-static void rtw_odm_adaptivity_mode_msg(void *sel, _adapter *adapter)
+void rtw_odm_adaptivity_mode_msg(void *sel, _adapter *adapter)
 {
 	struct registry_priv *regsty = &adapter->registrypriv;
 
@@ -78,7 +94,7 @@ static void rtw_odm_adaptivity_mode_msg(void *sel, _adapter *adapter)
 #define RTW_ADAPTIVITY_DML_DISABLE 0
 #define RTW_ADAPTIVITY_DML_ENABLE 1
 
-static void rtw_odm_adaptivity_dml_msg(void *sel, _adapter *adapter)
+void rtw_odm_adaptivity_dml_msg(void *sel, _adapter *adapter)
 {
 	struct registry_priv *regsty = &adapter->registrypriv;
 
@@ -92,7 +108,7 @@ static void rtw_odm_adaptivity_dml_msg(void *sel, _adapter *adapter)
 		_RTW_PRINT_SEL(sel, "INVALID\n");
 }
 
-static void rtw_odm_adaptivity_dc_backoff_msg(void *sel, _adapter *adapter)
+void rtw_odm_adaptivity_dc_backoff_msg(void *sel, _adapter *adapter)
 {
 	struct registry_priv *regsty = &adapter->registrypriv;
 
@@ -112,10 +128,10 @@ bool rtw_odm_adaptivity_needed(_adapter *adapter)
 {
 	struct registry_priv *regsty = &adapter->registrypriv;
 	struct mlme_priv *mlme = &adapter->mlmepriv;
-	bool ret = false;
+	bool ret = _FALSE;
 
 	if (regsty->adaptivity_en == RTW_ADAPTIVITY_EN_ENABLE)
-		ret = true;
+		ret = _TRUE;
 
 	return ret;
 }
@@ -169,7 +185,7 @@ void rtw_odm_get_perpkt_rssi(void *sel, _adapter *adapter)
 void rtw_odm_acquirespinlock(_adapter *adapter,	enum rt_spinlock_type type)
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(adapter);
-	unsigned long irqL;
+	_irqL irqL;
 
 	switch (type) {
 	case RT_IQK_SPINLOCK:
@@ -182,7 +198,7 @@ void rtw_odm_acquirespinlock(_adapter *adapter,	enum rt_spinlock_type type)
 void rtw_odm_releasespinlock(_adapter *adapter,	enum rt_spinlock_type type)
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(adapter);
-	unsigned long irqL;
+	_irqL irqL;
 
 	switch (type) {
 	case RT_IQK_SPINLOCK:
@@ -214,23 +230,23 @@ inline u8 rtw_odm_dfs_domain_unknown(_adapter *adapter)
 }
 
 #ifdef CONFIG_DFS_MASTER
-inline void rtw_odm_radar_detect_reset(_adapter *adapter)
+inline VOID rtw_odm_radar_detect_reset(_adapter *adapter)
 {
 	phydm_radar_detect_reset(GET_ODM(adapter));
 }
 
-inline void rtw_odm_radar_detect_disable(_adapter *adapter)
+inline VOID rtw_odm_radar_detect_disable(_adapter *adapter)
 {
 	phydm_radar_detect_disable(GET_ODM(adapter));
 }
 
 /* called after ch, bw is set */
-inline void rtw_odm_radar_detect_enable(_adapter *adapter)
+inline VOID rtw_odm_radar_detect_enable(_adapter *adapter)
 {
 	phydm_radar_detect_enable(GET_ODM(adapter));
 }
 
-inline bool rtw_odm_radar_detect(_adapter *adapter)
+inline BOOLEAN rtw_odm_radar_detect(_adapter *adapter)
 {
 	return phydm_radar_detect(GET_ODM(adapter));
 }
