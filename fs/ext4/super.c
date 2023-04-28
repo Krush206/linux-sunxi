@@ -3074,34 +3074,6 @@ static int set_journal_csum_feature_set(struct super_block *sb)
 	return ret;
 }
 
-size_t memweight(const unsigned char *bitmap, unsigned int numchars)
-{
-	size_t ret = 0, bytes = numchars;
-	size_t longs;
-
-	for (; bytes > 0 && ((unsigned long)bitmap) % sizeof(long);
-			bytes--, bitmap++)
-		ret += hweight8(*bitmap);
-
-	longs = bytes / sizeof(long);
-	if (longs) {
-		BUG_ON(longs >= INT_MAX / BITS_PER_LONG);
-		ret += bitmap_weight((unsigned long *)bitmap,
-				longs * BITS_PER_LONG);
-		bytes -= longs * sizeof(long);
-		bitmap += longs * sizeof(long);
-	}
-	/*
-	 * The reason that this last loop is distinct from the preceding
-	 * bitmap_weight() call is to compute 1-bits in the last region smaller
-	 * than sizeof(long) properly on big-endian systems.
-	 */
-	for (; bytes > 0; bytes--, bitmap++)
-		ret += hweight8(*bitmap);
-
-	return numchars * BITS_PER_BYTE - ret;
-}
-
 /*
  * Note: calculating the overhead so we can be compatible with
  * historical BSD practice is quite difficult in the face of
@@ -3167,7 +3139,7 @@ static int count_overhead(struct super_block *sb, ext4_group_t grp,
 	if (!count)
 		return 0;
 	return EXT4_CLUSTERS_PER_GROUP(sb) -
-		memweight(buf, EXT4_CLUSTERS_PER_GROUP(sb) / 8);
+		ext4_count_free(buf, EXT4_CLUSTERS_PER_GROUP(sb) / 8);
 }
 
 /*

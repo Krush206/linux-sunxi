@@ -13,16 +13,32 @@
 
 static const int nibblemap[] = {4, 3, 3, 2, 3, 2, 2, 1, 3, 2, 2, 1, 2, 1, 1, 0};
 
-unsigned int ext4_count_free(struct buffer_head *map, unsigned int numchars)
+unsigned int ext4_count_free(const unsigned char *bitmap, unsigned int numchars)
 {
-	unsigned int i, sum = 0;
+	size_t ret = 0, bytes = numchars;
+	size_t longs;
 
-	if (!map)
-		return 0;
-	for (i = 0; i < numchars; i++)
-		sum += nibblemap[map->b_data[i] & 0xf] +
-			nibblemap[(map->b_data[i] >> 4) & 0xf];
-	return sum;
+	for (; bytes > 0 && ((unsigned long)bitmap) % sizeof(long);
+			bytes--, bitmap++)
+		ret += hweight8(*bitmap);
+
+	longs = bytes / sizeof(long);
+	if (longs) {
+		BUG_ON(longs >= INT_MAX / BITS_PER_LONG);
+		ret += bitmap_weight((unsigned long *)bitmap,
+				longs * BITS_PER_LONG);
+		bytes -= longs * sizeof(long);
+		bitmap += longs * sizeof(long);
+	}
+	/*
+	 * The reason that this last loop is distinct from the preceding
+	 * bitmap_weight() call is to compute 1-bits in the last region smaller
+	 * than sizeof(long) properly on big-endian systems.
+	 */
+	for (; bytes > 0; bytes--, bitmap++)
+		ret += hweight8(*bitmap);
+
+	return numchars * BITS_PER_BYTE - ret;
 }
 
 int ext4_inode_bitmap_csum_verify(struct super_block *sb, ext4_group_t group,
